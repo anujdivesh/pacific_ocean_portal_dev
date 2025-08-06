@@ -1,0 +1,166 @@
+
+  .custom-modal .modal-content {
+    border-radius: 0; /* Removes the rounded corners */
+  }
+  
+
+  .custom-header2 {
+    color: white;
+  }
+  .custom-modal .modal-header,
+  .custom-modal .modal-body,
+  .custom-modal .modal-footer {
+    border-radius: 0 !important; /* Ensures the header, body, and footer have sharp edges */
+  }
+  
+  .fixed-column {
+    background-color: #f8f9fa !important; /* Optional: for better visibility */
+    border-right: 1px solid #dee2e6 !important; /* Optional: for better visibility */
+    height: 550px !important; /* Full height of viewport */
+    position: sticky !important;
+    top: 0 !important; /* Sticks to the top */
+    overflow: hidden !important; /* Prevents overflow in the fixed column */
+}
+
+.scrollable-column {
+    height: 550px !important; /* Full height of viewport */
+    overflow-y: auto !important; /* Allows vertical scrolling */
+}
+
+.scrollable-content {
+    padding: 15px !important; /* Optional: for padding inside the scrollable area */
+    /* Add additional styling as needed */
+}
+
+
+/* Make the modal header and footer thinner */
+.modal-header, .modal-footer {
+  padding: 0.5rem !important; /* Adjust the padding to make the header/footer thinner */
+}
+
+/* Optional: Adjust font size for better fit */
+.modal-header .modal-title, .modal-footer .modal-footer-content {
+  font-size: 0.875rem !important; /* Adjust the font size if necessary */
+}
+
+/* Optional: Customize modal header/footer borders */
+.modal-header {
+  border-bottom: 1px solid #ddd !important; /* Light border for the header */
+}
+
+.modal-footer {
+  border-top: 1px solid #ddd !important; /* Light border for the footer */
+}
+
+.modal-header .btn-close {
+  margin-right: 0 !important; /* Remove default margin */
+  padding-right: 2 !important; /* Remove default padding */
+  /* You can add more styles here if needed */
+}
+
+.modal-header, .modal-footer {
+  padding: 0.5rem !important;
+}
+
+/* Custom scrollbar styling for modal - Light Theme */
+.custom-modal .scrollable-column::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-modal .scrollable-column::-webkit-scrollbar-track {
+  background: var(--color-background, #f8fafc);
+  border-radius: 4px;
+}
+
+.custom-modal .scrollable-column::-webkit-scrollbar-thumb {
+  background: var(--color-secondary, #64748b);
+  border-radius: 4px;
+  border: 1px solid var(--color-background, #f8fafc);
+}
+
+.custom-modal .scrollable-column::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary, #2563eb);
+}
+
+.custom-modal .scrollable-column::-webkit-scrollbar-thumb:active {
+  background: var(--color-accent, #f59e42);
+}
+
+/* Firefox scrollbar styling - Light Theme */
+.custom-modal .scrollable-column {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-secondary, #64748b) var(--color-background, #f8fafc);
+}
+
+/* General modal scrollbar styling - Light Theme */
+.custom-modal ::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-modal ::-webkit-scrollbar-track {
+  background: var(--color-background, #f8fafc);
+  border-radius: 4px;
+}
+
+.custom-modal ::-webkit-scrollbar-thumb {
+  background: var(--color-secondary, #64748b);
+  border-radius: 4px;
+  border: 1px solid var(--color-background, #f8fafc);
+}
+
+.custom-modal ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary, #2563eb);
+}
+
+.custom-modal ::-webkit-scrollbar-thumb:active {
+  background: var(--color-accent, #f59e42);
+}
+
+/* Firefox general scrollbar styling - Light Theme */
+.custom-modal {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-secondary, #64748b) var(--color-background, #f8fafc);
+}
+
+/* Dark Theme Scrollbar Overrides */
+body.dark-mode .custom-modal .scrollable-column::-webkit-scrollbar-track {
+  background: var(--color-background, #2e2f33);
+}
+
+body.dark-mode .custom-modal .scrollable-column::-webkit-scrollbar-thumb {
+  background: var(--color-secondary, #a1a1aa);
+  border: 1px solid var(--color-background, #2e2f33);
+}
+
+body.dark-mode .custom-modal .scrollable-column::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary, #60a5fa);
+}
+
+body.dark-mode .custom-modal .scrollable-column::-webkit-scrollbar-thumb:active {
+  background: var(--color-accent, #fbbf24);
+}
+
+body.dark-mode .custom-modal .scrollable-column {
+  scrollbar-color: var(--color-secondary, #a1a1aa) var(--color-background, #2e2f33);
+}
+
+body.dark-mode .custom-modal ::-webkit-scrollbar-track {
+  background: var(--color-background, #2e2f33);
+}
+
+body.dark-mode .custom-modal ::-webkit-scrollbar-thumb {
+  background: var(--color-secondary, #a1a1aa);
+  border: 1px solid var(--color-background, #2e2f33);
+}
+
+body.dark-mode .custom-modal ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary, #60a5fa);
+}
+
+body.dark-mode .custom-modal ::-webkit-scrollbar-thumb:active {
+  background: var(--color-accent, #fbbf24);
+}
+
+body.dark-mode .custom-modal {
+  scrollbar-color: var(--color-secondary, #a1a1aa) var(--color-background, #2e2f33);
+}

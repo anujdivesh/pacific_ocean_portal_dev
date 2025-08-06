@@ -1,0 +1,842 @@
+/* bootstrap  */
+/*@import "bootstrap/dist/css/bootstrap.min.css";*/
+
+*{
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+  /* Light mode palette */
+  --color-primary: #2563eb;
+  --color-secondary: #64748b;
+  --color-accent: #f59e42;
+  --color-background: #f8fafc;
+  --color-surface: #ffffff;
+  --color-text: #1e293b;
+  --color-success: #22c55e;
+  --color-warning: #facc15;
+  --color-error: #ef4444;
+  --color-info: #0ea5e9;
+  --btn-secondary: #1c54b2;
+  --btn-secondary-hover: #174a8c;
+  --card-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  --card-shadow-hover: 0 4px 16px rgba(0,0,0,0.18);
+}
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+
+body.dark-mode {
+  /* Dark mode palette */
+  --color-primary: #60a5fa;
+  --color-secondary: #a1a1aa;
+  --color-accent: #fbbf24;
+  --color-background: #2e2f33;
+  --color-surface: #3f4854;
+  --color-text: #f1f5f9;
+  --color-border: #44454a;
+  --color-success: #4ade80;
+  --color-warning: #fde047;
+  --color-error: #f87171;
+  --color-info: #38bdf8;
+  --btn-secondary: #3f4854;
+  --btn-secondary-hover: #23242a;
+  --card-shadow: 0 2px 8px rgba(0,0,0,0.32);
+  --card-shadow-hover: 0 4px 16px rgba(0,0,0,0.44);
+  background-color: var(--color-background) !important;
+  color: var(--color-text) !important;
+}
+
+/* General UI elements */
+.card, .modal-content, .offcanvas-end, .accordion, .accordion-item, .list-group-item, .form-control, .dropdown-menu {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-secondary) !important;
+}
+.card-title, .modal-title, .offcanvas-title, .accordion-header, .navbar-brand {
+  color: var(--color-primary) !important;
+}
+.btn-primary {
+  background-color: var(--color-primary) !important;
+  color: #fff !important;
+  border: none !important;
+}
+.btn-primary:hover, .btn-primary:focus {
+  background-color: var(--color-accent) !important;
+  color: #fff !important;
+}
+.btn-secondary {
+  background-color: var(--color-secondary) !important;
+  color: #fff !important;
+  border: none !important;
+}
+.btn-success {
+  background-color: var(--color-success) !important;
+  color: #fff !important;
+}
+.btn-warning {
+  background-color: var(--color-warning) !important;
+  color: #1e293b !important;
+}
+.btn-danger {
+  background-color: var(--color-error) !important;
+  color: #fff !important;
+}
+.btn-info {
+  background-color: var(--color-info) !important;
+  color: #fff !important;
+}
+.alert-success {
+  background-color: var(--color-success) !important;
+  color: #fff !important;
+}
+.alert-warning {
+  background-color: var(--color-warning) !important;
+  color: #1e293b !important;
+}
+.alert-danger {
+  background-color: var(--color-error) !important;
+  color: #fff !important;
+}
+.alert-info {
+  background-color: var(--color-info) !important;
+  color: #fff !important;
+}
+/* Accent for badges, highlights, etc. */
+.badge.bg-light, .badge.bg-dark, .badge.bg-primary, .badge.bg-secondary {
+  background-color: var(--color-accent) !important;
+  color: #fff !important;
+}
+/* Inputs and dropdowns */
+input, textarea, select, .dropdown-menu {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-secondary) !important;
+}
+/* Remove box-shadow for a cleaner look */
+.card, .modal-content, .offcanvas-end, .btn, .form-control {
+  box-shadow: none !important;
+}
+
+/* ================== bootstrap behavior change ======================================= */
+/* ============= form ================= */
+.form-control{
+    border-radius: var(--bootstrap-field-radius);
+  }
+  .form-control:focus {
+    border-color: var(--bootstrap-active-field-color);
+    box-shadow: none;
+    
+    /* border: 1px solid green; */
+    /* border-color: #ff80ff; */
+    /* box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset, 0px 0px 8px rgba(255, 100, 255, 0.5); */
+  }
+
+/* --- Dark mode styles start --- */
+body.dark-mode {
+  background-color: var(--color-background) !important;
+  color: var(--color-text) !important;
+}
+body.dark-mode .navbar,
+body.dark-mode .navbar-brand,
+body.dark-mode .navbar-nav,
+body.dark-mode .modal-content {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+}
+body.dark-mode .card,
+body.dark-mode .list-group-item,
+body.dark-mode .form-control {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-border) !important;
+}
+body.dark-mode .btn-primary,
+body.dark-mode .btn-secondary,
+body.dark-mode .btn-success,
+body.dark-mode .btn-warning,
+body.dark-mode .btn-danger,
+body.dark-mode .btn-info,
+body.dark-mode .btn-light {
+  background-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-surface) !important;
+}
+body.dark-mode .btn-light {
+  background-color: #333 !important;
+  color: var(--color-text) !important;
+}
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-border) !important;
+}
+body.dark-mode .dropdown-menu {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+}
+body.dark-mode .modal-header,
+body.dark-mode .modal-footer {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+}
+body.dark-mode .table {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+}
+/* --- Dark mode styles end --- */
+
+/* --- Dark mode sidebar overrides start --- */
+body.dark-mode #sidebar-wrapper {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+}
+body.dark-mode #sidebar-wrapper .sidebar-heading {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+}
+body.dark-mode #sidebar-wrapper .list-group {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+}
+body.dark-mode #sidebar-wrapper select,
+body.dark-mode #sidebar-wrapper option {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+}
+body.dark-mode #sidebar-wrapper button {
+  background-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-surface) !important;
+}
+/* --- Dark mode sidebar overrides end --- */
+
+/* --- Dark mode navbar overrides start --- */
+body.dark-mode .navbar {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+}
+body.dark-mode .navbar-brand {
+  color: var(--color-text) !important;
+}
+body.dark-mode .navbar-brand:hover,
+body.dark-mode .navbar-brand:focus {
+  color: var(--color-accent) !important;
+}
+body.dark-mode .navbar-nav .nav-link,
+body.dark-mode .navbar-nav .nav-link.active,
+body.dark-mode .navbar-nav .show > .nav-link {
+  color: var(--color-text) !important;
+}
+
+body.dark-mode .navbar-toggler {
+  color: var(--color-text) !important;
+  border-color: var(--color-border) !important;
+}
+body.dark-mode .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28 255, 255, 255, 0.85 %29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+body.dark-mode .dropdown-menu {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+}
+body.dark-mode .dropdown-item {
+  color: var(--color-text) !important;
+}
+body.dark-mode .dropdown-item:hover,
+body.dark-mode .dropdown-item:focus {
+  background-color: var(--color-border) !important;
+  color: var(--color-accent) !important;
+}
+/* --- Dark mode navbar overrides end --- */
+
+/* --- Dark mode ExploreModal (model.jsx) overrides start --- */
+body.dark-mode .explore-modal .modal-content,
+body.dark-mode .explore-modal .modal-header,
+body.dark-mode .explore-modal .modal-body,
+body.dark-mode .explore-modal .modal-footer {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+}
+body.dark-mode .explore-modal .modal-title {
+  color: #2563eb !important;
+}
+body.dark-mode .explore-modal .btn-light {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  border-color: #dee2e6 !important;
+}
+body.dark-mode .explore-modal .btn-primary {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  border-color: #2563eb !important;
+}
+body.dark-mode .explore-modal .btn-primary:hover {
+  background-color: #1d4ed8 !important;
+  border-color: #1d4ed8 !important;
+}
+body.dark-mode .explore-modal .btn-light:hover {
+  background-color: #f8f9fa !important;
+  color: #1e293b !important;
+}
+body.dark-mode .explore-modal .scrollable-column {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+}
+body.dark-mode .explore-modal .btn {
+  color: #1e293b !important;
+}
+body.dark-mode .explore-modal .btn:hover,
+body.dark-mode .explore-modal .btn:focus {
+  color: #2563eb !important;
+}
+body.dark-mode .explore-modal .spinner-border {
+  color: #2563eb !important;
+}
+
+/* Accordion styling within explore-modal */
+body.dark-mode .explore-modal .accordion,
+body.dark-mode .explore-modal .accordion-item {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  border-color: #e5e7eb !important;
+}
+body.dark-mode .explore-modal .accordion-header {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+}
+body.dark-mode .explore-modal .accordion-body {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+}
+body.dark-mode .explore-modal .flex-container {
+  background-color: transparent !important;
+  color: #1e293b !important;
+}
+body.dark-mode .explore-modal .flex-container.active {
+  background-color: #d3f4ff !important;
+  color: #1e293b !important;
+}
+body.dark-mode .explore-modal .badge.bg-light {
+  background-color: #f8fafc !important;
+  color: #1e293b !important;
+}
+body.dark-mode .explore-modal .item {
+  color: #1e293b !important;
+}
+
+/* AccordionMetadata component styling within explore-modal */
+body.dark-mode .explore-modal .accordionmetadata {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+}
+
+body.dark-mode .explore-modal .accordionmetadata .item {
+  color: #64748b !important;
+}
+
+body.dark-mode .explore-modal .accordionmetadata p {
+  color: #1e293b !important;
+}
+
+body.dark-mode .explore-modal .accordionmetadata h5 {
+  color: #2563eb !important;
+}
+
+body.dark-mode .explore-modal .accordionmetadata button {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+body.dark-mode .explore-modal .accordionmetadata button:hover {
+  background-color: #1d4ed8 !important;
+}
+
+/* Fix accordion button styling - make them white and smaller */
+body.dark-mode .explore-modal .accordion-button {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0.5rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  min-height: auto !important;
+}
+
+body.dark-mode .explore-modal .accordion-button:not(.collapsed) {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  box-shadow: none !important;
+}
+
+body.dark-mode .explore-modal .accordion-button::after {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%231e293b'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e") !important;
+  width: 1rem !important;
+  height: 1rem !important;
+  right: 1rem !important;
+  left: auto !important;
+  position: absolute !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  background-size: 1rem !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+}
+
+body.dark-mode .explore-modal .accordion-button:not(.collapsed)::after {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%231e293b'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e") !important;
+  transform: translateY(-50%) rotate(180deg) !important;
+}
+
+/* Make accordion headers smaller */
+body.dark-mode .explore-modal .accordion-header {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  padding: 0.5rem 0.75rem !important;
+  min-height: auto !important;
+}
+
+body.dark-mode .explore-modal .accordion-header:hover {
+  background-color: #f8f9fa !important;
+}
+
+/* Make accordion items smaller */
+body.dark-mode .explore-modal .accordion-item {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  border-color: #e5e7eb !important;
+  margin-bottom: 0.25rem !important;
+}
+
+body.dark-mode .explore-modal .accordion-body {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  padding: 0.75rem !important;
+}
+
+/* Fix the dark gray preview area to be white */
+body.dark-mode .explore-modal .accordionmetadata > div {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+}
+
+body.dark-mode .explore-modal .accordionmetadata > div > div {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+}
+
+/* Specific styling for the "Select a dataset" div */
+body.dark-mode .explore-modal .accordionmetadata div[style*="fontSize: 18"] {
+  background-color: #ffffff !important;
+  color: #64748b !important;
+}
+
+/* Force all text in the modal to be visible */
+body.dark-mode .explore-modal .scrollable-column * {
+  color: #1e293b !important;
+}
+
+body.dark-mode .explore-modal .scrollable-column p {
+  color: #1e293b !important;
+}
+
+body.dark-mode .explore-modal .scrollable-column span {
+  color: #1e293b !important;
+}
+
+body.dark-mode .explore-modal .scrollable-column div {
+  color: #1e293b !important;
+}
+
+body.dark-mode .explore-modal .scrollable-column h1,
+body.dark-mode .explore-modal .scrollable-column h2,
+body.dark-mode .explore-modal .scrollable-column h3,
+body.dark-mode .explore-modal .scrollable-column h4,
+body.dark-mode .explore-modal .scrollable-column h5,
+body.dark-mode .explore-modal .scrollable-column h6 {
+  color: #1e293b !important;
+}
+
+/* Fix any nested accordion text */
+body.dark-mode .explore-modal .accordion * {
+  color: #1e293b !important;
+}
+
+body.dark-mode .explore-modal .accordion p {
+  color: #1e293b !important;
+}
+
+body.dark-mode .explore-modal .accordion span {
+  color: #1e293b !important;
+}
+
+body.dark-mode .explore-modal .accordion div {
+  color: #1e293b !important;
+}
+
+/* Ensure all text in the entire modal is visible */
+body.dark-mode .explore-modal * {
+  color: #1e293b !important;
+}
+
+/* Force modal body to be completely white - but preserve map */
+body.dark-mode .explore-modal .modal-body {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+}
+
+/* Force all containers in modal body to be white - but exclude map elements */
+body.dark-mode .explore-modal .modal-body .container,
+body.dark-mode .explore-modal .modal-body .row,
+body.dark-mode .explore-modal .modal-body .col,
+body.dark-mode .explore-modal .modal-body .col-md-4 {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+}
+
+/* Special handling for the map column - preserve map visibility */
+body.dark-mode .explore-modal .modal-body .col-md-8 {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+}
+
+/* Preserve map container transparency */
+body.dark-mode .explore-modal .modal-body .col-md-8 .small-map-outer,
+body.dark-mode .explore-modal .modal-body .col-md-8 .small-map-container,
+body.dark-mode .explore-modal .modal-body .col-md-8 #map2 {
+  background-color: transparent !important;
+}
+
+/* Preserve all Leaflet map elements */
+body.dark-mode .explore-modal .modal-body .col-md-8 .leaflet-container,
+body.dark-mode .explore-modal .modal-body .col-md-8 .leaflet-pane,
+body.dark-mode .explore-modal .modal-body .col-md-8 .leaflet-map-pane,
+body.dark-mode .explore-modal .modal-body .col-md-8 .leaflet-tile-pane,
+body.dark-mode .explore-modal .modal-body .col-md-8 .leaflet-overlay-pane,
+body.dark-mode .explore-modal .modal-body .col-md-8 .leaflet-marker-pane,
+body.dark-mode .explore-modal .modal-body .col-md-8 .leaflet-shadow-pane,
+body.dark-mode .explore-modal .modal-body .col-md-8 .leaflet-tooltip-pane,
+body.dark-mode .explore-modal .modal-body .col-md-8 .leaflet-popup-pane {
+  background-color: transparent !important;
+}
+
+/* Preserve map tiles */
+body.dark-mode .explore-modal .modal-body .col-md-8 .leaflet-tile {
+  background-color: transparent !important;
+}
+
+/* Preserve map controls but style them appropriately */
+body.dark-mode .explore-modal .modal-body .col-md-8 .leaflet-control-attribution {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  color: #1e293b !important;
+}
+
+body.dark-mode .explore-modal .modal-body .col-md-8 .leaflet-control-attribution a {
+  color: #2563eb !important;
+}
+
+body.dark-mode .explore-modal .modal-body .col-md-8 .leaflet-control-zoom {
+  background-color: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+body.dark-mode .explore-modal .modal-body .col-md-8 .leaflet-control-zoom a {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+body.dark-mode .explore-modal .modal-body .col-md-8 .leaflet-control-zoom a:hover {
+  background-color: #f8f9fa !important;
+  color: #1e293b !important;
+}
+
+/* Override any specific text colors that might be inherited */
+body.dark-mode .explore-modal .text-muted {
+  color: #64748b !important;
+}
+
+body.dark-mode .explore-modal .text-primary {
+  color: #2563eb !important;
+}
+
+body.dark-mode .explore-modal .text-secondary {
+  color: #64748b !important;
+}
+
+body.dark-mode .explore-modal a {
+  color: #2563eb !important;
+}
+
+body.dark-mode .explore-modal a:hover {
+  color: #1d4ed8 !important;
+}
+
+/* Make Add to Map button blue in explore-modal */
+body.dark-mode .explore-modal .custom-map-btn {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  border: 1px solid #2563eb !important;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2) !important;
+  z-index: 1000 !important;
+  position: relative !important;
+}
+
+body.dark-mode .explore-modal .custom-map-btn:hover {
+  background-color: #1d4ed8 !important;
+  border-color: #1d4ed8 !important;
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3) !important;
+}
+
+/* Also target any button with "Add to Map" text */
+body.dark-mode .explore-modal .leaflet-control-custom button {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  border: 1px solid #2563eb !important;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2) !important;
+  z-index: 1000 !important;
+  position: relative !important;
+}
+
+body.dark-mode .explore-modal .leaflet-control-custom button:hover {
+  background-color: #1d4ed8 !important;
+  border-color: #1d4ed8 !important;
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3) !important;
+}
+
+/* Ensure leaflet control container is properly positioned */
+body.dark-mode .explore-modal .leaflet-control-custom {
+  background-color: transparent !important;
+  z-index: 1000 !important;
+  position: relative !important;
+}
+/* --- Dark mode ExploreModal (model.jsx) overrides end --- */
+
+/* --- Dark mode accordion overrides start --- */
+body.dark-mode .sst-accordion-wrapper,
+body.dark-mode .accordion,
+body.dark-mode .accordion-item {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-border) !important;
+}
+body.dark-mode .accordion-header {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+}
+body.dark-mode .accordion-body {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+}
+body.dark-mode .flex-container {
+  background-color: transparent !important;
+  color: var(--color-text) !important;
+}
+body.dark-mode .flex-container.active {
+  background-color: #35363b !important;
+  color: var(--color-accent) !important;
+}
+body.dark-mode .badge.bg-light {
+  background-color: var(--color-border) !important;
+  color: var(--color-accent) !important;
+}
+body.dark-mode .item {
+  color: var(--color-text) !important;
+}
+
+/* --- Explore Modal Nested Accordion Specific Overrides --- */
+body.dark-mode .explore-modal .sst-accordion-wrapper,
+body.dark-mode .explore-modal .accordion,
+body.dark-mode .explore-modal .accordion-item {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  border-color: #e5e7eb !important;
+}
+
+body.dark-mode .explore-modal .accordion-header {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+}
+
+body.dark-mode .explore-modal .accordion-body {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+}
+
+body.dark-mode .explore-modal .flex-container {
+  background-color: transparent !important;
+  color: #1e293b !important;
+}
+
+body.dark-mode .explore-modal .flex-container.active {
+  background-color: #d3f4ff !important;
+  color: #1e293b !important;
+}
+
+body.dark-mode .explore-modal .badge.bg-light {
+  background-color: #f8fafc !important;
+  color: #1e293b !important;
+}
+
+body.dark-mode .explore-modal .item {
+  color: #1e293b !important;
+}
+/* --- Dark mode accordion overrides end --- */
+
+/* --- Dark mode dashboard card overrides start --- */
+body.dark-mode .card {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-border) !important;
+}
+body.dark-mode .card-body {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+}
+body.dark-mode .card-title {
+  color: var(--color-accent) !important;
+}
+body.dark-mode .card-img-top {
+  background-color: var(--color-background) !important;
+}
+body.dark-mode .btn-primary {
+  background-color: #4a6bff !important;
+  color: #fff !important;
+  border: none !important;
+}
+body.dark-mode .btn-primary:hover {
+  background-color: #3a5ae8 !important;
+}
+body.dark-mode .btn-secondary {
+  background-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+  border: none !important;
+}
+/* --- Dark mode dashboard card overrides end --- */
+
+/* --- Dark mode side offcanvas overrides start --- */
+body.dark-mode .offcanvas-end {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+}
+body.dark-mode .offcanvas-header {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}
+body.dark-mode .offcanvas-title {
+  color: var(--color-accent) !important;
+}
+body.dark-mode .offcanvas-body {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+}
+body.dark-mode .offcanvas-end .btn-primary {
+  background-color: #4a6bff !important;
+  color: #fff !important;
+  border: none !important;
+}
+body.dark-mode .offcanvas-end .btn-danger {
+  background-color: #FF8C00 !important;
+  color: #fff !important;
+  border: none !important;
+}
+/* --- Dark mode side offcanvas overrides end --- */
+
+/* --- Dark mode side offcanvas-body specificity fix start --- */
+body.dark-mode .offcanvas-end .offcanvas-body,
+body.dark-mode .offcanvas .offcanvas-body {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+}
+/* --- Dark mode side offcanvas-body specificity fix end --- */
+/* ontainer that holds the map controls */
+.leaflet-top.leaflet-right {
+  right: 20px !important;
+  left: auto !important;
+}
+
+/* Ensure the control itself doesn't override our positioning */
+.map-controls-container {
+  margin-right: 0 !important;
+  right: 0 !important;
+}
+  /* Custom right-side vertical zoom control for Leaflet */
+  .leaflet-right .leaflet-control-zoom {
+    right: 1px !important;
+    left: auto !important;
+    bottom: -540px !important;
+    top: auto !important;
+    position: absolute !important;
+    z-index: 1200 !important;
+  }
+
+.leaflet-control-zoom {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255,255,255,0.95) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  padding: 0 !important;
+  border: none !important;
+  width: 40px !important;
+  height: auto !important;
+  margin: 0 !important;
+  overflow: hidden;
+}
+
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+  background: #fff !important;
+  color: #223;
+  border: none !important;
+  border-radius: 0 !important;
+  width: 40px !important;
+  height: 40px !important;
+  margin: 0 !important;
+  font-size: 1.5rem !important;
+  box-shadow: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+}
+
+.leaflet-control-zoom-out {
+  border-bottom: none !important;
+}
+
+.leaflet-control-zoom-in:hover,
+.leaflet-control-zoom-out:hover {
+  background: #f0f0f0 !important;
+}
+
+.map-controls {
+  background: rgba(255, 255, 255, 0.1) !important; /* Semi-transparent white */
+  backdrop-filter: blur(8px); /* Frosted glass effect */
+  padding: 12px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  color: var(--color-text) !important;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+  border: 1px solid rgba(255, 255, 255, 0.2); /* Semi-transparent border */
+}
+
+@media (max-width: 1004px) {
+
+  .leaflet-right .leaflet-control-zoom {
+   
+    right: 900px !important;
+    top: 80px !important;
+    bottom: auto !important;
+  } 
+}

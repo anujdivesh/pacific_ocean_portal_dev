@@ -1,0 +1,121 @@
+/* App.css */
+
+/* Fancy Accordion Styles */
+.accordion-item {
+  border-radius: 10px !important;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+  border: 1.5px solid #23272b !important;
+  background: #181c20;
+  font-family: 'Fira Mono', 'Consolas', 'Menlo', 'monospace';
+  overflow: hidden;
+  transition: box-shadow 0.2s, border 0.2s;
+}
+body.dark-mode .accordion-item {
+  background: #181c20 !important;
+  border: 1.5px solid #333 !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.22);
+}
+
+.accordion-header {
+  background: #23272b;
+  color: #181c20;
+  font-family: 'Fira Mono', 'Consolas', 'Menlo', 'monospace';
+  font-weight: 500;
+  font-size: 1.02rem;
+  padding: 0.7rem 1.2rem 0.7rem 1.7rem;
+  border-left: 4px solid #47d371;
+  border-bottom: none;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-left 0.2s;
+  position: relative;
+}
+body.dark-mode .accordion-header {
+  background: #23272b !important;
+  color: #e5e7eb !important;
+  border-left: 4px solid #47d371 !important;
+}
+.accordion-header:hover, .accordion-header:focus {
+  background: #e3f2fd;
+  color: #181c20;
+  border-left: 4px solid #60db85;
+}
+body.dark-mode .accordion-header:hover, body.dark-mode .accordion-header:focus {
+  background: #1a2228 !important;
+  color: #fff !important;
+  border-left: 4px solid #60db85 !important;
+}
+
+.accordion-body {
+  background: #181c20;
+  color: #181c20;
+  font-family: 'Fira Mono', 'Consolas', 'Menlo', 'monospace';
+  padding: 1rem 1.5rem 1rem 2.2rem;
+  border-radius: 0 0 10px 10px;
+  transition: background 0.2s;
+}
+body.dark-mode .accordion-body {
+  background: #181c20 !important;
+  color: #e5e7eb !important;
+}
+
+/* Fancy badge */
+.badge {
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: 500;
+  padding: 0.25em 0.7em;
+  background: #23272b;
+  color: #00eaff;
+  margin-left: 0.5em;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  font-family: 'Fira Mono', 'Consolas', 'Menlo', 'monospace';
+}
+
+/* Fancy flex-container for content items */
+.flex-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5em 1em;
+  margin: 0.2em 0;
+  border-radius: 6px;
+  background: transparent;
+  transition: background 0.18s, color 0.18s;
+  cursor: pointer;
+  font-family: 'Fira Mono', 'Consolas', 'Menlo', 'monospace';
+  color: #181c20;
+}
+.flex-container:hover, .flex-container.active {
+  background: #e3f2fd;
+  color: #181c20;
+}
+body.dark-mode .flex-container:hover, body.dark-mode .flex-container.active {
+  background: #23272b;
+  color: #00eaff;
+}
+
+.sst-accordion-wrapper {
+  margin-bottom: 8px;
+}
+
+/* Custom horizontal divider for accordion_metadata.jsx */
+.custom-horizontal-divider {
+  border: none;
+  border-top: 3px solid #ff2222;
+  margin: 0 0 0 0;
+  width: 100%;
+}
+body.dark-mode .custom-horizontal-divider {
+  border-top: 3px solid #ff4444;
+}
+
+/* Accordion header color fix */
+.accordion-header {
+  background: var(--color-surface, #fff);
+  color: var(--color-text, #1e293b);
+}
+body.dark-mode .accordion-header {
+  background: var(--color-surface, #23272b) !important;
+  color: var(--color-text, #f1f1f1) !important;
+}
