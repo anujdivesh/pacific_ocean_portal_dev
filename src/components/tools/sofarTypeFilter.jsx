@@ -124,6 +124,29 @@ const SofarTypeFilter = ({ item }) => {
     updateLayerTypes([]);
   };
 
+  // Determine if all types are selected or none are selected
+  const allTypesSelected = selectedTypes.length === types.length && types.length > 0;
+  const noTypesSelected = selectedTypes.length === 0;
+  
+  // Determine button text and action based on current state
+  const getButtonText = () => {
+    if (allTypesSelected) {
+      return 'Remove all';
+    } else {
+      return 'Add all';
+    }
+  };
+
+  const handleToggleAll = () => {
+    if (allTypesSelected) {
+      // If all are selected, remove all
+      handleClearAll();
+    } else {
+      // If not all are selected, add all
+      handleSelectAll();
+    }
+  };
+
   if (loading) {
     return (
       <div style={{ padding: '10px', textAlign: 'center', color: '#666' }}>
@@ -151,7 +174,7 @@ const SofarTypeFilter = ({ item }) => {
         </span>
         <div style={{ display: 'flex', gap: '5px' }}>
           <button
-            onClick={handleClearAll}
+            onClick={handleToggleAll}
             disabled={!item.layer_information.enabled}
             style={{
               fontSize: '12px',
@@ -165,7 +188,7 @@ const SofarTypeFilter = ({ item }) => {
               opacity: item.layer_information.enabled ? 1 : 0.6
             }}
           >
-            Remove all
+            {getButtonText()}
           </button>
         </div>
       </div>

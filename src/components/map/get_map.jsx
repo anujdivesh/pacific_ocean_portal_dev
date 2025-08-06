@@ -78,7 +78,7 @@ const MapBox = () => {
     const dispatch = useAppDispatch();
     const { center, zoom, bounds, maxBounds, layers, basemap, eezoverlay,enable_eez,enable_coastline,coastlineoverlay,citynamesoverlay,enable_citynames, sidebarCollapsed } = useAppSelector((state) => state.mapbox);
     const isBing = useRef(false); 
-    const [selectedOption, setSelectedOption] = useState('bing'); // Changed default to 'bing' for Satellite view 
+    const [selectedOption, setSelectedOption] = useState('openstreetmap'); // Changed default to 'bing' for Satellite view 
     const [checkboxChecked, setCheckboxChecked] = useState(true);
     const [checkboxCheckedCoast, setCheckboxCheckedCoast] = useState(true);
     const [checkboxCheckedCity, setCheckboxCheckedCity] = useState(true);
@@ -428,9 +428,9 @@ const MapBox = () => {
         });
         console.log("Filtered entries:", filteredEntries.length);
       } else {
-        // If no types selected, show all entries (don't filter them out)
-        filteredEntries = entries;
-        console.log("No types selected, showing all entries:", filteredEntries.length);
+        // If no types selected, show no entries (empty array means no markers)
+        filteredEntries = [];
+        // console.log("No types selected, showing no entries:", filteredEntries.length);
       }
       
       return {
