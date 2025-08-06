@@ -35,8 +35,8 @@ import { get_url } from '@/components/json/urls';
 import BottomOffCanvas from '../tools/bottom_offcanvas';
 
 function Navigationbar({ children }) {
-  // Default to dark mode
-  const [darkMode, setDarkMode] = useState(true);
+  // Default to light mode
+  const [darkMode, setDarkMode] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const sidebarCollapsed = useAppSelector((state) => state.mapbox.sidebarCollapsed);
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -91,10 +91,10 @@ function Navigationbar({ children }) {
   useEffect(() => {
     const storedTheme = localStorage.getItem("theme");
     if (storedTheme === null) {
-      // If no theme is set in localStorage, default to dark mode
-      setDarkMode(true);
-      document.body.classList.add("dark-mode");
-      localStorage.setItem("theme", "dark");
+      // If no theme is set in localStorage, default to light mode
+      setDarkMode(false);
+      document.body.classList.remove("dark-mode");
+      localStorage.setItem("theme", "light");
     } else if (storedTheme === "dark") {
       setDarkMode(true);
       document.body.classList.add("dark-mode");

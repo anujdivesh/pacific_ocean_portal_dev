@@ -49,19 +49,27 @@ body.dark-mode {
   color: var(--color-text) !important;
 }
 
-/* General UI elements */
-.card, .modal-content, .offcanvas-end, .accordion, .accordion-item, .list-group-item, .form-control, .dropdown-menu {
+/* General UI elements - exclude modal accordions */
+.card, .modal-content, .offcanvas-end, .list-group-item, .form-control, .dropdown-menu {
   background-color: var(--color-surface) !important;
   color: var(--color-text) !important;
   border-color: var(--color-secondary) !important;
 }
 
-/* Dark mode border enhancements */
+/* Accordion styling - exclude modal accordions */
+.accordion:not(.explore-modal .accordion), 
+.accordion-item:not(.explore-modal .accordion-item) {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-secondary) !important;
+}
+
+/* Dark mode border enhancements - exclude modal accordions */
 body.dark-mode .card,
 body.dark-mode .modal-content,
 body.dark-mode .offcanvas-end,
-body.dark-mode .accordion,
-body.dark-mode .accordion-item,
+body.dark-mode .accordion:not(.explore-modal .accordion),
+body.dark-mode .accordion-item:not(.explore-modal .accordion-item),
 body.dark-mode .list-group-item,
 body.dark-mode .form-control,
 body.dark-mode .dropdown-menu,
@@ -92,7 +100,7 @@ body.dark-mode .dropdown-menu {
   border: 1px solid #6b7280 !important;
 }
 
-body.dark-mode .accordion-item {
+body.dark-mode .accordion-item:not(.explore-modal .accordion-item) {
   border: 1px solid #6b7280 !important;
 }
 
@@ -208,11 +216,7 @@ body.dark-mode .modal-footer {
   background-color: var(--color-info) !important;
   color: #fff !important;
 }
-/* Accent for badges, highlights, etc. */
-.badge.bg-light, .badge.bg-dark, .badge.bg-primary, .badge.bg-secondary {
-  background-color: var(--color-accent) !important;
-  color: #fff !important;
-}
+
 /* Inputs and dropdowns */
 input, textarea, select, .dropdown-menu {
   background-color: var(--color-surface) !important;
@@ -503,44 +507,19 @@ body.dark-mode .explore-modal .scrollable-column {
 body.dark-mode .explore-modal .btn {
   color: #1e293b !important;
 }
-body.dark-mode .explore-modal .btn:hover,
-body.dark-mode .explore-modal .btn:focus {
-  color: #2563eb !important;
+/* Active button text color for both light and dark modes */
+.explore-modal .btn.active {
+  color: #ffffff !important;
+}
+
+body.dark-mode .explore-modal .btn.active {
+  color: #ffffff !important;
 }
 body.dark-mode .explore-modal .spinner-border {
   color: #2563eb !important;
 }
 
-/* Accordion styling within explore-modal */
-body.dark-mode .explore-modal .accordion,
-body.dark-mode .explore-modal .accordion-item {
-  background-color: #ffffff !important;
-  color: #1e293b !important;
-  border-color: #e5e7eb !important;
-}
-body.dark-mode .explore-modal .accordion-header {
-  background-color: #ffffff !important;
-  color: #1e293b !important;
-}
-body.dark-mode .explore-modal .accordion-body {
-  background-color: #ffffff !important;
-  color: #1e293b !important;
-}
-body.dark-mode .explore-modal .flex-container {
-  background-color: transparent !important;
-  color: #1e293b !important;
-}
-body.dark-mode .explore-modal .flex-container.active {
-  background-color: #d3f4ff !important;
-  color: #1e293b !important;
-}
-body.dark-mode .explore-modal .badge.bg-light {
-  background-color: #f8fafc !important;
-  color: #1e293b !important;
-}
-body.dark-mode .explore-modal .item {
-  color: #1e293b !important;
-}
+/* Removed accordion styling - using Bootstrap defaults */
 
 /* AccordionMetadata component styling within explore-modal */
 body.dark-mode .explore-modal .accordionmetadata {
@@ -570,67 +549,7 @@ body.dark-mode .explore-modal .accordionmetadata button:hover {
   background-color: #1d4ed8 !important;
 }
 
-/* Fix accordion button styling - make them white and smaller */
-body.dark-mode .explore-modal .accordion-button {
-  background-color: #ffffff !important;
-  color: #1e293b !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0.5rem 0.75rem !important;
-  font-size: 0.875rem !important;
-  min-height: auto !important;
-}
-
-body.dark-mode .explore-modal .accordion-button:not(.collapsed) {
-  background-color: #ffffff !important;
-  color: #1e293b !important;
-  box-shadow: none !important;
-}
-
-body.dark-mode .explore-modal .accordion-button::after {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%231e293b'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e") !important;
-  width: 1rem !important;
-  height: 1rem !important;
-  right: 1rem !important;
-  left: auto !important;
-  position: absolute !important;
-  top: 50% !important;
-  transform: translateY(-50%) !important;
-  background-size: 1rem !important;
-  background-repeat: no-repeat !important;
-  background-position: center !important;
-}
-
-body.dark-mode .explore-modal .accordion-button:not(.collapsed)::after {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%231e293b'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e") !important;
-  transform: translateY(-50%) rotate(180deg) !important;
-}
-
-/* Make accordion headers smaller */
-body.dark-mode .explore-modal .accordion-header {
-  background-color: #ffffff !important;
-  color: #1e293b !important;
-  padding: 0.5rem 0.75rem !important;
-  min-height: auto !important;
-}
-
-body.dark-mode .explore-modal .accordion-header:hover {
-  background-color: #f8f9fa !important;
-}
-
-/* Make accordion items smaller */
-body.dark-mode .explore-modal .accordion-item {
-  background-color: #ffffff !important;
-  color: #1e293b !important;
-  border-color: #e5e7eb !important;
-  margin-bottom: 0.25rem !important;
-}
-
-body.dark-mode .explore-modal .accordion-body {
-  background-color: #ffffff !important;
-  color: #1e293b !important;
-  padding: 0.75rem !important;
-}
+/* Removed conflicting accordion button styles - using Bootstrap defaults */
 
 /* Fix the dark gray preview area to be white */
 body.dark-mode .explore-modal .accordionmetadata > div {
@@ -649,68 +568,11 @@ body.dark-mode .explore-modal .accordionmetadata div[style*="fontSize: 18"] {
   color: #64748b !important;
 }
 
-/* Force all text in the modal to be visible */
-body.dark-mode .explore-modal .scrollable-column * {
-  color: #1e293b !important;
-}
+/* Removed scrollable-column text overrides - using Bootstrap defaults for accordions */
 
-body.dark-mode .explore-modal .scrollable-column p {
-  color: #1e293b !important;
-}
+/* Removed accordion text overrides - using Bootstrap defaults */
 
-body.dark-mode .explore-modal .scrollable-column span {
-  color: #1e293b !important;
-}
-
-body.dark-mode .explore-modal .scrollable-column div {
-  color: #1e293b !important;
-}
-
-body.dark-mode .explore-modal .scrollable-column h1,
-body.dark-mode .explore-modal .scrollable-column h2,
-body.dark-mode .explore-modal .scrollable-column h3,
-body.dark-mode .explore-modal .scrollable-column h4,
-body.dark-mode .explore-modal .scrollable-column h5,
-body.dark-mode .explore-modal .scrollable-column h6 {
-  color: #1e293b !important;
-}
-
-/* Fix any nested accordion text */
-body.dark-mode .explore-modal .accordion * {
-  color: #1e293b !important;
-}
-
-body.dark-mode .explore-modal .accordion p {
-  color: #1e293b !important;
-}
-
-body.dark-mode .explore-modal .accordion span {
-  color: #1e293b !important;
-}
-
-body.dark-mode .explore-modal .accordion div {
-  color: #1e293b !important;
-}
-
-/* Ensure all text in the entire modal is visible */
-body.dark-mode .explore-modal * {
-  color: #1e293b !important;
-}
-
-/* Force modal body to be completely white - but preserve map */
-body.dark-mode .explore-modal .modal-body {
-  background-color: #ffffff !important;
-  color: #1e293b !important;
-}
-
-/* Force all containers in modal body to be white - but exclude map elements */
-body.dark-mode .explore-modal .modal-body .container,
-body.dark-mode .explore-modal .modal-body .row,
-body.dark-mode .explore-modal .modal-body .col,
-body.dark-mode .explore-modal .modal-body .col-md-4 {
-  background-color: #ffffff !important;
-  color: #1e293b !important;
-}
+/* Removed modal body overrides for accordion column - using Bootstrap defaults */
 
 /* Special handling for the map column - preserve map visibility */
 body.dark-mode .explore-modal .modal-body .col-md-8 {
@@ -854,51 +716,12 @@ body.dark-mode .flex-container.active {
   background-color: #35363b !important;
   color: var(--color-accent) !important;
 }
-body.dark-mode .badge.bg-light {
-  background-color: var(--color-border) !important;
-  color: var(--color-accent) !important;
-}
+
 body.dark-mode .item {
   color: var(--color-text) !important;
 }
 
-/* --- Explore Modal Nested Accordion Specific Overrides --- */
-body.dark-mode .explore-modal .sst-accordion-wrapper,
-body.dark-mode .explore-modal .accordion,
-body.dark-mode .explore-modal .accordion-item {
-  background-color: #ffffff !important;
-  color: #1e293b !important;
-  border-color: #e5e7eb !important;
-}
-
-body.dark-mode .explore-modal .accordion-header {
-  background-color: #ffffff !important;
-  color: #1e293b !important;
-}
-
-body.dark-mode .explore-modal .accordion-body {
-  background-color: #ffffff !important;
-  color: #1e293b !important;
-}
-
-body.dark-mode .explore-modal .flex-container {
-  background-color: transparent !important;
-  color: #1e293b !important;
-}
-
-body.dark-mode .explore-modal .flex-container.active {
-  background-color: #d3f4ff !important;
-  color: #1e293b !important;
-}
-
-body.dark-mode .explore-modal .badge.bg-light {
-  background-color: #f8fafc !important;
-  color: #1e293b !important;
-}
-
-body.dark-mode .explore-modal .item {
-  color: #1e293b !important;
-}
+/* --- Removed Explore Modal Accordion Overrides - Using Bootstrap Defaults --- */
 /* --- Dark mode accordion overrides end --- */
 
 /* --- Dark mode sidebar accordion specific fixes start --- */
@@ -930,10 +753,7 @@ body.dark-mode #sidebar-wrapper .flex-container.active {
   color: var(--color-accent) !important;
 }
 
-body.dark-mode #sidebar-wrapper .badge.bg-light {
-  background-color: var(--color-border) !important;
-  color: var(--color-accent) !important;
-}
+
 
 body.dark-mode #sidebar-wrapper .item {
   color: var(--color-text) !important;
@@ -967,10 +787,7 @@ body.dark-mode #sidebar-wrapper .sst-accordion-wrapper .flex-container.active {
   color: var(--color-accent) !important;
 }
 
-body.dark-mode #sidebar-wrapper .sst-accordion-wrapper .badge.bg-light {
-  background-color: var(--color-border) !important;
-  color: var(--color-accent) !important;
-}
+
 
 body.dark-mode #sidebar-wrapper .sst-accordion-wrapper .item {
   color: var(--color-text) !important;
@@ -1192,3 +1009,208 @@ body.dark-mode .offcanvas .offcanvas-body {
     bottom: auto !important;
   } 
 }
+
+/* Modal accordions use Bootstrap default styling */
+.explore-modal .accordion {
+    --bs-accordion-color: #212529;
+    --bs-accordion-bg: #fff;
+    --bs-accordion-transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, border-radius 0.15s ease;
+    --bs-accordion-border-color: var(--bs-border-color);
+    --bs-accordion-border-width: 1px;
+    --bs-accordion-border-radius: 0.375rem;
+    --bs-accordion-inner-border-radius: calc(0.375rem - 1px);
+    --bs-accordion-btn-padding-x: 1.25rem;
+    --bs-accordion-btn-padding-y: 1rem;
+    --bs-accordion-btn-color: #212529;
+    --bs-accordion-btn-bg: var(--bs-accordion-bg);
+    --bs-accordion-btn-icon: url(data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23212529'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e);
+    --bs-accordion-btn-icon-width: 1.25rem;
+    --bs-accordion-btn-icon-transform: rotate(-180deg);
+    --bs-accordion-btn-icon-transition: transform 0.2s ease-in-out;
+    --bs-accordion-btn-active-icon: url(data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%230c63e4'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e);
+    --bs-accordion-btn-focus-border-color: #86b7fe;
+    --bs-accordion-btn-focus-box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, .25);
+    --bs-accordion-body-padding-x: 1.25rem;
+    --bs-accordion-body-padding-y: 1rem;
+    --bs-accordion-active-color: #0c63e4;
+    --bs-accordion-active-bg: #e7f1ff;
+}
+
+/* Force modal accordions to use light mode styling in dark mode */
+body.dark-mode .explore-modal .accordion {
+    --bs-accordion-color: #212529 !important;
+    --bs-accordion-bg: #fff !important;
+    --bs-accordion-border-color: #dee2e6 !important;
+    --bs-accordion-btn-color: #212529 !important;
+    --bs-accordion-btn-bg: #fff !important;
+    --bs-accordion-btn-icon: url(data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23212529'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e) !important;
+    --bs-accordion-btn-active-icon: url(data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%230c63e4'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e) !important;
+    --bs-accordion-active-color: #0c63e4 !important;
+    --bs-accordion-active-bg: #e7f1ff !important;
+    --bs-accordion-btn-focus-border-color: #86b7fe !important;
+    --bs-accordion-btn-focus-box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, .25) !important;
+}
+
+/* Force accordion elements to use light colors in dark mode */
+body.dark-mode .explore-modal .accordion,
+body.dark-mode .explore-modal .accordion-item,
+body.dark-mode .explore-modal .accordion-header,
+body.dark-mode .explore-modal .accordion-body {
+    background-color: #fff !important;
+    color: #212529 !important;
+    border-color: #dee2e6 !important;
+}
+
+/* Force accordion button to use light styling in dark mode */
+body.dark-mode .explore-modal .accordion-button {
+    background-color: #fff !important;
+    color: #212529 !important;
+    border-color: #dee2e6 !important;
+}
+
+/* Force active accordion button to use light blue in dark mode */
+body.dark-mode .explore-modal .accordion-button:not(.collapsed) {
+    background-color: #e7f1ff !important;
+    color: #0c63e4 !important;
+}
+
+
+
+
+/* Force all accordion states to match light mode exactly */
+body.dark-mode .explore-modal .accordion-button:hover {
+    background-color: #f8f9fa !important;
+    color: #212529 !important;
+    border-color: #dee2e6 !important;
+}
+
+body.dark-mode .explore-modal .accordion-button:focus {
+    background-color: #fff !important;
+    color: #212529 !important;
+    border-color: #86b7fe !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, .25) !important;
+}
+
+body.dark-mode .explore-modal .accordion-button:not(.collapsed):hover {
+    background-color: #e7f1ff !important;
+    color: #0c63e4 !important;
+}
+
+
+
+/* Force accordion text hover effects to match light mode */
+body.dark-mode .explore-modal .accordion a:hover,
+body.dark-mode .explore-modal .accordion .accordion-button:hover .text,
+body.dark-mode .explore-modal .accordion .accordion-button:hover span,
+body.dark-mode .explore-modal .accordion .accordion-button:hover div,
+body.dark-mode .explore-modal .accordion .clickable-text:hover {
+    color: #0c63e4 !important;
+    /* text-decoration: underline !important; */
+}
+
+/* Force accordion item content hover effects */
+body.dark-mode .explore-modal .accordion .accordion-body a:hover,
+body.dark-mode .explore-modal .accordion .accordion-body .item:hover,
+body.dark-mode .explore-modal .accordion .accordion-body .clickable:hover {
+    color: #0c63e4 !important;
+    background-color: #f8f9fa !important;
+}
+
+/* Force flex-container hover effects to match light mode */
+body.dark-mode .explore-modal .accordion .flex-container:hover {
+    background-color: #f8f9fa !important;
+    color: #212529 !important;
+    cursor: pointer !important;
+}
+
+body.dark-mode .explore-modal .accordion .flex-container:hover .item {
+    color: #0c63e4 !important;
+}
+
+/* Force accordion collapse transition states */
+body.dark-mode .explore-modal .accordion-collapse {
+    background-color: #fff !important;
+    border-color: #dee2e6 !important;
+}
+
+/* Ensure accordion items have proper spacing and borders */
+body.dark-mode .explore-modal .accordion-item:first-child {
+    border-top-left-radius: 0.375rem !important;
+    border-top-right-radius: 0.375rem !important;
+}
+
+body.dark-mode .explore-modal .accordion-item:last-child {
+    border-bottom-left-radius: 0.375rem !important;
+    border-bottom-right-radius: 0.375rem !important;
+}
+
+body.dark-mode .explore-modal .accordion-item:not(:first-child) {
+    border-top: 0 !important;
+}
+
+/* Additional comprehensive overrides to ensure 100% light mode consistency */
+
+/* Force all text and elements to use light mode colors */
+body.dark-mode .explore-modal .accordion * {
+    border-color: #dee2e6 !important;
+}
+
+/* Override any potential dark mode text overrides */
+body.dark-mode .explore-modal .accordion span,
+body.dark-mode .explore-modal .accordion div:not(.accordion-button),
+body.dark-mode .explore-modal .accordion p,
+body.dark-mode .explore-modal .accordion h1,
+body.dark-mode .explore-modal .accordion h2,
+body.dark-mode .explore-modal .accordion h3,
+body.dark-mode .explore-modal .accordion h4,
+body.dark-mode .explore-modal .accordion h5,
+body.dark-mode .explore-modal .accordion h6 {
+    color: #212529 !important;
+    background-color: transparent !important;
+}
+
+/* Force accordion button text specifically */
+body.dark-mode .explore-modal .accordion-button span,
+body.dark-mode .explore-modal .accordion-button div,
+body.dark-mode .explore-modal .accordion-button .text {
+    color: #212529 !important;
+}
+
+/* Force active accordion button text */
+body.dark-mode .explore-modal .accordion-button:not(.collapsed) span,
+body.dark-mode .explore-modal .accordion-button:not(.collapsed) div,
+body.dark-mode .explore-modal .accordion-button:not(.collapsed) .text {
+    color: #0c63e4 !important;
+}
+
+/* Force container backgrounds */
+body.dark-mode .explore-modal .scrollable-column {
+    background-color: #fff !important;
+}
+
+/* Remove any top spacing from small map in explore modal */
+.explore-modal .small-map-outer,
+.explore-modal .small-map-container {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* Remove spacing from accordion metadata container */
+.explore-modal .scrollable-column > div:first-child {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* Force all transitions and animations to use light mode values */
+body.dark-mode .explore-modal .accordion,
+body.dark-mode .explore-modal .accordion * {
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, border-radius 0.15s ease !important;
+}
+
+/* Remove any box shadows that might interfere */
+body.dark-mode .explore-modal .accordion,
+body.dark-mode .explore-modal .accordion-item,
+body.dark-mode .explore-modal .accordion-button:not(:focus) {
+    box-shadow: none !important;
+}
+
