@@ -15,11 +15,14 @@ import TimeseriesWfs from './timeseries_wfs';
 import TimeseriesSofar from './timeseries_sofar';
 import TideImageComponent from './tide_image';
 import Histogram from './histogram';
+import ShareWorkbench from './shareWorkbench';
+import { FaShare } from 'react-icons/fa';
 
 function BottomOffCanvas({ isVisible, id }) {
   const currentId = useAppSelector((state) => state.offcanvas.currentId);
   const mapLayer = useAppSelector((state) => state.mapbox.layers);
   const [layerType, setLayerType] = useState('');
+  const [showShareModal, setShowShareModal] = useState(false);
   
   useEffect(() => {
     if (currentId === id) {
@@ -61,6 +64,14 @@ function BottomOffCanvas({ isVisible, id }) {
 
   const handleClose = () => {
     dispatch(hideoffCanvas());
+  };
+
+  const handleShowShareModal = () => {
+    setShowShareModal(true);
+  };
+
+  const handleHideShareModal = () => {
+    setShowShareModal(false);
   };
 
   const handleMouseMove = (e) => {
@@ -186,6 +197,41 @@ function BottomOffCanvas({ isVisible, id }) {
         ></div>
       </div>
 
+      {/* Share Button */}
+      <Button
+        onClick={handleShowShareModal}
+        style={{
+          position: 'absolute',
+          bottom: '15px',
+          right: '15px',
+          zIndex: 10,
+          width: '40px',
+          height: '40px',
+          background: 'var(--color-surface, #fff)',
+          color: 'var(--color-text, #333)',
+          border: '1px solid var(--color-border, #ddd)',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 1px 5px rgba(0,0,0,0.2)',
+          transition: 'all 0.2s ease'
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.background = 'var(--color-background, #f8f9fa)';
+          e.target.style.transform = 'scale(1.05)';
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.background = 'var(--color-surface, #fff)';
+          e.target.style.transform = 'scale(1)';
+        }}
+        title="Share Workbench"
+      >
+        <FaShare size={16} />
+      </Button>
+
+      {/* Close Button */}
       <Button
         variant="link"
         onClick={handleClose}
@@ -205,6 +251,12 @@ function BottomOffCanvas({ isVisible, id }) {
       <Offcanvas.Body style={{ paddingTop: '3', borderRadius: 0 }}>
         {renderTabsBasedOnLayerType()}
       </Offcanvas.Body>
+
+      {/* Share Workbench Modal */}
+      <ShareWorkbench 
+        show={showShareModal} 
+        onHide={handleHideShareModal} 
+      />
     </Offcanvas>
   );
 }

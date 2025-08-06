@@ -935,13 +935,14 @@ body.dark-mode .offcanvas .offcanvas-body {
   margin-right: 0 !important;
   right: 0 !important;
 }
-  /* Custom right-side vertical zoom control for Leaflet */
+  /* Custom right-side vertical zoom control for Leaflet - Fixed positioning */
   .leaflet-right .leaflet-control-zoom {
-    right: 1px !important;
+    right: 20px !important;
     left: auto !important;
-    bottom: -540px !important;
-    top: auto !important;
-    position: absolute !important;
+    top: 93% !important;
+    transform: translateY(-50%) !important;
+    bottom: auto !important;
+    position: fixed !important;
     z-index: 1200 !important;
   }
 
@@ -1000,14 +1001,28 @@ body.dark-mode .offcanvas .offcanvas-body {
   border: 1px solid rgba(255, 255, 255, 0.2); /* Semi-transparent border */
 }
 
-@media (max-width: 1004px) {
+/* Share button positioning - Fixed to viewport */
+.share-button-control {
+  position: fixed !important;
+  right: 10px !important;
+  left: auto !important;
+  top: 82% !important;
+  z-index: 1000 !important;
+}
 
+@media (max-width: 1004px) {
   .leaflet-right .leaflet-control-zoom {
-   
-    right: 900px !important;
-    top: 80px !important;
+    right: 15px !important;
+    top: 20% !important;
+    transform: translateY(-50%) !important;
     bottom: auto !important;
-  } 
+    position: fixed !important;
+  }
+  
+  .share-button-control {
+    right: 15px !important;
+    top: calc(20% + 80px) !important;
+  }
 }
 
 /* Modal accordions use Bootstrap default styling */

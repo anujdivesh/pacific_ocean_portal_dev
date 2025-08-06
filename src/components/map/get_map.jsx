@@ -895,9 +895,9 @@ const MapBox = () => {
       const ShareButtonControl = L.Control.extend({
         onAdd: function(map) {
           const container = L.DomUtil.create('div', 'share-button-control');
-          container.style.position = 'absolute';
-          container.style.right = '-10px';
-          container.style.top = '660px'; // Position below zoom controls
+          container.style.position = 'fixed';
+          container.style.right = '20px';
+          container.style.top = 'calc(50% + 60px)'; // Position below zoom controls
           container.style.zIndex = '1000';
           
           const button = L.DomUtil.create('button', 'share-button-map', container);
