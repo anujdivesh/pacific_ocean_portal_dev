@@ -393,7 +393,8 @@ body.dark-mode .table {
 body.dark-mode #sidebar-wrapper {
   background-color: var(--color-surface) !important;
   color: var(--color-text) !important;
-  border: 1px solid #6b7280 !important;
+  border: none !important;
+  border-right: 1px solid #6b7280 !important;
 }
 
 /* Sidebar specific border styling for dark mode */
@@ -401,7 +402,8 @@ body.dark-mode .sidebar,
 body.dark-mode .sidebar-wrapper,
 body.dark-mode .desktop-sidebar,
 body.dark-mode .mobile-sidebar {
-  border: 1px solid #6b7280 !important;
+  border: none !important;
+  border-right: 1px solid #6b7280 !important;
 }
 
 body.dark-mode .sidebar-header,
@@ -436,6 +438,7 @@ body.dark-mode #sidebar-wrapper button {
 body.dark-mode .navbar {
   background-color: var(--color-surface) !important;
   color: var(--color-text) !important;
+  border: none !important;
 }
 body.dark-mode .navbar-brand {
   color: var(--color-text) !important;
