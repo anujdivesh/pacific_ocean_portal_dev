@@ -977,6 +977,69 @@ body.dark-mode #sidebar-wrapper .sst-accordion-wrapper .item {
 }
 /* --- Dark mode sidebar accordion specific fixes end --- */
 
+/* Share button on map styling */
+.share-button-map {
+  transition: all 0.2s ease-in-out;
+  
+}
+
+.share-button-map:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+}
+
+.share-button-map:active {
+  transform: scale(0.95);
+}
+
+/* Dark mode share button styling */
+body.dark-mode .share-button-map {
+  background: var(--color-surface, #2d3748) !important;
+  color: var(--color-text, #e2e8f0) !important;
+  border: 1px solid var(--color-border, #4a5568) !important;
+}
+
+body.dark-mode .share-button-map:hover {
+  background: var(--color-background, #4a5568) !important;
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.4);
+}
+
+/* Sidebar buttons styling */
+.sidebar-buttons .explore-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3);
+}
+.sidebar-buttons .explore-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(13, 110, 253, 0.2);
+}
+
+.sidebar-buttons .more-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(199, 212, 68, 0.3);
+  background-color: #b8c93a !important;
+}
+.sidebar-buttons .more-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(199, 212, 68, 0.2);
+}
+
+/* Dark mode sidebar buttons styling */
+body.dark-mode .sidebar-buttons .explore-button {
+  border: 1px solid var(--color-border, #4a5568) !important;
+}
+body.dark-mode .sidebar-buttons .explore-button:hover {
+  box-shadow: 0 4px 8px rgba(13, 110, 253, 0.4);
+}
+
+body.dark-mode .sidebar-buttons .more-button {
+  border: 1px solid var(--color-border, #4a5568) !important;
+}
+body.dark-mode .sidebar-buttons .more-button:hover {
+  box-shadow: 0 4px 8px rgba(199, 212, 68, 0.4);
+  background-color: #b8c93a !important;
+}
+
 /* --- Dark mode dashboard card overrides start --- */
 body.dark-mode .card {
   background-color: var(--color-surface) !important;

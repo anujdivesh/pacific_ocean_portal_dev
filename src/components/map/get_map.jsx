@@ -9,6 +9,8 @@ import addWMSTileLayer from '../functions/addWMSTileLayer';
 import '@/components/css/legend.css';
 import { get_url } from '@/components/json/urls';
 import { showoffCanvas, hideoffCanvas  } from '@/app/GlobalRedux/Features/offcanvas/offcanvasSlice';
+import { FaShare } from "react-icons/fa";
+import ShareWorkbench from '../tools/shareWorkbench';
 // Import marker cluster CSS
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
@@ -96,10 +98,18 @@ const MapBox = () => {
     const [noDataMessage, setNoDataMessage] = useState('');
     const [showNoDataMessage, setShowNoDataMessage] = useState(false);
     const [isCheckingData, setIsCheckingData] = useState(false);
-;
+    const [showShareModal, setShowShareModal] = useState(false);
     
     const handleShow = (id) => {
         dispatch(showoffCanvas(id));
+    };
+
+    const handleShowShareModal = () => {
+        setShowShareModal(true);
+    };
+    
+    const handleHideShareModal = () => {
+        setShowShareModal(false);
     };
 
     // Function to check data availability for different layer types
@@ -880,6 +890,53 @@ const MapBox = () => {
 
       // Add zoom control to map
       zoomControl.addTo(mapRef.current);
+
+      // Create custom share button control
+      const ShareButtonControl = L.Control.extend({
+        onAdd: function(map) {
+          const container = L.DomUtil.create('div', 'share-button-control');
+          container.style.position = 'absolute';
+          container.style.right = '-10px';
+          container.style.top = '660px'; // Position below zoom controls
+          container.style.zIndex = '1000';
+          
+          const button = L.DomUtil.create('button', 'share-button-map', container);
+          button.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>';
+          button.title = 'Share Workbench';
+          button.style.cssText = `
+            width: 40px;
+            height: 40px;
+            background: var(--color-surface, #fff);
+            color: var(--color-text, #333);
+            border: 1px solid var(--color-border, #ddd);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;           
+          `;
+          
+          button.addEventListener('mouseenter', function() {
+            this.style.background = 'var(--color-background, #f8f9fa)';
+            this.style.transform = 'scale(1.05)';
+          });
+          
+          button.addEventListener('mouseleave', function() {
+            this.style.background = 'var(--color-surface, #fff)';
+            this.style.transform = 'scale(1)';
+          });
+          
+          button.addEventListener('click', handleShowShareModal);
+          
+          return container;
+        }
+      });
+      
+      // Add share button control to map
+      const shareButtonControl = new ShareButtonControl();
+      shareButtonControl.addTo(mapRef.current);
 
         // Custom attribution control with better positioning
         const attributionControl = L.control.attribution({
@@ -1928,6 +1985,11 @@ const MapBox = () => {
           100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
         }
       `}</style>
+      
+      <ShareWorkbench
+        show={showShareModal}
+        onHide={handleHideShareModal}
+      />
     </div>
   );
 };
