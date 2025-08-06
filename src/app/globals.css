@@ -1214,3 +1214,29 @@ body.dark-mode .explore-modal .accordion-button:not(:focus) {
     box-shadow: none !important;
 }
 
+/* Login Modal Header - Force white text in both light and dark mode */
+.custom-modal .modal-header .modal-title {
+    color: white !important;
+}
+
+/* Login Modal Input Fields - Make them clearly visible */
+.custom-modal .form-control {
+    background-color: #ffffff !important;
+    border: 2px solid #dee2e6 !important;
+    color: #1e293b !important;
+    border-radius: 6px !important;
+}
+
+.custom-modal .form-control:focus {
+    background-color: #ffffff !important;
+    border: 2px solid #2563eb !important;
+    color: #1e293b !important;
+    box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25) !important;
+    outline: none !important;
+}
+
+.custom-modal .form-control::placeholder {
+    color: #9ca3af !important;
+    opacity: 1 !important;
+}
+
