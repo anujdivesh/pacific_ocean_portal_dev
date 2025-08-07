@@ -91,10 +91,10 @@ function Navigationbar({ children }) {
   useEffect(() => {
     const storedTheme = localStorage.getItem("theme");
     if (storedTheme === null) {
-      // If no theme is set in localStorage, default to light mode
-      setDarkMode(false);
-      document.body.classList.remove("dark-mode");
-      localStorage.setItem("theme", "light");
+      // If no theme is set in localStorage, default to dark mode
+      setDarkMode(true);
+      document.body.classList.add("dark-mode");
+      localStorage.setItem("theme", "dark");
     } else if (storedTheme === "dark") {
       setDarkMode(true);
       document.body.classList.add("dark-mode");

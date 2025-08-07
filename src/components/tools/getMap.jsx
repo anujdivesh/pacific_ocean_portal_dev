@@ -533,10 +533,23 @@ const visibleDots = timestamps.slice(
               <>
                 <button
                   onClick={openModal}
-                  className="btn btn-outline-success"
+                  className="btn"
                   style={{
                     padding: '5px 15px',
                     cursor: 'pointer',
+                    backgroundColor: isDarkMode ? '#28a745' : 'transparent',
+                    border: isDarkMode ? '1px solid #28a745' : '1px solid #28a745',
+                    color: isDarkMode ? '#ffffff' : '#28a745',
+                    borderRadius: '4px',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.backgroundColor = isDarkMode ? '#218838' : '#28a745';
+                    e.target.style.color = isDarkMode ? '#ffffff' : '#ffffff';
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.backgroundColor = isDarkMode ? '#28a745' : 'transparent';
+                    e.target.style.color = isDarkMode ? '#ffffff' : '#28a745';
                   }}
                   disabled={loading || error}
                 >
