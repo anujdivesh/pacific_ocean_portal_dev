@@ -31,14 +31,14 @@ function AccordionMetadata() {
                 <SmallMap currentDataset={dataset_list} />
             </div>
             <div className="mt-3">
-                <div className="fw-bold mb-2">{dataset_list.name.replace(/\[.*?\]/g, '').trim()}</div>
-                <div className="mb-3">{dataset_list.copyright}</div>
+                <div className="fw-bold mb-2 mr-2" style={{marginLeft: '10px'}}>{dataset_list.name.replace(/\[.*?\]/g, '').trim()}</div>
+                <div className="mb-3  mr-2" style={{marginLeft: '10px'}}>{dataset_list.copyright}</div>
                 {dataset_list.metadata_one_id !== "" && (
                     <Accordion className="mb-2" defaultActiveKey="1">
                         <Accordion.Item eventKey="1">
                             <Accordion.Header>{dataset_list.metadata_one_id}</Accordion.Header>
                             <Accordion.Body>
-                                {dataset_list.metadata_one_value}
+                                {dataset_list.metadata_one_value} 
                             </Accordion.Body>
                         </Accordion.Item>
                     </Accordion>

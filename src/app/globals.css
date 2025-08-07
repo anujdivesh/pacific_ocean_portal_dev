@@ -456,6 +456,23 @@ body.dark-mode .chartjs-tooltip {
 .modal-header .modal-title {
   color: white !important;
 }
+
+/* Sharp edges for modals */
+.modal-content {
+  border-radius: 0 !important;
+}
+
+.modal-header {
+  border-radius: 0 !important;
+}
+
+.modal-body {
+  border-radius: 0 !important;
+}
+
+.modal-footer {
+  border-radius: 0 !important;
+}
 body.dark-mode .navbar-brand {
   color: var(--color-text) !important;
 }
@@ -1272,5 +1289,14 @@ body.dark-mode .explore-modal .accordion-button:not(:focus) {
 .custom-modal .form-control::placeholder {
     color: #9ca3af !important;
     opacity: 1 !important;
+}
+
+/* Dashboard search bar border fixes */
+body.dark-mode #dashboard-search-group .input-group-text {
+    border-left: none !important;
+}
+
+body.dark-mode #dashboard-search-group .form-control {
+    border-left: none !important;
 }
 

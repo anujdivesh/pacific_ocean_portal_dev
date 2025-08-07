@@ -355,46 +355,46 @@ function Dashboard() {
                         <h1 className="display-9 mb-0">Dashboard Collections</h1>
                     </div>
                     <div className="d-flex justify-content-center">
-                        <Form className="mt-3" autoComplete="off" onSubmit={e => e.preventDefault()} style={{ width: '100%' }}>
-                            <InputGroup>
-                                                            <InputGroup.Text
-                                style={{
-                                    background: 'var(--color-surface, #fff)',
-                                    border: document.body.classList.contains('dark-mode') ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid var(--color-secondary, #e5e7eb)',
-                                    borderRight: 'none',
-                                    paddingRight: 0,
-                                    color: document.body.classList.contains('dark-mode') ? 'var(--color-secondary, #a1a1aa)' : 'var(--color-secondary, #64748b)',
-                                    borderTopLeftRadius: 12,
-                                    borderBottomLeftRadius: 12,
-                                    borderTopRightRadius: 0,
-                                    borderBottomRightRadius: 0,
-                                    boxShadow: document.body.classList.contains('dark-mode') ? 'none' : '0 2px 8px rgba(0,0,0,0.08)',
-                                }}
-                            >
-                                <FaSearch size={16} />
-                            </InputGroup.Text>
-                            <Form.Control
-                                type="text"
-                                placeholder="Search dashboards by title..."
-                                value={search}
-                                onChange={e => setSearch(e.target.value)}
-                                style={{
-                                    border: document.body.classList.contains('dark-mode') ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid var(--color-secondary, #e5e7eb)',
-                                    borderLeft: 'none',
-                                    borderTopLeftRadius: 0,
-                                    borderBottomLeftRadius: 0,
-                                    borderTopRightRadius: 12,
-                                    borderBottomRightRadius: 12,
-                                    boxShadow: document.body.classList.contains('dark-mode') ? 'none' : '0 2px 8px rgba(0,0,0,0.08)',
-                                    paddingLeft: 16,
-                                    paddingRight: 16,
-                                    paddingTop: 12,
-                                    paddingBottom: 12,
-                                    fontSize: '16px',
-                                    background: 'var(--color-surface, #fff)',
-                                    color: 'var(--color-text, #1e293b)',
-                                }}
-                            />
+                                                 <Form className="mt-3" autoComplete="off" onSubmit={e => e.preventDefault()} style={{ width: '100%' }}>
+                             <InputGroup id="dashboard-search-group">
+                                 <InputGroup.Text
+                                     style={{
+                                         background: 'var(--color-surface, #fff)',
+                                         border: '1px solid var(--color-secondary, #e5e7eb)',
+                                         borderRight: 'none',
+                                         paddingRight: 0,
+                                         color: 'var(--color-secondary, #64748b)',
+                                         borderTopLeftRadius: 12,
+                                         borderBottomLeftRadius: 12,
+                                         borderTopRightRadius: 0,
+                                         borderBottomRightRadius: 0,
+                                         boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                                     }}
+                                 >
+                                     <FaSearch size={16} />
+                                 </InputGroup.Text>
+                                 <Form.Control
+                                     type="text"
+                                     placeholder="Search dashboards by title..."
+                                     value={search}
+                                     onChange={e => setSearch(e.target.value)}
+                                     style={{
+                                         border: '1px solid var(--color-secondary, #e5e7eb)',
+                                         borderLeft: 'none',
+                                         borderTopLeftRadius: 0,
+                                         borderBottomLeftRadius: 0,
+                                         borderTopRightRadius: 12,
+                                         borderBottomRightRadius: 12,
+                                         boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                                         paddingLeft: 16,
+                                         paddingRight: 16,
+                                         paddingTop: 12,
+                                         paddingBottom: 12,
+                                         fontSize: '16px',
+                                         background: 'var(--color-surface, #fff)',
+                                         color: 'var(--color-text, #1e293b)',
+                                     }}
+                                 />
                             </InputGroup>
                         </Form>
                     </div>
