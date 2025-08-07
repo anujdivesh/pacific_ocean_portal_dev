@@ -527,32 +527,49 @@ const visibleDots = timestamps.slice(
         )}
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <button
-            onClick={openModal}
-            className="btn btn-outline-success"
-            style={{
-              padding: '5px 15px',
-              cursor: 'pointer',
-            }}
-            disabled={loading || error}
-          >
-            View in Popup
-          </button>
-          <a
-            onClick={handleDownload}
-            className="btn btn-outline-warning"
-            style={{
-              padding: '5px 15px',
-              cursor: 'pointer',
-              textDecoration: 'none',
-              color: 'darkorange',
-            }}
-            onMouseOver={(e) => e.target.style.color = 'white'}
-            onMouseOut={(e) => e.target.style.color = 'darkorange'}
-            disabled={loading || error}
-          >
-            Download
-          </a>
+          {(() => {
+            const isDarkMode = typeof document !== 'undefined' && document.body.classList.contains('dark-mode');
+            return (
+              <>
+                <button
+                  onClick={openModal}
+                  className="btn btn-outline-success"
+                  style={{
+                    padding: '5px 15px',
+                    cursor: 'pointer',
+                  }}
+                  disabled={loading || error}
+                >
+                  View in Popup
+                </button>
+                <a
+                  onClick={handleDownload}
+                  className="btn"
+                  style={{
+                    padding: '5px 15px',
+                    cursor: 'pointer',
+                    textDecoration: 'none',
+                    backgroundColor: isDarkMode ? '#495057' : '#f8f9fa',
+                    border: isDarkMode ? '1px solid #6c757d' : '1px solid #dee2e6',
+                    color: isDarkMode ? '#ffa500' : '#ff8c00',
+                    borderRadius: '4px',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.backgroundColor = isDarkMode ? '#6c757d' : '#e9ecef';
+                    e.target.style.color = isDarkMode ? '#ffffff' : '#495057';
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.backgroundColor = isDarkMode ? '#495057' : '#f8f9fa';
+                    e.target.style.color = isDarkMode ? '#ffa500' : '#ff8c00';
+                  }}
+                  disabled={loading || error}
+                >
+                  Download
+                </a>
+              </>
+            );
+          })()}
         </div>
       </div>
 

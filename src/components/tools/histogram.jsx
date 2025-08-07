@@ -318,6 +318,10 @@ function Histogram({ height }) {
   }, [x, y, sizex, sizey, bbox, mapLayer, datasetsConfig]);
 
   const getChartOptions = () => {
+    const isDarkMode = typeof document !== 'undefined' && document.body.classList.contains('dark-mode');
+    const textColor = isDarkMode ? '#ffffff' : '#666666';
+    const gridColor = isDarkMode ? '#444444' : '#e1e1e1';
+    
     const scales = {
       x: {
         type: 'category',
@@ -325,12 +329,26 @@ function Histogram({ height }) {
           display: true,
           maxRotation: 45,
           autoSkip: true,
+          color: textColor,
+        },
+        grid: {
+          color: gridColor,
+        },
+        border: {
+          color: gridColor,
         },
       },
       y: {
         position: 'left',
         ticks: {
           display: true,
+          color: textColor,
+        },
+        grid: {
+          color: gridColor,
+        },
+        border: {
+          color: gridColor,
         },
         beginAtZero: false,
         grace: '5%',
@@ -356,6 +374,18 @@ function Histogram({ height }) {
         ...config,
         grid: {
           drawOnChartArea: false,
+          color: gridColor,
+        },
+        border: {
+          color: gridColor,
+        },
+        ticks: {
+          ...config.ticks,
+          color: textColor,
+        },
+        title: {
+          ...config.title,
+          color: textColor,
         },
         beginAtZero: false,
         grace: '5%',
@@ -385,6 +415,11 @@ function Histogram({ height }) {
         intersect: false,
       },
       plugins: {
+        legend: {
+          labels: {
+            color: textColor,
+          },
+        },
         tooltip: {
           callbacks: {
             label: function(context) {
