@@ -454,7 +454,7 @@ const formatShortTimestamp = (timestamp, currentIndex) => {
         display: 'flex',
         alignItems: 'center',
       }}>
-        <p style={{ fontSize: 16, color: '#333' }}>This Feature is disabled.</p>
+        <p style={{ fontSize: 16, color: 'var(--color-text, #333)' }}>This Feature is disabled.</p>
       </div>
     );
   }
@@ -481,6 +481,8 @@ const visibleDots = timestamps.slice(
         justifyContent: 'space-between',
         padding: '10px',
         boxSizing: 'border-box',
+        backgroundColor: 'var(--color-surface, #fff)',
+        color: 'var(--color-text, #333)',
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px' }}>
           <button
@@ -518,7 +520,7 @@ const visibleDots = timestamps.slice(
             marginTop: '10px',
             textAlign: 'center',
             fontSize: '14px',
-            color: '#555',
+            color: 'var(--color-text, #555)',
           }}>
             {formatTimestamp(timestamps[currentIndex], currentIndex)}
           </div>
@@ -556,7 +558,7 @@ const visibleDots = timestamps.slice(
 
       <div style={{
         width: '2px',
-        backgroundColor: 'lightgray',
+        backgroundColor: 'var(--color-border, lightgray)',
         height: '100%',
       }}></div>
 
@@ -573,7 +575,7 @@ const visibleDots = timestamps.slice(
             alignItems: 'center',
           }}>
             <Spinner animation="border" role="status" variant="primary"/>
-            <span style={{ marginLeft: '10px', fontSize: '18px' }}>
+            <span style={{ marginLeft: '10px', fontSize: '18px', color: 'var(--color-text, #333)' }}>
       {loadingTime > 11 
         ? "Rendering complex geospatial data... Almost there!" 
         : loadingTime > 5 
@@ -596,8 +598,9 @@ const visibleDots = timestamps.slice(
             color: 'red',
             textAlign: 'center',
             padding: '20px',
-            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+            backgroundColor: 'var(--color-surface, rgba(255, 255, 255, 0.9))',
             borderRadius: '5px',
+            border: '1px solid var(--color-border, #ddd)',
           }}>
             <div style={{ fontWeight: 'bold', marginBottom: '10px' }}>Error Loading Image</div>
             <div>{error}</div>
@@ -666,7 +669,7 @@ const visibleDots = timestamps.slice(
                     padding: '6px 10px',
                     borderRadius: '3px',
                     backgroundColor: '#0275d8',
-                    color: 'white',
+                    color: '#ffffff',
                     cursor: 'pointer',
                     fontSize: '12px',
                     whiteSpace: 'nowrap',
@@ -717,7 +720,7 @@ const visibleDots = timestamps.slice(
       {/* Modal for enlarged view */}
       <Modal show={showModal} onHide={closeModal} size="lg">
         <Modal.Header closeButton style={{backgroundColor:'#3f51b5', color:'white'}} closeVariant="white">
-          <Modal.Title>Preview</Modal.Title>
+          <Modal.Title style={{color: 'white !important'}}>Preview</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {error ? (

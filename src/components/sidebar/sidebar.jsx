@@ -13,10 +13,9 @@ import SideOffCanvas from '../tools/side_offcanvas';
 import {  hideoffCanvas  } from '@/app/GlobalRedux/Features/offcanvas/offcanvasSlice';
 import { MdAddCircleOutline } from "react-icons/md";
 import { CgMoreO } from "react-icons/cg";
-import { FaSearch, FaShare } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
 import { get_url } from '@/components/json/urls';
 import { setShortName } from "@/app/GlobalRedux/Features/country/countrySlice";
-import ShareWorkbench from '../tools/shareWorkbench';
 
 const ExploreModal = dynamic(() => import('@/components/tools/model'), {ssr: false})
 
@@ -27,13 +26,7 @@ const SideBar = () => {
       dispatch(showsideoffCanvas())
     };
     
-    const handleShowShareModal = () => {
-      setShowShareModal(true);
-    };
-    
-    const handleHideShareModal = () => {
-      setShowShareModal(false);
-    };
+
     const isVisiblecanvas = useAppSelector((state) => state.sideoffcanvas.isVisible);
     const short_name = useAppSelector((state) => state.country.short_name);
     //const [showModal, setShowModal] = useState(false);
@@ -46,8 +39,7 @@ const SideBar = () => {
     const [searchError, setSearchError] = useState('');
     const [showStationSearch, setShowStationSearch] = useState(false);
     
-    // Share modal state
-    const [showShareModal, setShowShareModal] = useState(false);
+
     
     // Autocomplete state
     const [autocompleteSuggestions, setAutocompleteSuggestions] = useState([]);
@@ -552,10 +544,18 @@ const SideBar = () => {
           </Row>
         )}
 
-          <div className="d-flex justify-content-between sidebar-buttons" style={{paddingTop:'10px', gap: '6px'}}>
+          <div className="d-flex justify-content-between sidebar-buttons" style={{paddingTop:'10px', gap: '8px'}}>
                                 <Button
                                     variant="btn btn-primary btn-sm rounded-pill"
-                                    style={{ padding: '8px 10px', color: 'white', width: '40%', fontSize: '0.85rem' }}
+                                    style={{ 
+                                        padding: '10px 12px', 
+                                        color: 'white', 
+                                        width: '55%', 
+                                        fontSize: '0.85rem',
+                                        fontWeight: '500',
+                                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                        transition: 'all 0.2s ease-in-out'
+                                    }}
                                     className="explore-button"
                                     onClick={handleShow}
                                 >
@@ -564,34 +564,22 @@ const SideBar = () => {
                                 <Button
     variant="btn btn-info btn-sm rounded-pill"
     style={{
-        padding: '8px 10px',
+        padding: '10px 12px',
         color: 'white',
-        width: '30%',
+        width: '45%',
         backgroundColor: '#C7D444',
         border: 'none',
-        fontSize: '0.85rem'
+        fontSize: '0.85rem',
+        fontWeight: '500',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        transition: 'all 0.2s ease-in-out'
     }}
     className="more-button"
     onClick={handleShowCanvas}
 >
     <CgMoreO size={16} />&nbsp;More
 </Button>
-                                <Button
-    variant="btn btn-success btn-sm rounded-pill"
-    style={{
-        padding: '8px 10px',
-        color: 'white',
-        width: '30%',
-        backgroundColor: '#28a745',
-        border: 'none',
-        fontSize: '0.85rem'
-    }}
-    className="share-button"
-    onClick={handleShowShareModal}
-    title="Share Workbench"
->
-    <FaShare size={16} />
-</Button>
+
 
                             </div>
         
@@ -606,10 +594,7 @@ const SideBar = () => {
        title="Data Catalogue" 
        bodyContent="This is the modal body content." 
        />
-      <ShareWorkbench
-        show={showShareModal}
-        onHide={handleHideShareModal}
-      />
+
     </div>
   );
 };

@@ -198,7 +198,7 @@ const MyWorkbench = () => {
             
             if (layer_Type === 'WMS' || layer_Type === 'WMS_UGRID') {
               return (
-                <Accordion key={`${item.id}-${index}`} activeKey={isOpen ? item.id : null} style={{ paddingBottom: 4 }}>
+                <Accordion key={`${item.id}-${index}`} activeKey={isOpen ? item.id : null} style={{ paddingBottom: 4, border:0 }}>
                   <Card>
                     <Card.Header>
                       <CheckBox item={item} />

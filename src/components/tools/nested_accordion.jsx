@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { Accordion, Spinner } from 'react-bootstrap';
 //import '@/components/css/accordion.css';
-import { IoMdCheckmarkCircleOutline } from "react-icons/io";
-import { FaRegCircle } from "react-icons/fa";
+// import { IoMdCheckmarkCircleOutline } from "react-icons/io";
+import { IoMdAddCircleOutline, IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { useAppDispatch } from '@/app/GlobalRedux/hooks';
 import { setDataset } from '@/app/GlobalRedux/Features/dataset/dataSlice';
 import { setAccordion } from '@/app/GlobalRedux/Features/accordion/accordionSlice';
@@ -170,7 +170,7 @@ const NestedAccordion = ({ data, openIds }) => {
                         {activeItemId === contentItem.id ? (
                           <IoMdCheckmarkCircleOutline size={22} style={{ cursor: 'pointer', color: 'green' }} />
                         ) : (
-                          <FaRegCircle size={22} style={{ cursor: 'pointer' }} />
+                          <IoMdAddCircleOutline size={22} style={{ cursor: 'pointer' }} />
                         )}
                       </div>
                     </div>
@@ -200,7 +200,7 @@ const NestedAccordion = ({ data, openIds }) => {
               {activeItemId === contentItem.id ? (
                 <IoMdCheckmarkCircleOutline size={22} style={{ cursor: 'pointer', color: 'green' }} />
               ) : (
-                <FaRegCircle size={22} style={{ cursor: 'pointer' }} />
+                <IoMdAddCircleOutline size={22} style={{ cursor: 'pointer' }} />
               )}
             </div>
           </div>
@@ -218,7 +218,7 @@ const NestedAccordion = ({ data, openIds }) => {
       return (
         <Accordion.Item eventKey={item.id} key={`${item.id}-${index}`} style={{ borderRadius: 0, padding: 2, borderRight: '1px solid #ccc', borderBottom: '1px solid #ccc' }}>
           <Accordion.Header onClick={(e) => e.currentTarget.blur()}>
-            {item.display_title}
+            {item.display_title} 
             <span className="badge bg-light text-dark ms-2">
               {countItems(item)}
             </span>
@@ -242,6 +242,7 @@ const NestedAccordion = ({ data, openIds }) => {
         <Spinner animation="border" variant="primary" style={{ marginLeft: 150, marginTop: 50 }} />
       ) : (
         <Accordion flush defaultActiveKey={activeKeys}>
+        
           {renderAccordionItems(data)}
         </Accordion>
       )}

@@ -2,6 +2,7 @@
   position: relative;
   width: 100%;
   margin: 0;
+  padding: 0;
 }
 
 .small-map-container {
@@ -11,15 +12,21 @@
   overflow: hidden;
   background: #f8f9fa;
   transition: box-shadow 0.2s;
+  margin: 0;
+  padding: 0;
 }
 
 /* Special styling for small map within explore modal */
 .explore-modal .small-map-container {
   background: transparent !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .explore-modal .small-map-outer {
   background: transparent !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .small-map-loading-overlay {

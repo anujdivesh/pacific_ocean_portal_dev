@@ -15,11 +15,70 @@ import TimeseriesWfs from './timeseries_wfs';
 import TimeseriesSofar from './timeseries_sofar';
 import TideImageComponent from './tide_image';
 import Histogram from './histogram';
+import ShareWorkbench from './shareWorkbench';
+import { FaShare } from 'react-icons/fa';
+
+// Custom tab styles
+const customTabStyles = `
+  .custom-bottom-tabs .nav-link.active {
+    color: rgb(0, 123, 255) !important;
+    background-color: transparent !important;
+    border-color: transparent transparent rgb(0, 123, 255) transparent !important;
+    border-bottom: 2px solid rgb(0, 123, 255) !important;
+  }
+  .custom-bottom-tabs .nav-link.active:hover,
+  .custom-bottom-tabs .nav-link.active:focus {
+    color: rgb(0, 123, 255) !important;
+    border-bottom: 2px solid rgb(0, 123, 255) !important;
+  }
+  .custom-bottom-tabs .nav-tabs .nav-link {
+    border: none !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+  }
+  .custom-bottom-tabs.nav-tabs {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+  }
+  body.dark-mode .custom-bottom-tabs .nav-link.active {
+    color: rgb(0, 123, 255) !important;
+    background-color: transparent !important;
+    border-color: transparent transparent rgb(0, 123, 255) transparent !important;
+    border-bottom: 2px solid rgb(0, 123, 255) !important;
+  }
+  body.dark-mode .custom-bottom-tabs .nav-link.active:hover,
+  body.dark-mode .custom-bottom-tabs .nav-link.active:focus {
+    color: rgb(0, 123, 255) !important;
+    border-bottom: 2px solid rgb(0, 123, 255) !important;
+  }
+  body.dark-mode .custom-bottom-tabs .nav-tabs .nav-link {
+    border: none !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  }
+  body.dark-mode .custom-bottom-tabs.nav-tabs {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  }
+  
+  /* Remove square borders from close button - more aggressive */
+  #close-offcanvas-btn,
+  #close-offcanvas-btn:hover,
+  #close-offcanvas-btn:focus,
+  #close-offcanvas-btn:active,
+  #close-offcanvas-btn.active,
+  #close-offcanvas-btn:focus-visible,
+  #close-offcanvas-btn.btn-link:focus {
+    box-shadow: none !important;
+    border: none !important;
+    outline: none !important;
+    text-decoration: none !important;
+    background: transparent !important;
+    color: rgb(0, 123, 255) !important;
+  }
+`;
 
 function BottomOffCanvas({ isVisible, id }) {
   const currentId = useAppSelector((state) => state.offcanvas.currentId);
   const mapLayer = useAppSelector((state) => state.mapbox.layers);
   const [layerType, setLayerType] = useState('');
+  const [showShareModal, setShowShareModal] = useState(false);
   
   useEffect(() => {
     if (currentId === id) {
@@ -63,6 +122,14 @@ function BottomOffCanvas({ isVisible, id }) {
     dispatch(hideoffCanvas());
   };
 
+  const handleShowShareModal = () => {
+    setShowShareModal(true);
+  };
+
+  const handleHideShareModal = () => {
+    setShowShareModal(false);
+  };
+
   const handleMouseMove = (e) => {
     if (draggingRef.current) {
       const deltaY = e.clientY - startYRef.current;
@@ -91,7 +158,7 @@ function BottomOffCanvas({ isVisible, id }) {
     switch (layerType) {
       case 'WMS':
         return (
-          <Tabs activeKey={selectedTab} onSelect={(k) => setSelectedTab(k)} id="offcanvas-tabs" className="mb-3 custom-tabs">
+          <Tabs activeKey={selectedTab} onSelect={(k) => setSelectedTab(k)} id="offcanvas-tabs" className="mb-3 custom-bottom-tabs">
             <Tab eventKey="tab4" title="Get Map">
               <DynamicImage height={height - 100} />
             </Tab>
@@ -115,7 +182,7 @@ function BottomOffCanvas({ isVisible, id }) {
       
       case 'WFS':
         return (
-          <Tabs activeKey={selectedTab} onSelect={(k) => setSelectedTab(k)} id="offcanvas-tabs" className="mb-3 custom-tabs">
+          <Tabs activeKey={selectedTab} onSelect={(k) => setSelectedTab(k)} id="offcanvas-tabs" className="mb-3 custom-bottom-tabs">
              <Tab eventKey="tab4" title="Timeseries">
                 <TimeseriesWfs height={height - 100} data={data} /> {/* Subtracting space for header */}
               </Tab>
@@ -124,7 +191,7 @@ function BottomOffCanvas({ isVisible, id }) {
       
       case 'SOFAR':
         return (
-          <Tabs activeKey={selectedTab} onSelect={(k) => setSelectedTab(k)} id="offcanvas-tabs" className="mb-3 custom-tabs">
+          <Tabs activeKey={selectedTab} onSelect={(k) => setSelectedTab(k)} id="offcanvas-tabs" className="mb-3 custom-bottom-tabs">
             <Tab eventKey="tab4" title="Timeseries">
               <TimeseriesSofar height={height - 100} data={data} /> 
             </Tab>
@@ -133,7 +200,7 @@ function BottomOffCanvas({ isVisible, id }) {
 
         case 'TIDE':
           return (
-            <Tabs activeKey={selectedTab} onSelect={(k) => setSelectedTab(k)} id="offcanvas-tabs" className="mb-3 custom-tabs">
+            <Tabs activeKey={selectedTab} onSelect={(k) => setSelectedTab(k)} id="offcanvas-tabs" className="mb-3 custom-bottom-tabs">
               <Tab eventKey="tab4" title="Tide Chart">
                 <TideImageComponent height={height - 100} data={data} /> 
               </Tab>
@@ -186,7 +253,43 @@ function BottomOffCanvas({ isVisible, id }) {
         ></div>
       </div>
 
+      {/* Share Button */}
       <Button
+        onClick={handleShowShareModal}
+        style={{
+          position: 'absolute',
+          bottom: '15px',
+          right: '15px',
+          zIndex: 10,
+          width: '40px',
+          height: '40px',
+          background: 'var(--color-surface, #fff)',
+          color: 'var(--color-text, #333)',
+          border: '1px solid var(--color-border, #ddd)',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 1px 5px rgba(0,0,0,0.2)',
+          transition: 'all 0.2s ease'
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.background = 'var(--color-background, #f8f9fa)';
+          e.target.style.transform = 'scale(1.05)';
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.background = 'var(--color-surface, #fff)';
+          e.target.style.transform = 'scale(1)';
+        }}
+        title="Share Workbench"
+      >
+        <FaShare size={16} />
+      </Button>
+
+      {/* Close Button */}
+      <Button
+        id="close-offcanvas-btn"
         variant="link"
         onClick={handleClose}
         style={{
@@ -196,15 +299,27 @@ function BottomOffCanvas({ isVisible, id }) {
           zIndex: 10,
           fontSize: '1.5rem',
           padding: '0',
-          paddingRight: '10px'
+          paddingRight: '10px',
+          color: 'rgb(0, 123, 255)',
+          border: 'none',
+          boxShadow: 'none',
+          outline: 'none'
         }}
       >
         <span>&times;</span>
       </Button>
 
+      <style>{customTabStyles}</style>
+      
       <Offcanvas.Body style={{ paddingTop: '3', borderRadius: 0 }}>
         {renderTabsBasedOnLayerType()}
       </Offcanvas.Body>
+
+      {/* Share Workbench Modal */}
+      <ShareWorkbench 
+        show={showShareModal} 
+        onHide={handleHideShareModal} 
+      />
     </Offcanvas>
   );
 }

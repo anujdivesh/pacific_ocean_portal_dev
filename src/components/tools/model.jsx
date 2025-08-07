@@ -119,80 +119,54 @@ const ExploreModal = ({ show, onClose, title, bodyContent }) => {
   return (
     <Modal show={show} onHide={onClose} centered scrollable size="xl" className="custom-modal explore-modal">
       <Modal.Header closeButton className="custom-header2" style={{ background: 'var(--color-surface, #fff)', borderBottom: '1px solid var(--color-secondary, #e5e7eb)', paddingTop: '8px', paddingBottom: '8px', minHeight: 'unset' }}>
-        <Modal.Title style={{ fontSize: '16px', color: 'var(--color-primary, #2563eb)', fontWeight: 700, padding: 0 }}>
-          <div className="tab-bar-wrap" style={{ 
-            display: 'flex', 
-            flexWrap: 'nowrap', 
-            gap: '6px', 
-            alignItems: 'center', 
-            margin: 0,
-            overflowX: 'auto',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none'
-          }}>
-            {/* Show the "Tailored" button only if the user is logged in */}
-            {userId && (
-              <button
-                className={`btn btn-sm rounded-pill ${showTailoredContent ? 'btn-primary' : 'btn-light'} fw-semibold shadow-sm`}
-                style={{
-                  padding: '4px 8px',
-                  background: showTailoredContent ? 'var(--color-primary, #2563eb)' : 'var(--color-surface, #fff)',
-                  color: showTailoredContent ? '#fff' : 'var(--color-text, #1e293b)',
-                  marginLeft: '0',
-                  border: showTailoredContent ? '1px solid var(--color-primary, #2563eb)' : '1px solid var(--color-secondary, #dee2e6)',
-                  fontWeight: 500,
-                  display: 'flex', alignItems: 'center', gap: 4,
-                  height: '28px',
-                  minWidth: 'unset',
-                  boxSizing: 'border-box'
-                }}
-                onClick={handleTailoredClick}
-              >
-                <FaDotCircle style={{ color: showTailoredContent ? '#fff' : 'var(--color-primary, #2563eb)' }} />
-                Tailored Products
-              </button>
-            )}
-            {/* Render the theme buttons */}
-            {theme.map((themeItem, idx) => (
-              <button
-                key={themeItem.id}
-                className={`btn btn-sm rounded-pill ${selectedId === themeItem.id ? 'btn-primary' : 'btn-light'} fw-semibold shadow-sm`}
-                style={{
-                  padding: '4px 8px',
-                  color: selectedId === themeItem.id ? '#fff' : 'var(--color-text, #1e293b)',
-                  marginLeft: idx === 0 && !userId ? '0' : '0',
-                  marginRight: '0',
-                  display: 'flex', alignItems: 'center', gap: 4,
-                  background: selectedId === themeItem.id ? 'var(--color-primary, #2563eb)' : 'var(--color-surface, #fff)',
-                  border: selectedId === themeItem.id ? '1px solid var(--color-primary, #2563eb)' : '1px solid var(--color-secondary, #dee2e6)',
-                  fontWeight: 500,
-                  height: '28px',
-                  minWidth: 'unset',
-                  boxSizing: 'border-box'
-                }}
-                onClick={() => handleThemeClick(themeItem.id)}
-              >
-                {selectedId === themeItem.id ? (
-                  <FaDotCircle style={{ color: '#fff' }} />
-                ) : (
-                  <FaRegCircle style={{ color: 'var(--color-primary, #2563eb)' }} />
-                )}
-                {themeItem.name}
-              </button>
-            ))}
-          </div>
+      <Modal.Title style={{ fontSize: '18px' }}>
+          {/* Show the "Tailored" button only if the user is logged in */}
+          {userId && (
+            <button
+            className={`btn btn-sm rounded-pill ${showTailoredContent ? 'active' : 'btn-light'}`}
+            style={{
+              padding: '8px',
+              backgroundColor: showTailoredContent ? '#0a58ca' : '',
+              color: showTailoredContent ? 'white !important' : 'var(--color-text, #1e293b)',
+              marginLeft: '4px',
+              border: showTailoredContent ? '1px solid #0a58ca' : '1px solid #dee2e6',
+              fontWeight: '500'
+            }}
+            onClick={handleTailoredClick}
+          >
+              &nbsp;Tailored Products&nbsp;
+            </button>
+          )}
+
+          {/* Render the theme buttons */}
+          {theme.map((themeItem) => (
+            <button
+              key={themeItem.id}
+              className={`btn btn-sm rounded-pill ${selectedId === themeItem.id ? 'active' : 'btn-light'}`}
+              style={{ 
+                padding: '8px', 
+                backgroundColor: selectedId === themeItem.id ? '#0a58ca' : '',
+                color: selectedId === themeItem.id ? 'white !important' : 'var(--color-text, #1e293b)', 
+                marginLeft: '4px',
+                border: selectedId === themeItem.id ? '1px solid #0a58ca' : '1px solid #dee2e6'
+              }}
+              onClick={() => handleThemeClick(themeItem.id)}
+            >
+              &nbsp;{themeItem.name} &nbsp;
+            </button>
+          ))}
         </Modal.Title>
       </Modal.Header>
-      <Modal.Body style={{ padding: "0%", marginRight: "auto", marginLeft: "auto", width: '100%', background: 'var(--color-surface, #fff)', color: 'var(--color-text, #1e293b)' }}>
+      <Modal.Body style={{ padding: 0, margin: 0, width: '100%', background: 'var(--color-surface, #fff)', color: 'var(--color-text, #1e293b)' }}>
         <Row className="g-0">
           <Col md={4} className="scrollable-column" style={{ background: 'var(--color-surface, #fff)', borderRight: '1.5px solid var(--color-secondary, #e5e7eb)' }}>
             {loading ? (
               <Spinner animation="border" variant="primary" style={{ margin: 170 }} />
             ) : (
-              <MyAccordion className="scrollable-content" dataset={data} />
+              <MyAccordion className="scrollable-content modal-accordion" dataset={data} />
             )}
           </Col>
-          <Col md={8} className="scrollable-column" style={{ background: 'var(--color-surface, #fff)' }}>
+          <Col md={8} className="scrollable-column" style={{ background: 'var(--color-surface, #fff)', padding: 0 }}>
             <AccordionMetadata />
           </Col>
         </Row>

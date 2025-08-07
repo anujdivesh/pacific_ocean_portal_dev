@@ -65,14 +65,14 @@ function Download({ height }) {
 
   return (
     <>
-      <div style={{ display: 'flex', flexDirection: 'column', height: `${height}px`, padding: '10px', backgroundColor: '#f4f4f4', borderRadius: '8px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', height: `${height}px`, padding: '10px', backgroundColor: 'var(--color-surface, #f4f4f4)', borderRadius: '8px', border: '1px solid var(--color-border, #e0e0e0)' }}>
         <div style={{ marginBottom: '10px' }}>
-          <p style={{ fontSize: '15px', margin: 0, color: '#333' }}>
+          <p style={{ fontSize: '15px', margin: 0, color: 'var(--color-text, #333)' }}>
             <strong>Dataset Name:</strong> {mapLayer[mapLayer.length - 1]?.layer_information.layer_title}
           </p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <p style={{ fontSize: '15px', margin: 0, color: '#333', marginRight: '10px' }}>
+          <p style={{ fontSize: '15px', margin: 0, color: 'var(--color-text, #333)', marginRight: '10px' }}>
             <strong>OpenDAP Connector:</strong>
           </p>
           <input
@@ -82,10 +82,10 @@ function Download({ height }) {
             style={{
               padding: '5px 10px',
               fontSize: '14px',
-              border: '1px solid #ccc',
+              border: '1px solid var(--color-border, #ccc)',
               borderRadius: '4px',
-              backgroundColor: '#e9e9e9',
-              color: '#333',
+              backgroundColor: 'var(--color-background, #e9e9e9)',
+              color: 'var(--color-text, #333)',
               width: '80%',
               marginRight: '8px'
             }}

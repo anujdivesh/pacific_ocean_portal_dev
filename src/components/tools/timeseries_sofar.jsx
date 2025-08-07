@@ -329,7 +329,7 @@ function TimeseriesSofar({ height }) {
         display: 'flex',
         alignItems: 'center',
       }}>
-        <p style={{ fontSize: 16, color: '#333' }}>Please select a station to view wave data.</p>
+        <p style={{ fontSize: 16, color: 'var(--color-text, #333)' }}>Please select a station to view wave data.</p>
       </div>
     );
   }
@@ -436,6 +436,11 @@ function TimeseriesSofar({ height }) {
       }}>
         {/* Dynamic y-axes logic */}
         {(() => {
+          // Check if dark mode is active
+          const isDarkMode = document.body.classList.contains('dark-mode');
+          const textColor = isDarkMode ? '#ffffff' : '#333';
+          const gridColor = isDarkMode ? '#4a5568' : '#e0e0e0';
+          
           // Build y-axes dynamically based on datasets
           const yAxes = chartData.datasets.map((dataset, index) => ({
             id: `y-axis-${index}`,
@@ -445,9 +450,20 @@ function TimeseriesSofar({ height }) {
             title: {
               display: true,
               text: dataset.label,
+              color: textColor,
+              font: {
+                weight: 'normal'
+              }
+            },
+            ticks: {
+              color: textColor,
+              font: {
+                weight: 'normal'
+              }
             },
             grid: {
               drawOnChartArea: index === 0, // only draw grid for the first axis
+              color: gridColor,
             },
           }));
 
@@ -458,6 +474,13 @@ function TimeseriesSofar({ height }) {
                 display: true,
                 maxRotation: 45,
                 autoSkip: true,
+                color: textColor,
+                font: {
+                  weight: 'normal'
+                }
+              },
+              grid: {
+                color: gridColor,
               },
             },
           };
@@ -479,9 +502,22 @@ function TimeseriesSofar({ height }) {
                 },
                 plugins: {
                   tooltip: {
+                    backgroundColor: isDarkMode ? '#2d3748' : 'rgba(0,0,0,0.8)',
+                    titleColor: isDarkMode ? '#ffffff' : '#fff',
+                    bodyColor: isDarkMode ? '#ffffff' : '#fff',
+                    borderColor: isDarkMode ? '#4a5568' : '#ccc',
+                    borderWidth: 1,
                     callbacks: {
                       label: function(context) {
                         return `${context.dataset.label}: ${context.parsed.y}`;
+                      }
+                    }
+                  },
+                  legend: {
+                    labels: {
+                      color: textColor,
+                      font: {
+                        weight: 'normal'
                       }
                     }
                   }
