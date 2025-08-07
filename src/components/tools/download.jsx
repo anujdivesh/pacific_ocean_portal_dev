@@ -22,15 +22,17 @@ function Download({ height }) {
 
   // Effect to handle coordinate updates and API requests only when valid coordinates are present
   useEffect(() => {
-    // var selected_layer = getLayerById(mapLayer, currentId)
-    // let url_map = selected_layer.layer_information.url;
-    if (!mapLayer || !currentId) return;
+    if (!mapLayer || mapLayer.length === 0 || !currentId) {
+      lastlayer.current = '';
+      return;
+    }
     
     const selected_layer = getLayerById(mapLayer, currentId);
     
     // checking to see if its empty by it i mean selected layers
     if (!selected_layer || !selected_layer.layer_information) {
-      console.error('No layer found or layer is missing layer_information');
+      // Layer was likely removed while offcanvas is open. Reset and exit quietly.
+      lastlayer.current = '';
       return;
     }
     
@@ -38,7 +40,7 @@ function Download({ height }) {
     
     // Add null check for url_map
     if (!url_map) {
-      console.error('No URL found in layer information');
+      lastlayer.current = '';
       return;
     }
     
@@ -68,7 +70,7 @@ function Download({ height }) {
       <div style={{ display: 'flex', flexDirection: 'column', height: `${height}px`, padding: '10px', backgroundColor: 'var(--color-surface, #f4f4f4)', borderRadius: '8px', border: '1px solid var(--color-border, #e0e0e0)' }}>
         <div style={{ marginBottom: '10px' }}>
           <p style={{ fontSize: '15px', margin: 0, color: 'var(--color-text, #333)' }}>
-            <strong>Dataset Name:</strong> {mapLayer[mapLayer.length - 1]?.layer_information.layer_title}
+            <strong>Dataset Name:</strong> {getLayerById(mapLayer, currentId)?.layer_information?.layer_title || '—'}
           </p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -102,6 +104,7 @@ function Download({ height }) {
               cursor: 'pointer',
               transition: 'background 0.2s'
             }}
+            disabled={!lastlayer.current}
           >
             {copied ? "Copied!" : "Copy"}
           </button>
