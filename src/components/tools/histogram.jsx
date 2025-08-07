@@ -418,7 +418,7 @@ function Histogram({ height }) {
         display: 'flex',
         alignItems: 'center',
       }}>
-        <p style={{ fontSize: 16, color: '#333' }}>Click on map to retrieve data.</p>
+        <p style={{ fontSize: 16, color: 'var(--color-text, #333)' }}>Click on map to retrieve data.</p>
       </div>
     );
   }
@@ -434,7 +434,7 @@ function Histogram({ height }) {
         display: 'flex',
         alignItems: 'center',
       }}>
-        <p style={{ fontSize: 16, color: '#333' }}>This Feature is disabled.</p>
+        <p style={{ fontSize: 16, color: 'var(--color-text, #333)' }}>This Feature is disabled.</p>
       </div>
     );
   }

@@ -440,6 +440,22 @@ body.dark-mode .navbar {
   color: var(--color-text) !important;
   border: none !important;
 }
+
+/* Chart.js text styling for dark mode */
+body.dark-mode canvas {
+  color: #ffffff !important;
+}
+
+body.dark-mode .chartjs-tooltip {
+  background-color: var(--color-surface) !important;
+  color: #ffffff !important;
+  border-color: var(--color-border) !important;
+}
+
+/* Modal title white text */
+.modal-header .modal-title {
+  color: white !important;
+}
 body.dark-mode .navbar-brand {
   color: var(--color-text) !important;
 }
