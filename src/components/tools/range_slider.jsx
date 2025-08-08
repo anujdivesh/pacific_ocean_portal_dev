@@ -141,12 +141,17 @@ function RangeSlider({item}) { // Default value for the slider
       <Row className="align-items-center g-1">
         {/* Time Label - aligned with slider */}
         <Col xs="auto" className="pe-1" style={{ marginTop: "-10px" }}>
-          <span style={{ 
-            fontSize: '12px', 
-            whiteSpace: 'nowrap',
-            fontWeight: '500',
-            color: '#495057'
-          }}>Time Range:</span>
+          {(() => {
+            const isDarkMode = typeof document !== 'undefined' && document.body.classList.contains('dark-mode');
+            return (
+              <span style={{ 
+                fontSize: '12px', 
+                whiteSpace: 'nowrap',
+                fontWeight: '500',
+                color: isDarkMode ? '#ffffff' : '#495057'
+              }}>Time Range:</span>
+            );
+          })()}
         </Col>
         
         {/* Combined Slider + Controls */}
@@ -171,57 +176,75 @@ function RangeSlider({item}) { // Default value for the slider
             
             {/* Control buttons */}
             <div className="d-flex gap-1" style={{ flexShrink: 0 }}>
-              <button 
-                className="btn btn-outline-secondary btn-xs p-0"
-                onClick={handlePreviousClick}
-                style={{ 
-                  width: "22px",
-                  height: "22px",
-                  lineHeight: "1"
-                }}
-              >
-                <FaBackward size={8} style={{marginTop:'-3px'}}/>
-              </button>
-              <button 
-                className={`btn btn-xs p-0 ${playing ? 'btn-danger' : 'btn-success'}`}
-                onClick={handlePlayClick}
-                style={{ 
-                  width: "22px",
-                  height: "22px",
-                  lineHeight: "1"
-                }}
-              >
-                {playing ? <FaPause size={8} style={{marginTop:'-3px'}}/> : <FaPlay size={8} style={{marginTop:'-3px'}}/>}
-              </button>
-              <button 
-                className="btn btn-outline-secondary btn-xs p-0"
-                onClick={handleNextClick}
-                style={{ 
-                  width: "22px",
-                  height: "22px",
-                  lineHeight: "1"
-                }}
-              >
-                <FaForward size={8} style={{marginTop:'-3px'}}/>
-              </button>
+              {(() => {
+                const isDarkMode = typeof document !== 'undefined' && document.body.classList.contains('dark-mode');
+                return (
+                  <>
+                    <button 
+                      className="btn btn-xs p-0"
+                      onClick={handlePreviousClick}
+                      style={{ 
+                        width: "22px",
+                        height: "22px",
+                        lineHeight: "1",
+                        backgroundColor: isDarkMode ? '#495057' : '#f8f9fa',
+                        border: isDarkMode ? '1px solid #6c757d' : '1px solid #dee2e6',
+                        color: isDarkMode ? '#ffffff' : '#495057'
+                      }}
+                    >
+                      <FaBackward size={8} style={{marginTop:'-3px'}}/>
+                    </button>
+                    <button 
+                      className={`btn btn-xs p-0 ${playing ? 'btn-danger' : 'btn-success'}`}
+                      onClick={handlePlayClick}
+                      style={{ 
+                        width: "22px",
+                        height: "22px",
+                        lineHeight: "1"
+                      }}
+                    >
+                      {playing ? <FaPause size={8} style={{marginTop:'-3px'}}/> : <FaPlay size={8} style={{marginTop:'-3px'}}/>}
+                    </button>
+                    <button 
+                      className="btn btn-xs p-0"
+                      onClick={handleNextClick}
+                      style={{ 
+                        width: "22px",
+                        height: "22px",
+                        lineHeight: "1",
+                        backgroundColor: isDarkMode ? '#495057' : '#f8f9fa',
+                        border: isDarkMode ? '1px solid #6c757d' : '1px solid #dee2e6',
+                        color: isDarkMode ? '#ffffff' : '#495057'
+                      }}
+                    >
+                      <FaForward size={8} style={{marginTop:'-3px'}}/>
+                    </button>
+                  </>
+                );
+              })()}
             </div>
           </div>
           
           {/* Date label - closer to slider */}
-          <div style={{ 
-            marginTop: "2px",
-            marginLeft: "2px"
-          }}>
-            <Badge bg="secondary" className="fw-bold small p-1" style={{
-              fontSize: "11px",
-              color: "white",
-              backgroundColor: "#6c757d",
-              padding: "2px 6px",
-              borderRadius: "4px"
-            }}>
-              {formatDateToISOWithoutMilliseconds(sliderValue)}
-            </Badge>
-          </div>
+          {(() => {
+            const isDarkMode = typeof document !== 'undefined' && document.body.classList.contains('dark-mode');
+            return (
+              <div style={{ 
+                marginTop: "2px",
+                marginLeft: "2px"
+              }}>
+                <Badge bg="secondary" className="fw-bold small p-1" style={{
+                  fontSize: "11px",
+                  color: isDarkMode ? '#ffffff' : 'white',
+                  backgroundColor: "#6c757d",
+                  padding: "2px 6px",
+                  borderRadius: "4px"
+                }}>
+                  {formatDateToISOWithoutMilliseconds(sliderValue)}
+                </Badge>
+              </div>
+            );
+          })()}
         </Col>
       </Row>
     </div>

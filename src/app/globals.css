@@ -406,6 +406,38 @@ body.dark-mode .mobile-sidebar {
   border-right: 1px solid #6b7280 !important;
 }
 
+/* Enhanced sidebar styling to ensure persistence across navigation */
+.desktop-sidebar,
+.mobile-sidebar {
+  border-right: 1px solid var(--color-border, #dee2e6) !important;
+  background-color: var(--color-surface, #ffffff) !important;
+  color: var(--color-text, #1e293b) !important;
+}
+
+/* Force sidebar borders to persist */
+body:has(.desktop-sidebar) .desktop-sidebar,
+body:has(.mobile-sidebar) .mobile-sidebar {
+  border-right: 1px solid var(--color-border, #dee2e6) !important;
+}
+
+body.dark-mode:has(.desktop-sidebar) .desktop-sidebar,
+body.dark-mode:has(.mobile-sidebar) .mobile-sidebar {
+  border-right: 1px solid var(--color-border, #6b7280) !important;
+}
+
+/* Ensure sidebar content maintains styling */
+.desktop-sidebar .sidebar-scrollable,
+.mobile-sidebar .sidebar-scrollable {
+  background-color: var(--color-surface, #ffffff) !important;
+  color: var(--color-text, #1e293b) !important;
+}
+
+body.dark-mode .desktop-sidebar .sidebar-scrollable,
+body.dark-mode .mobile-sidebar .sidebar-scrollable {
+  background-color: var(--color-surface, #3f4854) !important;
+  color: var(--color-text, #f1f5f9) !important;
+}
+
 body.dark-mode .sidebar-header,
 body.dark-mode .sidebar-footer {
   border-bottom: 1px solid #6b7280 !important;

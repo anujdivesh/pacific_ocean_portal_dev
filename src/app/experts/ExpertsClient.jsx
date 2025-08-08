@@ -100,10 +100,10 @@ const countryConfigs = [
 const Experts = () => {
     const mapRef = useRef(null);
     const [basemap, setBasemap] = useState({ 
-        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', // Satellite default
-        attribution: '&copy; Esri, Maxar, Earthstar Geographics, and the GIS User Community' 
+        url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', // OpenStreetMap default
+        attribution: '&copy; OpenStreetMap contributors' 
     });
-    const [basemapOption, setBasemapOption] = useState('satellite'); // Default to satellite
+    const [basemapOption, setBasemapOption] = useState('osm'); // Default to OpenStreetMap
     const [expertsData, setExpertsData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -444,7 +444,7 @@ const Experts = () => {
                     gap: '10px'
                 }}>
                     <Spinner animation="border" variant="primary"  />
-                    <span style={{ color: '#2c3e50', fontSize: '1.1rem' }}>
+                    <span style={{ fontSize: '1.1rem' }}>
                         Loading ocean experts data...
                     </span>
                 </div>

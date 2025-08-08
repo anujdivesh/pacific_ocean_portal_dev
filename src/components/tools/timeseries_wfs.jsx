@@ -173,11 +173,53 @@ function TimeseriesWfs({ height }) {
                   display: true,
                   maxRotation: 45,
                   autoSkip: true,
+                  color: (() => {
+                    const isDarkMode = typeof document !== 'undefined' && document.body.classList.contains('dark-mode');
+                    return isDarkMode ? '#ffffff' : '#666666';
+                  })(),
+                },
+                grid: {
+                  color: (() => {
+                    const isDarkMode = typeof document !== 'undefined' && document.body.classList.contains('dark-mode');
+                    return isDarkMode ? '#444444' : '#e1e1e1';
+                  })(),
+                },
+                border: {
+                  color: (() => {
+                    const isDarkMode = typeof document !== 'undefined' && document.body.classList.contains('dark-mode');
+                    return isDarkMode ? '#444444' : '#e1e1e1';
+                  })(),
                 },
               },
               y: {
                 ticks: {
                   display: true,
+                  color: (() => {
+                    const isDarkMode = typeof document !== 'undefined' && document.body.classList.contains('dark-mode');
+                    return isDarkMode ? '#ffffff' : '#666666';
+                  })(),
+                },
+                grid: {
+                  color: (() => {
+                    const isDarkMode = typeof document !== 'undefined' && document.body.classList.contains('dark-mode');
+                    return isDarkMode ? '#444444' : '#e1e1e1';
+                  })(),
+                },
+                border: {
+                  color: (() => {
+                    const isDarkMode = typeof document !== 'undefined' && document.body.classList.contains('dark-mode');
+                    return isDarkMode ? '#444444' : '#e1e1e1';
+                  })(),
+                },
+              },
+            },
+            plugins: {
+              legend: {
+                labels: {
+                  color: (() => {
+                    const isDarkMode = typeof document !== 'undefined' && document.body.classList.contains('dark-mode');
+                    return isDarkMode ? '#ffffff' : '#666666';
+                  })(),
                 },
               },
             },

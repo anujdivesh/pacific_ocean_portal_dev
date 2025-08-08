@@ -392,12 +392,19 @@ function Tabular({ height }) {
     );
   }
 
+  const isDarkMode = typeof document !== 'undefined' && document.body.classList.contains('dark-mode');
+  const textColor = isDarkMode ? '#ffffff' : '#000000';
+  const bgColor = isDarkMode ? '#2d3748' : '#eeeeee';
+  const borderColor = isDarkMode ? '#4a5568' : '#E5E4E2';
+  const hoverBgColor = isDarkMode ? '#4a5568' : '#eeeeee';
+  const hoverTextColor = isDarkMode ? '#ffffff' : '#000000';
+
   const thFirstCol = {
     textAlign: 'center',
     fontWeight: 'normal',
-    backgroundColor: '#eeeeee',
-    color: 'black',
-    border: '1px solid #E5E4E2',
+    backgroundColor: bgColor,
+    color: textColor,
+    border: `1px solid ${borderColor}`,
     whiteSpace: 'nowrap',
     maxWidth: '240px',
     width: 'max-content',
@@ -405,9 +412,9 @@ function Tabular({ height }) {
   const thOtherCols = {
     fontWeight: 'normal',
     textAlign: 'center',
-    backgroundColor: '#eeeeee',
-    color: 'black',
-    border: '1px solid #E5E4E2',
+    backgroundColor: bgColor,
+    color: textColor,
+    border: `1px solid ${borderColor}`,
     padding: '0 4px',
     minWidth: 32,
     maxWidth: 48,
@@ -418,25 +425,27 @@ function Tabular({ height }) {
     fontWeight: 'normal',
     textAlign: 'left',
     padding: '2px 6px',
-    border: '1px solid #E5E4E2',
+    border: `1px solid ${borderColor}`,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     maxWidth: '240px',
     width: 'max-content',
-    backgroundColor: '#eeeeee',
+    backgroundColor: bgColor,
+    color: textColor,
   };
   const tdOtherCols = {
     fontWeight: 'normal',
     textAlign: 'center',
     padding: '0 6px',
-    border: '1px solid #E5E4E2',
+    border: `1px solid ${borderColor}`,
     minWidth: 32,
     maxWidth: 48,
     width: 38,
     whiteSpace: 'nowrap',
     cursor: 'pointer',
-    transition: 'background 0.2s, color 0.2s'
+    transition: 'background 0.2s, color 0.2s',
+    color: textColor,
   };
 
   const ArrowSVG = ({ angle }) => (
@@ -446,8 +455,8 @@ function Tabular({ height }) {
       transition: "transform 0.2s",
       verticalAlign: "middle"
     }}>
-      <line x1="11" y1="18" x2="11" y2="4" stroke="#222" strokeWidth="2"/>
-      <polygon points="11,2 7,8 15,8" fill="#222" />
+      <line x1="11" y1="18" x2="11" y2="4" stroke={textColor} strokeWidth="2"/>
+      <polygon points="11,2 7,8 15,8" fill={textColor} />
     </svg>
   );
 
@@ -472,7 +481,7 @@ function Tabular({ height }) {
           borderCollapse: 'collapse',
           textAlign: 'center',
           fontSize: 14,
-          border: '1px solid #fff',
+          border: `1px solid ${borderColor}`,
           tableLayout: 'auto',
           width: 'auto',
           minWidth: 0,
@@ -540,8 +549,8 @@ function Tabular({ height }) {
                     if (hover.row === rowIdx && hover.col === colIdx) {
                       cellStyle = {
                         ...cellStyle,
-                        backgroundColor: '#eeeeee',
-                        color: '#000',
+                        backgroundColor: hoverBgColor,
+                        color: hoverTextColor,
                         zIndex: 10
                       };
                     }
@@ -602,8 +611,8 @@ function Tabular({ height }) {
                         if (hover.row === rowIdx && hover.col === colIdx) {
                           cellStyle = {
                             ...cellStyle,
-                            backgroundColor: '#eeeeee',
-                            color: '#000',
+                            backgroundColor: hoverBgColor,
+                            color: hoverTextColor,
                             zIndex: 10
                           };
                         }

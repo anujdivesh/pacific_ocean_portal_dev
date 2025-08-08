@@ -12,6 +12,7 @@ import Legend from './legend';
 import Opacity from './opacity';
 import DateSelector from './date_selector';
 import { addMapLayer,removeAllMapLayer,removeDuplicateLayers } from '@/app/GlobalRedux/Features/map/mapSlice';
+import { hideoffCanvas } from '@/app/GlobalRedux/Features/offcanvas/offcanvasSlice';
 import { useAccordionButton } from 'react-bootstrap/AccordionButton';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import CheckBox from './checkbox';
@@ -184,6 +185,8 @@ const MyWorkbench = () => {
       dispatch(removeAllMapLayer());
       // Also clear localStorage to prevent duplicates on reload
       localStorage.removeItem('savedLayers');
+      // Hide bottom offcanvas and clear currentId to avoid stale references
+      dispatch(hideoffCanvas());
     }}
   >
      <IoMdRemoveCircleOutline size={14} className="icon" />

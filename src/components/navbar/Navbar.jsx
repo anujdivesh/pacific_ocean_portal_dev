@@ -1,7 +1,7 @@
 "use client"; // Client-side rendering
 
 // Libraries
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { createPortal } from "react-dom";
@@ -53,6 +53,7 @@ function Navigationbar({ children }) {
   const userCountry = useAppSelector((state) => state.auth.country);
   const isVisible = useAppSelector((state) => state.offcanvas.isVisible);
   const currentId = useAppSelector((state) => state.offcanvas.currentId);
+  const prevPathnameRef = useRef(pathname);
 
   const countriesxxx = [
     { id: 26, short_name: "PCN" },
@@ -91,10 +92,10 @@ function Navigationbar({ children }) {
   useEffect(() => {
     const storedTheme = localStorage.getItem("theme");
     if (storedTheme === null) {
-      // If no theme is set in localStorage, default to light mode
-      setDarkMode(false);
-      document.body.classList.remove("dark-mode");
-      localStorage.setItem("theme", "light");
+      // If no theme is set in localStorage, default to dark mode
+      setDarkMode(true);
+      document.body.classList.add("dark-mode");
+      localStorage.setItem("theme", "dark");
     } else if (storedTheme === "dark") {
       setDarkMode(true);
       document.body.classList.add("dark-mode");
@@ -135,7 +136,12 @@ function Navigationbar({ children }) {
   // Close mobile menu when route changes
   useEffect(() => {
     setMobileMenuOpen(false);
-  }, [pathname]);
+    // Close bottom offcanvas when navigating to different pages
+    if (isVisible && prevPathnameRef.current !== pathname) {
+      dispatch(hideoffCanvas());
+    }
+    prevPathnameRef.current = pathname;
+  }, [pathname, isVisible, dispatch]);
 
   // Toggle sidebar
   const handleToggleSidebar = () => {
@@ -759,7 +765,7 @@ function Navigationbar({ children }) {
                 height: 64,
                 borderRadius: '0 32px 32px 0',
                 background: 'var(--color-surface)',
-                border: '1px solid var(--color-border)',
+                border: '1px solid #495057', /* Darker gray border */
                 borderLeft: 'none',
                 display: 'flex',
                 alignItems: 'center',
@@ -771,6 +777,7 @@ function Navigationbar({ children }) {
                 transform: sidebarCollapsed ? 'translateX(0)' : 'translateX(-100%)',
                 opacity: hovered || sidebarCollapsed ? 1 : 0.8,
                 boxShadow: '2px 0 4px rgba(0,0,0,0.1)',
+                color: '#626875'
               }}
               aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             >
