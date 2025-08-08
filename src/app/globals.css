@@ -1100,8 +1100,8 @@ body.dark-mode .offcanvas .offcanvas-body {
     --bs-accordion-transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, border-radius 0.15s ease;
     --bs-accordion-border-color: var(--bs-border-color);
     --bs-accordion-border-width: 1px;
-    --bs-accordion-border-radius: 0.375rem;
-    --bs-accordion-inner-border-radius: calc(0.375rem - 1px);
+    --bs-accordion-border-radius: 0;
+    --bs-accordion-inner-border-radius: 0;
     --bs-accordion-btn-padding-x: 1.25rem;
     --bs-accordion-btn-padding-y: 1rem;
     --bs-accordion-btn-color: #212529;
@@ -1216,15 +1216,15 @@ body.dark-mode .explore-modal .accordion-collapse {
     border-color: #dee2e6 !important;
 }
 
-/* Ensure accordion items have proper spacing and borders */
+/* Ensure accordion items have proper spacing and borders - SHARP CORNERS */
 body.dark-mode .explore-modal .accordion-item:first-child {
-    border-top-left-radius: 0.375rem !important;
-    border-top-right-radius: 0.375rem !important;
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
 }
 
 body.dark-mode .explore-modal .accordion-item:last-child {
-    border-bottom-left-radius: 0.375rem !important;
-    border-bottom-right-radius: 0.375rem !important;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
 }
 
 body.dark-mode .explore-modal .accordion-item:not(:first-child) {
@@ -1330,5 +1330,180 @@ body.dark-mode #dashboard-search-group .input-group-text {
 
 body.dark-mode #dashboard-search-group .form-control {
     border-left: none !important;
+}
+
+/* Modal background color overrides for dark mode */
+body.dark-mode .explore-modal .modal-body {
+  background-color: #ffffff !important;
+}
+
+body.dark-mode .explore-modal .scrollable-column:first-child {
+  background-color: #f8f8f8 !important;
+  border-radius: 0 !important;
+}
+
+body.dark-mode .explore-modal .scrollable-column:last-child {
+  background-color: #ffffff !important;
+  border-radius: 0 !important;
+}
+
+/* Ensure modal accordion styling is consistent in dark mode */
+body.dark-mode .explore-modal .accordion,
+body.dark-mode .explore-modal .accordion-item,
+body.dark-mode .explore-modal .accordion-header,
+body.dark-mode .explore-modal .accordion-button,
+body.dark-mode .explore-modal .accordion-body {
+  border-radius: 0 !important;
+}
+
+/* Force the left panel background in dark mode */
+body.dark-mode .explore-modal .modal-body .row .col-md-4 {
+  background-color: #f8f8f8 !important;
+  border-radius: 0 !important;
+}
+
+/* Force the right panel background in dark mode */
+body.dark-mode .explore-modal .modal-body .row .col-md-8 {
+  background-color: #ffffff !important;
+  border-radius: 0 !important;
+}
+
+/* Force all nested accordion elements to have sharp corners in dark mode */
+body.dark-mode .nested-accordion .accordion,
+body.dark-mode .nested-accordion .accordion-item,
+body.dark-mode .nested-accordion .accordion-header,
+body.dark-mode .nested-accordion .accordion-button,
+body.dark-mode .nested-accordion .accordion-body,
+body.dark-mode .sst-accordion-wrapper .accordion,
+body.dark-mode .sst-accordion-wrapper .accordion-item,
+body.dark-mode .sst-accordion-wrapper .accordion-header,
+body.dark-mode .sst-accordion-wrapper .accordion-button,
+body.dark-mode .sst-accordion-wrapper .accordion-body {
+  border-radius: 0 !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  --bs-accordion-border-radius: 0 !important;
+  --bs-accordion-inner-border-radius: 0 !important;
+}
+
+/* Force all accordion items to have sharp corners regardless of position */
+body.dark-mode .explore-modal .accordion-item,
+body.dark-mode .explore-modal .accordion-item:first-child,
+body.dark-mode .explore-modal .accordion-item:last-child,
+body.dark-mode .nested-accordion .accordion-item,
+body.dark-mode .nested-accordion .accordion-item:first-child,
+body.dark-mode .nested-accordion .accordion-item:last-child,
+body.dark-mode .sst-accordion-wrapper .accordion-item,
+body.dark-mode .sst-accordion-wrapper .accordion-item:first-child,
+body.dark-mode .sst-accordion-wrapper .accordion-item:last-child {
+  border-radius: 0 !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+/* Accordion metadata specific styling for sharp corners */
+.accordion-metadata .accordion,
+.accordion-metadata .accordion-item,
+.accordion-metadata .accordion-header,
+.accordion-metadata .accordion-button,
+.accordion-metadata .accordion-body {
+  border-radius: 0 !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+/* Dark mode accordion metadata styling */
+body.dark-mode .accordion-metadata .accordion,
+body.dark-mode .accordion-metadata .accordion-item,
+body.dark-mode .accordion-metadata .accordion-header,
+body.dark-mode .accordion-metadata .accordion-button,
+body.dark-mode .accordion-metadata .accordion-body {
+  border-radius: 0 !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+/* Force sharp corners on all accordion elements in the modal */
+.explore-modal .accordion,
+.explore-modal .accordion-item,
+.explore-modal .accordion-header,
+.explore-modal .accordion-button,
+.explore-modal .accordion-body {
+  border-radius: 0 !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+/* Dark mode modal accordion sharp corners */
+body.dark-mode .explore-modal .accordion,
+body.dark-mode .explore-modal .accordion-item,
+body.dark-mode .explore-modal .accordion-header,
+body.dark-mode .explore-modal .accordion-button,
+body.dark-mode .explore-modal .accordion-body {
+  border-radius: 0 !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+/* Nested accordion specific styling for sharp corners in dark mode */
+body.dark-mode .sst-accordion-wrapper .accordion,
+body.dark-mode .sst-accordion-wrapper .accordion-item,
+body.dark-mode .sst-accordion-wrapper .accordion-header,
+body.dark-mode .sst-accordion-wrapper .accordion-button,
+body.dark-mode .sst-accordion-wrapper .accordion-body {
+  border-radius: 0 !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+/* Flex container sharp corners in dark mode */
+body.dark-mode .flex-container {
+  border-radius: 0 !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+/* Force all accordion elements in nested accordion to have sharp corners in dark mode */
+body.dark-mode .nested-accordion .accordion,
+body.dark-mode .nested-accordion .accordion-item,
+body.dark-mode .nested-accordion .accordion-header,
+body.dark-mode .nested-accordion .accordion-button,
+body.dark-mode .nested-accordion .accordion-body,
+body.dark-mode .nested-accordion .flex-container {
+  border-radius: 0 !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+/* Additional specificity for nested accordion elements */
+body.dark-mode .scrollable-column .accordion,
+body.dark-mode .scrollable-column .accordion-item,
+body.dark-mode .scrollable-column .accordion-header,
+body.dark-mode .scrollable-column .accordion-button,
+body.dark-mode .scrollable-column .accordion-body,
+body.dark-mode .scrollable-column .flex-container {
+  border-radius: 0 !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
 }
 
