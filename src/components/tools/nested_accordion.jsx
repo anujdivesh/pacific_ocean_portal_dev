@@ -138,17 +138,18 @@ const NestedAccordion = ({ data, openIds }) => {
               activeKey={sstAccordionOpen === label ? label : ''}
               onSelect={() => setSstAccordionOpen(sstAccordionOpen === label ? null : label)}
               flush
+              style={{ '--bs-accordion-border-radius': '0', '--bs-accordion-inner-border-radius': '0' }}
             >
-              <Accordion.Item 
-                eventKey={label}
-                style={{ 
-                  borderRadius: 0, 
-                  padding: 2, 
-                  borderRight: '1px solid #ccc', 
-                  borderBottom: '1px solid #ccc',
-                }}
-              >
-                <Accordion.Header onClick={(e) => e.currentTarget.blur()}>
+                             <Accordion.Item 
+                 eventKey={label}
+                 style={{ 
+                   borderRadius: 0, 
+                   padding: 2, 
+                   borderRight: '1px solid #ccc', 
+                   borderBottom: '1px solid #ccc',
+                 }}
+               >
+                <Accordion.Header onClick={(e) => e.currentTarget.blur()} style={{ borderRadius: 0 }}>
                   {label}
                   <span className="badge bg-light text-dark ms-2">{items.length}</span>
                 </Accordion.Header>
@@ -161,7 +162,7 @@ const NestedAccordion = ({ data, openIds }) => {
                       style={{
                         cursor: 'pointer',
                         backgroundColor: activeItemId === contentItem.id ? '#d3f4ff' : 'transparent',
-                        borderRadius: '4px',
+                        borderRadius: 0,
                         padding: '2px',
                       }}
                     >
@@ -190,7 +191,7 @@ const NestedAccordion = ({ data, openIds }) => {
             style={{
               cursor: 'pointer',
               backgroundColor: activeItemId === contentItem.id ? '#d3f4ff' : 'transparent',
-              borderRadius: '4px',
+              borderRadius: 0,
               padding: '2px',
               marginTop: '2px'
             }}
@@ -216,17 +217,17 @@ const NestedAccordion = ({ data, openIds }) => {
         : [];
 
       return (
-        <Accordion.Item eventKey={item.id} key={`${item.id}-${index}`} style={{ borderRadius: 0, padding: 2, borderRight: '1px solid #ccc', borderBottom: '1px solid #ccc' }}>
-          <Accordion.Header onClick={(e) => e.currentTarget.blur()}>
+                 <Accordion.Item eventKey={item.id} key={`${item.id}-${index}`} style={{ borderRadius: '0 !important', padding: 2, borderRight: '1px solid #ccc', borderBottom: '1px solid #ccc' }}>
+          <Accordion.Header onClick={(e) => e.currentTarget.blur()} style={{ borderRadius: 0 }}>
             {item.display_title} 
             <span className="badge bg-light text-dark ms-2">
               {countItems(item)}
             </span>
           </Accordion.Header>
-          <Accordion.Body style={{ paddingLeft: 20, paddingRight: 0, backgroundColor: '#ffffff' }}>
+          <Accordion.Body style={{ paddingLeft: 20, paddingRight: 0, backgroundColor: '#ffffff', borderRadius: 0 }}>
             {renderContentItems(sortedContent, item.id)}
             {item.children && item.children.length > 0 && (
-              <Accordion flush defaultActiveKey={activeKeys}>
+              <Accordion flush defaultActiveKey={activeKeys} style={{ '--bs-accordion-border-radius': '0', '--bs-accordion-inner-border-radius': '0' }}>
                 {renderAccordionItems(item.children)}
               </Accordion>
             )}
@@ -241,10 +242,11 @@ const NestedAccordion = ({ data, openIds }) => {
       {data.length === 0 ? (
         <Spinner animation="border" variant="primary" style={{ marginLeft: 150, marginTop: 50 }} />
       ) : (
-        <Accordion flush defaultActiveKey={activeKeys}>
-        
-          {renderAccordionItems(data)}
-        </Accordion>
+        <div className="nested-accordion">
+          <Accordion flush defaultActiveKey={activeKeys}>
+            {renderAccordionItems(data)}
+          </Accordion>
+        </div>
       )}
     </>
   );
