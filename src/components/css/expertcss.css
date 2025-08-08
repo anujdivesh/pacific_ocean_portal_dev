@@ -273,68 +273,117 @@
     margin-top: 15px;
   }
 
+/* Dark Mode Styles - Updated for better contrast and white text */
 body.dark-mode .expert-container {
     background-color: var(--color-background) !important;
     color: var(--color-text) !important;
 }
+
 body.dark-mode .side-panel {
     background-color: var(--color-surface) !important;
     color: var(--color-text) !important;
     box-shadow: -2px 0 5px rgba(0,0,0,0.32) !important;
 }
+
 body.dark-mode .panel-header {
-    color: var(--color-primary) !important;
+    color: var(--color-text) !important;
     border-bottom: 1px solid var(--color-border) !important;
 }
+
+body.dark-mode .panel-title {
+    color: var(--color-text) !important;
+}
+
 body.dark-mode .expert-item {
     background-color: var(--color-surface) !important;
     border-bottom: 1px solid var(--color-border) !important;
     color: var(--color-text) !important;
 }
+
 body.dark-mode .expert-item:hover {
     background-color: #23242a !important;
     box-shadow: 0 2px 5px rgba(0,0,0,0.18) !important;
 }
+
 body.dark-mode .expert-item:active {
     background-color: #18181b !important;
 }
+
+body.dark-mode .expert-name {
+    color: var(--color-text) !important;
+}
+
 body.dark-mode .expert-institution,
 body.dark-mode .expert-meta,
 body.dark-mode .disclaimer-container p {
-    color: var(--color-secondary) !important;
+    color: #d1d5db !important;
 }
+
 body.dark-mode .expert-link,
 body.dark-mode .source-link {
     color: var(--color-accent) !important;
 }
+
+body.dark-mode .expert-link:hover,
+body.dark-mode .source-link:hover {
+    color: #fbbf24 !important;
+    text-decoration: underline !important;
+}
+
 body.dark-mode .divider {
     color: var(--color-border) !important;
 }
+
 body.dark-mode .empty-state {
-    color: var(--color-secondary) !important;
+    color: #d1d5db !important;
 }
+
 body.dark-mode .search-input {
     background-color: var(--color-surface) !important;
     color: var(--color-text) !important;
     border: 1px solid var(--color-border) !important;
 }
-body.dark-mode .clear-search {
-    color: var(--color-secondary) !important;
+
+body.dark-mode .search-input::placeholder {
+    color: #9ca3af !important;
 }
+
+body.dark-mode .clear-search {
+    color: #9ca3af !important;
+}
+
 body.dark-mode .clear-search:hover {
     color: var(--color-accent) !important;
 }
+
 body.dark-mode .loading-overlay {
     background-color: rgba(57, 58, 64, 0.95) !important;
     color: var(--color-text) !important;
 }
+
 body.dark-mode .error-message {
     background-color: #3b1c1c !important;
     color: #f87171 !important;
     border: 1px solid #f87171 !important;
 }
+
 body.dark-mode .disclaimer-container h5 {
-    color: var(--color-primary) !important;
+    color: var(--color-text) !important;
+}
+
+body.dark-mode .disclaimer-container {
+    border-top: 1px solid var(--color-border) !important;
+}
+
+/* Map attribution dark mode */
+body.dark-mode .map-container .leaflet-control-attribution {
+    background: rgba(47, 48, 51, 0.9) !important;
+    color: var(--color-text) !important;
+    border-top: 1px solid var(--color-border) !important;
+}
+
+body.dark-mode .map-container .leaflet-control-attribution a {
+    color: var(--color-accent) !important;
 }
 
 /* Move only the expert map's zoom controls 30px to the right */
@@ -427,6 +476,18 @@ body.dark-mode #map.expert-map-container .leaflet-control-zoom a:hover {
   .expert-list-container {
     padding: 0 10px !important;
   }
+}
+
+/* Dark mode mobile styles */
+body.dark-mode .mobile-bottom-panel {
+    background: var(--color-surface) !important;
+    color: var(--color-text) !important;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.32) !important;
+}
+
+body.dark-mode .side-panel {
+    background: var(--color-surface) !important;
+    color: var(--color-text) !important;
 }
 
 @media (max-width: 600px) {

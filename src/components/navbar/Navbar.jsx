@@ -759,7 +759,7 @@ function Navigationbar({ children }) {
                 height: 64,
                 borderRadius: '0 32px 32px 0',
                 background: 'var(--color-surface)',
-                border: '1px solid var(--color-border)',
+                border: '1px solid #495057', /* Darker gray border */
                 borderLeft: 'none',
                 display: 'flex',
                 alignItems: 'center',
@@ -771,6 +771,7 @@ function Navigationbar({ children }) {
                 transform: sidebarCollapsed ? 'translateX(0)' : 'translateX(-100%)',
                 opacity: hovered || sidebarCollapsed ? 1 : 0.8,
                 boxShadow: '2px 0 4px rgba(0,0,0,0.1)',
+                color: '#626875'
               }}
               aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             >

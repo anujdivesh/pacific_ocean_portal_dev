@@ -157,20 +157,20 @@ const ExploreModal = ({ show, onClose, title, bodyContent }) => {
           ))}
         </Modal.Title>
       </Modal.Header>
-      <Modal.Body style={{ padding: 0, margin: 0, width: '100%', background: 'var(--color-surface, #fff)', color: 'var(--color-text, #1e293b)' }}>
-        <Row className="g-0">
-          <Col md={4} className="scrollable-column" style={{ background: 'var(--color-surface, #fff)', borderRight: '1.5px solid var(--color-secondary, #e5e7eb)' }}>
-            {loading ? (
-              <Spinner animation="border" variant="primary" style={{ margin: 170 }} />
-            ) : (
-              <MyAccordion className="scrollable-content modal-accordion" dataset={data} />
-            )}
-          </Col>
-          <Col md={8} className="scrollable-column" style={{ background: 'var(--color-surface, #fff)', padding: 0 }}>
-            <AccordionMetadata />
-          </Col>
-        </Row>
-      </Modal.Body>
+             <Modal.Body style={{ padding: 0, margin: 0, width: '100%', background: '#ffffff', color: 'var(--color-text, #1e293b)' }}>
+         <Row className="g-0">
+           <Col md={4} className="scrollable-column" style={{ background: '#f8f8f8' }}>
+             {loading ? (
+               <Spinner animation="border" variant="primary" style={{ margin: 170 }} />
+             ) : (
+               <MyAccordion className="scrollable-content modal-accordion" dataset={data} />
+             )}
+           </Col>
+           <Col md={8} className="scrollable-column" style={{ background: '#ffffff', padding: 0 }}>
+             <AccordionMetadata />
+           </Col>
+         </Row>
+       </Modal.Body>
       <Modal.Footer className="custom-header2" style={{ background: 'var(--color-surface, #fff)', borderTop: '1px solid var(--color-secondary, #e5e7eb)', paddingTop: '6px', paddingBottom: '6px', minHeight: 'unset' }}>
         <p style={{ fontSize: '11px', color: 'var(--color-secondary, #64748b)', margin: 0 }}>&copy; All Rights Reserved SPC </p>
       </Modal.Footer>
