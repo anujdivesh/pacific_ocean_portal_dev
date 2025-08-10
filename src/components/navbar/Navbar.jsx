@@ -598,6 +598,41 @@ function Navigationbar({ children }) {
                 </div>
               )}
             </li>
+            <li style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--color-border)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px' }}>
+                <span style={{ color: 'var(--color-text)', fontWeight: '500' }}>Theme</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <button
+                    onClick={toggleDarkMode}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: 'var(--color-primary)',
+                      fontSize: '1.5rem',
+                      outline: 'none',
+                    }}
+                    aria-label={darkMode ? 'Dark mode enabled' : 'Light mode enabled'}
+                  >
+                    {darkMode ? <FaToggleOn /> : <FaToggleOff />}
+                  </button>
+                  <button
+                    onClick={toggleDarkMode}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: 'var(--color-primary)',
+                      fontSize: '1.2rem',
+                      outline: 'none',
+                    }}
+                    aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+                  >
+                    {darkMode ? <FaSun /> : <FaMoon />}
+                  </button>
+                </div>
+              </div>
+            </li>
           </ul>
         </div>
       )}

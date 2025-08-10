@@ -484,6 +484,79 @@ function Dashboard() {
                 .dashboard-widget-container .accordion {
                   /* Add your widget's accordion base styles here */
                 }
+
+                /* Dark mode styles */
+                body.dark-mode .display-9,
+                body.dark-mode h1,
+                body.dark-mode h2,
+                body.dark-mode h3,
+                body.dark-mode h4,
+                body.dark-mode h5,
+                body.dark-mode h6,
+                body.dark-mode p,
+                body.dark-mode span,
+                body.dark-mode .card-title,
+                body.dark-mode .card-text,
+                body.dark-mode .text-muted {
+                  color: #ffffff !important;
+                }
+                
+                body.dark-mode .card {
+                  background-color: var(--color-surface, #374151) !important;
+                  border-color: var(--color-border, #6b7280) !important;
+                  color: #ffffff !important;
+                }
+                
+                body.dark-mode .card-body {
+                  color: #ffffff !important;
+                }
+                
+                body.dark-mode .small.text-muted {
+                  color: #d1d5db !important;
+                }
+                
+                body.dark-mode .fw-semibold {
+                  color: #ffffff !important;
+                }
+
+                body.dark-mode .alert-danger {
+                  background-color: rgba(220, 38, 38, 0.1) !important;
+                  border-color: #dc2626 !important;
+                  color: #ffffff !important;
+                }
+
+                /* Ensure spinner is visible in dark mode */
+                body.dark-mode .spinner-border {
+                  color: #60a5fa !important;
+                }
+
+                /* Loading text in dark mode */
+                body.dark-mode div[style*="textAlign: center"] {
+                  color: #ffffff !important;
+                }
+
+                /* Search input dark mode styling */
+                body.dark-mode .form-control {
+                  background-color: var(--color-surface, #374151) !important;
+                  border-color: var(--color-border, #6b7280) !important;
+                  color: #ffffff !important;
+                }
+
+                body.dark-mode .form-control::placeholder {
+                  color: #9ca3af !important;
+                }
+
+                body.dark-mode .input-group-text {
+                  background-color: var(--color-surface, #374151) !important;
+                  border-color: var(--color-border, #6b7280) !important;
+                  color: #9ca3af !important;
+                }
+
+                /* Main container dark mode */
+                body.dark-mode main {
+                  background-color: var(--color-background, #1f2937) !important;
+                  color: #ffffff !important;
+                }
             `}</style>
         </main>
     );
