@@ -903,6 +903,31 @@ const MapBox = () => {
 
       // Add zoom control to map
       zoomControl.addTo(mapRef.current);
+      
+      // Add error handling for map controls
+      const handleMapError = (error) => {
+        if (error.message && error.message.includes('_leaflet_pos')) {
+          console.warn('Leaflet position error detected, attempting to recover...');
+          // Force map to recalculate positions
+          if (mapRef.current && mapRef.current.invalidateSize) {
+            setTimeout(() => {
+              try {
+                mapRef.current.invalidateSize();
+              } catch (e) {
+                console.warn('Map invalidateSize failed:', e);
+              }
+            }, 100);
+          }
+        }
+      };
+      
+      // Add global error handler for Leaflet
+      window.addEventListener('error', (event) => {
+        if (event.error && event.error.message && event.error.message.includes('_leaflet_pos')) {
+          event.preventDefault();
+          handleMapError(event.error);
+        }
+      });
 
       // Create custom share button control
       const ShareButtonControl = L.Control.extend({
@@ -969,6 +994,41 @@ const MapBox = () => {
       // Add share button control to map
       const shareButtonControl = new ShareButtonControl();
       shareButtonControl.addTo(mapRef.current);
+      
+      // Add sidebar collapse/expand handler to fix map positioning
+      const handleSidebarToggle = () => {
+        if (mapRef.current && mapRef.current.invalidateSize) {
+          setTimeout(() => {
+            try {
+              mapRef.current.invalidateSize();
+            } catch (e) {
+              console.warn('Map invalidateSize after sidebar toggle failed:', e);
+            }
+          }, 300); // Delay to allow sidebar animation to complete
+        }
+      };
+      
+      // Listen for sidebar toggle events
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+            if (mutation.target.classList.contains('sb-sidenav-toggled') || 
+                mutation.target.classList.contains('desktop-sidebar')) {
+              handleSidebarToggle();
+            }
+          }
+        });
+      });
+      
+      // Observe body for sidebar class changes
+      observer.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class']
+      });
+      
+      // Store references for cleanup
+      mapRef.current._errorHandler = handleMapError;
+      mapRef.current._sidebarObserver = observer;
 
         // Custom attribution control with better positioning
         const attributionControl = L.control.attribution({
@@ -1710,7 +1770,22 @@ const MapBox = () => {
         return () => {
           if (mapRef.current && isMapInitialized.current) {
             try {
-          mapRef.current.remove();
+              // Cleanup observers and event listeners
+              if (mapRef.current._sidebarObserver) {
+                mapRef.current._sidebarObserver.disconnect();
+              }
+              
+              // Remove global error handler
+              window.removeEventListener('error', (event) => {
+                if (event.error && event.error.message && event.error.message.includes('_leaflet_pos')) {
+                  event.preventDefault();
+                  if (mapRef.current._errorHandler) {
+                    mapRef.current._errorHandler(event.error);
+                  }
+                }
+              });
+              
+              mapRef.current.remove();
             } catch (error) {
               console.error('Error removing map:', error);
             }
