@@ -3,13 +3,15 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Form, Alert, Spinner } from 'react-bootstrap';
 import { useAppSelector } from '@/app/GlobalRedux/hooks';
-import { FaShare, FaCopy, FaLink } from 'react-icons/fa';
+import { FaShare, FaCopy, FaLink, FaCompress } from 'react-icons/fa';
 import { get_url } from '@/components/json/urls';
 import LZString from 'lz-string';
 
 const ShareWorkbench = ({ show, onHide }) => {
   const [shareUrl, setShareUrl] = useState('');
+  const [shortenedUrl, setShortenedUrl] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isShortening, setIsShortening] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [error, setError] = useState('');
   
@@ -28,12 +30,14 @@ const ShareWorkbench = ({ show, onHide }) => {
     if (show && mapLayers.length > 0) {
       // Clear previous URL and generate fresh one
       setShareUrl('');
+      setShortenedUrl('');
       setError('');
       setIsCopied(false);
       generateShareUrl();
     } else if (!show) {
       // Clear URL when modal closes
       setShareUrl('');
+      setShortenedUrl('');
       setError('');
       setIsCopied(false);
     }
@@ -55,7 +59,7 @@ const ShareWorkbench = ({ show, onHide }) => {
            // Only save essential layer information to reduce URL size
            const layerState = {
              id: layer.id,
-             // Only save essential layer_information fields
+             // Save ALL essential layer_information fields to ensure complete restoration
              layer_information: {
                id: layer.layer_information.id,
                layer_title: layer.layer_information.layer_title,
@@ -63,36 +67,48 @@ const ShareWorkbench = ({ show, onHide }) => {
                url: layer.layer_information.url,
                enabled: layer.layer_information?.enabled || false,
                selectedSofarTypes: layer.layer_information?.selectedSofarTypes || [],
-               // Add properties needed by date_selector and other components
+               // Date and time properties
                specific_timestemps: layer.layer_information.specific_timestemps || null,
                interval_step: layer.layer_information.interval_step || null,
                timeIntervalStart: layer.layer_information.timeIntervalStart || null,
                timeIntervalEnd: layer.layer_information.timeIntervalEnd || null,
+               timeIntervalStartOriginal: layer.layer_information.timeIntervalStartOriginal || null,
+               timeIntervalEndOriginal: layer.layer_information.timeIntervalEndOriginal || null,
                is_timeseries: layer.layer_information.is_timeseries || false,
                is_composite: layer.layer_information.is_composite || false,
+               // Layer properties
                layer_name: layer.layer_information.layer_name || '',
                style: layer.layer_information.style || '',
                opacity: layer.layer_information.opacity || 1,
+               // Color scale properties
                colormin: layer.layer_information.colormin || 0,
                colormax: layer.layer_information.colormax || 1,
                abovemaxcolor: layer.layer_information.abovemaxcolor || 'extend',
                belowmincolor: layer.layer_information.belowmincolor || 'transparent',
                numcolorbands: layer.layer_information.numcolorbands || 250,
                logscale: layer.layer_information.logscale || false,
+               // Map properties
                zoomToLayer: layer.layer_information.zoomToLayer || false,
+               // Additional properties that might be needed
+               datetime_format: layer.layer_information.datetime_format || null,
+               restricted: layer.layer_information.restricted || false,
+               timeseries_url: layer.layer_information.timeseries_url || null,
+               composite_layer_id: layer.layer_information.composite_layer_id || null,
+               // Preserve all other properties that might exist
+               ...layer.layer_information
              },
              enabled: layer.layer_information?.enabled || false,
              opacity: layer.opacity || 1,
              selectedSofarTypes: layer.layer_information?.selectedSofarTypes || [],
            };
           
-          // console.log(`Sharing layer:`, {
-          //   id: layerState.id,
-          //   title: layerState.layer_information.layer_title,
-          //   type: layerState.layer_information.layer_type,
-          //   enabled: layerState.enabled,
-          //   selectedSofarTypes: layerState.selectedSofarTypes
-          // });
+          console.log(`Sharing layer:`, {
+            id: layerState.id,
+            title: layerState.layer_information.layer_title,
+            type: layerState.layer_information.layer_type,
+            enabled: layerState.layer_information.enabled,
+            selectedSofarTypes: layerState.selectedSofarTypes
+          });
           
           // console.log(`Sharing coordinates:`, selectedCoordinates);
           
@@ -151,13 +167,52 @@ const ShareWorkbench = ({ show, onHide }) => {
     }
   };
 
-  const copyToClipboard = async () => {
+  const copyToClipboard = async (urlToCopy = shareUrl) => {
     try {
-      await navigator.clipboard.writeText(shareUrl);
+      await navigator.clipboard.writeText(urlToCopy);
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
     } catch (err) {
       setError('Failed to copy to clipboard. Please copy the URL manually.');
+    }
+  };
+
+  const shortenUrl = async () => {
+    if (!shareUrl) {
+      setError('No URL to shorten. Please generate a share link first.');
+      return;
+    }
+
+    setIsShortening(true);
+    setError('');
+
+    try {
+      // Using TinyURL API (free and reliable)
+      const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(shareUrl)}`);
+      
+      if (response.ok) {
+        const shortenedUrlResult = await response.text();
+        setShortenedUrl(shortenedUrlResult);
+      } else {
+        // Fallback to is.gd API
+        const fallbackResponse = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(shareUrl)}`);
+        
+        if (fallbackResponse.ok) {
+          const fallbackData = await fallbackResponse.json();
+          if (fallbackData.shorturl) {
+            setShortenedUrl(fallbackData.shorturl);
+          } else {
+            throw new Error('Failed to shorten URL with fallback service');
+          }
+        } else {
+          throw new Error('Failed to shorten URL');
+        }
+      }
+    } catch (err) {
+      console.error('Error shortening URL:', err);
+      setError('Failed to shorten URL. You can still use the original link.');
+    } finally {
+      setIsShortening(false);
     }
   };
 
@@ -210,13 +265,13 @@ const ShareWorkbench = ({ show, onHide }) => {
                   <div className="input-group">
                     <Form.Control
                       type="text"
-                      value={shareUrl}
+                      value={shortenedUrl || shareUrl}
                       readOnly
                       className="form-control"
                     />
                     <Button 
                       variant="outline-secondary" 
-                      onClick={copyToClipboard}
+                      onClick={() => copyToClipboard(shortenedUrl || shareUrl)}
                       disabled={isCopied}
                     >
                       {isCopied ? (
@@ -233,6 +288,38 @@ const ShareWorkbench = ({ show, onHide }) => {
                     </Button>
                   </div>
                 </Form.Group>
+
+                {!shortenedUrl && (
+                  <div className="mb-3">
+                    <Button 
+                      variant="outline-primary" 
+                      onClick={shortenUrl}
+                      disabled={isShortening}
+                      size="sm"
+                    >
+                      {isShortening ? (
+                        <>
+                          <Spinner animation="border" size="sm" className="me-1" />
+                          Shortening...
+                        </>
+                      ) : (
+                        <>
+                          <FaCompress className="me-1" />
+                          Shorten URL
+                        </>
+                      )}
+                    </Button>
+                    <small className="text-muted ms-2">
+                      Make the link shorter and easier to share
+                    </small>
+                  </div>
+                )}
+
+                {shortenedUrl && (
+                  <Alert variant="success" className="small">
+                    <strong>URL shortened successfully!</strong> The shortened link is now displayed above and ready to share.
+                  </Alert>
+                )}
 
                 <Alert variant="info" className="small">
                   <strong>How it works:</strong> When someone opens this link, 
