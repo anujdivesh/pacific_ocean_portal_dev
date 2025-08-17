@@ -565,12 +565,12 @@ const SideBar = () => {
                                     <MdAddCircleOutline size={16}/>&nbsp;Explore Map Data
                                 </Button>
                                 <Button
-    variant="btn btn-info btn-sm rounded-pill"
+    variant="btn btn-sm rounded-pill"
     style={{
         padding: '10px 12px',
         color: 'white',
         width: '45%',
-        backgroundColor: '#C7D444',
+        backgroundColor: '#b8c93a',
         border: 'none',
         fontSize: '0.85rem',
         fontWeight: '500',

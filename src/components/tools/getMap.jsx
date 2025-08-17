@@ -562,9 +562,9 @@ const visibleDots = timestamps.slice(
                     padding: '5px 15px',
                     cursor: 'pointer',
                     textDecoration: 'none',
-                    backgroundColor: isDarkMode ? '#495057' : '#f8f9fa',
-                    border: isDarkMode ? '1px solid #6c757d' : '1px solid #dee2e6',
-                    color: isDarkMode ? '#ffa500' : '#ff8c00',
+                    backgroundColor: isDarkMode ? '#ff8c00' : '#f8f9fa',
+                    border: isDarkMode ? '1px solid #ff8c00' : '1px solid #dee2e6',
+                    color: isDarkMode ? '#ffffff' : '#ff8c00',
                     borderRadius: '4px',
                     transition: 'all 0.2s ease'
                   }}
