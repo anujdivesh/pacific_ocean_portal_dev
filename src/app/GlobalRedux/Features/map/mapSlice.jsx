@@ -11,7 +11,7 @@ const mapSlice = createSlice({
     layers: [],
     basemap: {
       //url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png',
-      url: 'https://spc-osm.spc.int/tile/{z}/{x}/{y}.png',
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
       //url: get_url('geowebcache')+'/basemap/{z}/{x}/{y}.png',
       attribution: '&copy; Pacific Community SPC',
     },

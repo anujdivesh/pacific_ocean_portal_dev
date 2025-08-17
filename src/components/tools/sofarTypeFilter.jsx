@@ -194,23 +194,48 @@ const SofarTypeFilter = ({ item }) => {
       </div>
       
       <div style={{ display: 'inline-block' }}>
-        {types.map((type) => (
-          <Form.Check
-            key={type.id}
-            type="checkbox"
-            id={`sofar-type-${item.id}-${type.id}`}
-            label={type.value.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-            checked={selectedTypes.includes(type.id)}
-            onChange={(e) => handleTypeChange(type.id, e.target.checked)}
-            disabled={!item.layer_information.enabled}
-            style={{ 
-              fontSize: '14px',
-              marginBottom: '5px',
-              cursor: item.layer_information.enabled ? 'pointer' : 'not-allowed',
-              opacity: item.layer_information.enabled ? 1 : 0.6
+        {types.map((type) => {
+  let circleColor = "#01dddd"; // default blue
+  if (type.id === 3) {
+    circleColor = "#3f51b5"; // light purple
+  } else if (type.id === 4) {
+    circleColor = "#fe7e0f"; // light green
+  }
+
+  return (
+    <Form.Check
+      key={type.id}
+      type="checkbox"
+      id={`sofar-type-${item.id}-${type.id}`}
+      label={
+        <span style={{ display: "flex", alignItems: "center" }}>
+          <span
+            style={{
+              display: "inline-block",
+              width: 12,
+              height: 12,
+              borderRadius: "50%",
+              background: circleColor,
+              marginRight: 8,
+              border: "1.5px solid #fff",
+              boxShadow: "0 0 2px rgba(0,0,0,0.2)"
             }}
           />
-        ))}
+          {type.value.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+        </span>
+      }
+      checked={selectedTypes.includes(type.id)}
+      onChange={(e) => handleTypeChange(type.id, e.target.checked)}
+      disabled={!item.layer_information.enabled}
+      style={{
+        fontSize: '14px',
+        marginBottom: '5px',
+        cursor: item.layer_information.enabled ? 'pointer' : 'not-allowed',
+        opacity: item.layer_information.enabled ? 1 : 0.6
+      }}
+    />
+  );
+})}
       </div>
     </div>
   );

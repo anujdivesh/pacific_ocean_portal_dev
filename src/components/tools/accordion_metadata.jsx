@@ -83,16 +83,32 @@ function AccordionMetadata() {
                         </Accordion.Item>
                     </Accordion>
                 )}
-                {dataset_list.metadata_six_id !== "" && (
+                 {dataset_list.metadata_six_id !== "" && (
                     <Accordion className="mb-2" defaultActiveKey="6" style={{ borderRadius: 0 }}>
                         <Accordion.Item eventKey="6" style={{ borderRadius: 0, border: 'none', borderTopLeftRadius: 0, borderTopRightRadius: 0, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}>
                             <Accordion.Header style={{ borderRadius: 0, border: 'none', borderTopLeftRadius: 0, borderTopRightRadius: 0, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}>{dataset_list.metadata_six_id}</Accordion.Header>
                             <Accordion.Body style={{ borderRadius: 0, border: 'none', borderTopLeftRadius: 0, borderTopRightRadius: 0, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}>
-                                {dataset_list.metadata_six_value}
+                                  <ul style={{ marginBottom: 0 }}>
+                                    {dataset_list.metadata_six_value.split("/").map((item, idx) => (
+                                        <li key={idx}>{item}</li>
+                                    ))}
+                                    </ul>
                             </Accordion.Body>
                         </Accordion.Item>
                     </Accordion>
                 )}
+                {dataset_list.metadata_seven_id !== "" && (
+                    <Accordion className="mb-2" defaultActiveKey="7" style={{ borderRadius: 0 }}>
+                        <Accordion.Item eventKey="7" style={{ borderRadius: 0, border: 'none', borderTopLeftRadius: 0, borderTopRightRadius: 0, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}>
+                            <Accordion.Header style={{ borderRadius: 0, border: 'none', borderTopLeftRadius: 0, borderTopRightRadius: 0, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}>{dataset_list.metadata_seven_id}</Accordion.Header>
+                            <Accordion.Body style={{ borderRadius: 0, border: 'none', borderTopLeftRadius: 0, borderTopRightRadius: 0, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}>
+                                {dataset_list.metadata_seven_value}
+                                
+                            </Accordion.Body>
+                        </Accordion.Item>
+                    </Accordion>
+                )}
+               
             </div>
         </div>
     );

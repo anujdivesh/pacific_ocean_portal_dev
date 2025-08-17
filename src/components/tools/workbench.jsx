@@ -199,7 +199,7 @@ const MyWorkbench = () => {
             var layer_Type = item.layer_information.layer_type;
             layer_Type = layer_Type.replace("_FORECAST", "");
             
-            if (layer_Type === 'WMS' || layer_Type === 'WMS_UGRID') {
+            if (layer_Type === 'WMS' || layer_Type === 'WMS_UGRID' || layer_Type === 'WMS_HINDCAST') {
               return (
                 <Accordion key={`${item.id}-${index}`} activeKey={isOpen ? item.id : null} style={{ paddingBottom: 4, border:0 }}>
                   <Card>

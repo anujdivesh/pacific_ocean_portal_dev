@@ -80,7 +80,7 @@ const MapBox = () => {
     const dispatch = useAppDispatch();
     const { center, zoom, bounds, maxBounds, layers, basemap, eezoverlay,enable_eez,enable_coastline,coastlineoverlay,citynamesoverlay,enable_citynames, sidebarCollapsed } = useAppSelector((state) => state.mapbox);
     const isBing = useRef(false); 
-    const [selectedOption, setSelectedOption] = useState('openstreetmap'); // Changed default to 'bing' for Satellite view 
+    const [selectedOption, setSelectedOption] = useState('bing'); // Changed default to 'bing' for Satellite view 
     const [checkboxChecked, setCheckboxChecked] = useState(true);
     const [checkboxCheckedCoast, setCheckboxCheckedCoast] = useState(true);
     const [checkboxCheckedCity, setCheckboxCheckedCity] = useState(true);
@@ -332,11 +332,37 @@ const MapBox = () => {
                 latlng.lat + (Math.random() * dispersion * 2 - dispersion),
                 latlng.lng + (Math.random() * dispersion * 2 - dispersion)
               );
+              //Adding circle
+              let circleColor = "#01dddd"; // default blue
+              if (feature.properties.type_id === 3) {
+                circleColor = "#3f51b5"; // light purple (Material: Deep Purple 200)
+              } else if (feature.properties.type_id === 4) {
+                circleColor = "#fe7e0f"; // light green (Material: Green A100)
+              }
 
+              const blueCircleIcon = L.divIcon({
+                html: `<div style="
+                  background: ${circleColor};
+                  border-radius: 50%;
+                  width: 18px;
+                  height: 18px;
+                  border: 2px solid white;
+                  box-shadow: 0 1px 5px rgba(30,144,255,0.3);
+                "></div>`,
+                className: '',
+                iconSize: [18, 18]
+              });
+
+              const marker = L.marker(dispersedLatLng, {
+                icon: blueCircleIcon,
+                stationId: feature.properties.spotter_id
+              });
+              /*
               const marker = L.marker(dispersedLatLng, {
                 icon: feature.properties.is_active === "TRUE" ? greenIcon : blueIcon,
                 stationId: feature.properties.spotter_id // Add station ID to marker options
               });
+              */
 
               const tooltipContent = `
                 <div style="min-width:120px;">
@@ -1252,7 +1278,7 @@ const MapBox = () => {
             <span>Base Map</span>
             <span class="toggle-icon">-</span>
           </div>
-          <div class="basemap-options">
+          <div class="basemap-options" >
             <label>
               <input 
                 type="radio" 
@@ -1665,6 +1691,103 @@ const MapBox = () => {
           addLayerWithLoading(layerGroup, wmsLayer, setIsLoading);
 
         }
+          //set Bounds
+          if(layer.layer_information.zoomToLayer){
+            if (bounds === null) {
+            mapRef.current.fitBounds(L.latLngBounds([[layer.south_bound_latitude,
+              layer.east_bound_longitude],[layer.north_bound_latitude, layer.west_bound_longitude]]));
+           }
+          }
+        }
+        else if(layer.layer_information.layer_type == "WMS_HINDCAST"){
+          var dateToDisplay = layer.layer_information.timeIntervalEnd;
+          const compositeLayerId = layer.layer_information.composite_layer_id; // e.g. 'ww3.glob_24m./%Y%m/.nc'
+          const url = layer.layer_information.url; // e.g. 'https://gemthreddshpc.spc.int/thredds/wms/POP/model/regional/bom/hindcast/hourly/wavewatch3/PROD/latest.ncml'
+                  
+                  // 1. Split composite_layer_id by '/'
+          const compositeParts = compositeLayerId.split('/');
+          // compositeParts = ['ww3.glob_24m.', '%Y%m', '.nc']
+
+          // 2. Format the date as %Y%m
+          function formatYearMonth(dateString) {
+            const d = new Date(dateString);
+            const yyyy = d.getUTCFullYear();
+            const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
+            return `${yyyy}${mm}`;
+          }
+          const formattedDate = formatYearMonth(dateToDisplay); // '202412'
+
+          // 3. Construct new filename
+          const newFilename = compositeParts[0] + formattedDate + compositeParts[compositeParts.length - 1];
+          // 'ww3.glob_24m.202412.nc'
+
+          // 4. Replace the last part of the url with new filename
+          const urlParts = url.split('/');
+          urlParts[urlParts.length - 1] = newFilename;
+          const newUrl = urlParts.join('/');
+
+          if (layer.layer_information.is_composite) {
+        var layername = layer.layer_information.layer_name.split(',');
+        var stylname = layer.layer_information.style.split(',');
+        const bbox = [-23.5, -176, -15.5, -173];
+        const wmsLayer = addWMSTileLayer(mapRef.current, newUrl, {
+          id: layer.layer_information.id,
+          layers: layername[0],
+          format: 'image/png',
+          transparent: true,
+          opacity: layer.layer_information.opacity,
+          styles: stylname[0],
+          colorscalerange: layer.layer_information.colormin+", "+layer.layer_information.colormax,
+          abovemaxcolor: layer.layer_information.abovemaxcolor,
+          belowmincolor: layer.layer_information.belowmincolor,
+          numcolorbands: layer.layer_information.numcolorbands,
+          time: dateToDisplay,
+          logscale: layer.layer_information.logscale,
+          //crs: L.CRS.EPSG4326,  // Define CRS as EPSG:4326
+          //bbox: bbox,
+        },handleShow);
+        // Track loading state
+       // addLayerWithLoading(layerGroup, wmsLayer, setIsLoading);
+        layerGroup.addLayer(wmsLayer);
+
+        const wmsLayer2 = addWMSTileLayer(mapRef.current, newUrl, {
+          id: layer.layer_information.id,
+          layers: layername[1],
+          format: 'image/png',
+          transparent: true,
+          opacity: layer.layer_information.opacity,
+          styles: stylname[1],
+          time: dateToDisplay,
+          logscale: layer.layer_information.logscale,
+          //crs: L.CRS.EPSG4326,
+          //crs: L.CRS84,  // Define CRS as EPSG:4326
+          //bbox: bbox,
+        },handleShow);
+
+        // Add the second layer of the composite
+        addLayerWithLoading(layerGroup, wmsLayer2, setIsLoading);
+        //layerGroup.addLayer(wmsLayer2);
+      }
+      else{
+
+        const wmsLayer = addWMSTileLayer(mapRef.current, newUrl, {
+          id: layer.layer_information.id,
+          layers: layer.layer_information.layer_name,
+          format: 'image/png',
+          transparent: true,
+          opacity: layer.layer_information.opacity,
+          styles: layer.layer_information.style,
+          colorscalerange: layer.layer_information.colormin+", "+layer.layer_information.colormax,
+          abovemaxcolor: layer.layer_information.abovemaxcolor,
+          belowmincolor: layer.layer_information.belowmincolor,
+          numcolorbands: layer.layer_information.numcolorbands,
+          time: dateToDisplay,
+          logscale: layer.layer_information.logscale,
+         // crs: L.CRS.EPSG4326,
+        },handleShow);
+        //layerGroup.addLayer(wmsLayer);
+        addLayerWithLoading(layerGroup, wmsLayer, setIsLoading);
+      }
           //set Bounds
           if(layer.layer_information.zoomToLayer){
             if (bounds === null) {

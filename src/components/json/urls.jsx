@@ -33,6 +33,8 @@
         return 'https://ocean-obs-api.spc.int/insitu/types/'
       case 'insitu-station':
         return 'https://ocean-obs-api.spc.int/insitu/get_data/station'
+      case 'dataset':
+        return 'https://ocean-middleware.spc.int/middleware/api/dataset/'+id+'/?format=json'
       default:
         return 'https://api.example.com/default';
     }

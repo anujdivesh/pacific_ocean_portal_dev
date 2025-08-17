@@ -179,10 +179,11 @@ function TimeseriesSofar({ height }) {
     setChartData({
       labels: times,
       datasets: datasets.map((dataset, index) => {
+        console.log(dataset)
         // Filter out -999 values by replacing them with null to create gaps
         const filteredValues = dataset.values.map(value => {
           // Check for -999 or similar missing data indicators
-          if (value === -999 || value === -999.0 || value === -999.9 || 
+          if (value === -999 || value === "-999" || value === -999.0 || value === -999.9 || 
               value === null || value === undefined || 
               (typeof value === 'number' && isNaN(value))) {
             return null;

@@ -93,6 +93,7 @@ function BottomOffCanvas({ isVisible, id }) {
         let layer_type = selectedLayer.layer_information.layer_type;
         layer_type = layer_type.replace("_FORECAST", "");
         layer_type = layer_type.replace("_UGRID", "");
+        layer_type = layer_type.replace("_HINDCAST", "");
         setLayerType(layer_type);
       }
     }

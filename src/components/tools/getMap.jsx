@@ -635,7 +635,7 @@ const visibleDots = timestamps.slice(
             <div style={{ fontWeight: 'bold', marginBottom: '10px' }}>Error Loading Image</div>
             <div>{error}</div>
             <Button
-              variant="danger"
+              variant="warning"
               onClick={() => navigateImage(currentIndex)}
               style={{ marginTop: '10px' }}
             >
@@ -654,9 +654,9 @@ const visibleDots = timestamps.slice(
             height: 'calc(100% - 24px)',
             objectFit: 'contain',
             visibility: loading || error ? 'hidden' : 'visible',
+            paddingBottom:5
           }}
         />
-
         {/* Dots navigation */}
         {timestamps.length > 0 && (
           <div style={{

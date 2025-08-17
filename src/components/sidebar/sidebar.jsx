@@ -557,7 +557,10 @@ const SideBar = () => {
                                         transition: 'all 0.2s ease-in-out'
                                     }}
                                     className="explore-button"
-                                    onClick={handleShow}
+                                    onClick={e => {
+                                      handleShow();
+                                      e.currentTarget.blur();
+                                    }}
                                 >
                                     <MdAddCircleOutline size={16}/>&nbsp;Explore Map Data
                                 </Button>
