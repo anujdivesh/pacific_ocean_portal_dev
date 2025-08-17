@@ -473,6 +473,11 @@ body.dark-mode .navbar {
   border: none !important;
 }
 
+/* Ensure navbar title stays blue in dark mode */
+body.dark-mode .navbar .navbar-title {
+  color: var(--color-primary) !important;
+}
+
 /* Chart.js text styling for dark mode */
 body.dark-mode canvas {
   color: #ffffff !important;
