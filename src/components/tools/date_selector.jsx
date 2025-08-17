@@ -210,7 +210,7 @@ function DateSelector({item,period,startDateStr,endDateStr}) {
   //new
   let content;
   if (item.layer_information.datetime_format === 'DAILY') {
-    content = <div>
+    content = <div style={{ width: '90%' }}>
   <DatePicker
     id="datepicker"
     selected={currentDate}
