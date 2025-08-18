@@ -99,6 +99,59 @@ const MapBox = () => {
     const [showNoDataMessage, setShowNoDataMessage] = useState(false);
     const [isCheckingData, setIsCheckingData] = useState(false);
     const [showShareModal, setShowShareModal] = useState(false);
+    // Central guarded map operations / safe fitBounds helpers
+    const opQueueRef = useRef([]);
+    const canOperateMap = () => {
+      if (!mapRef.current) return false;
+      if (mapRef.current._sidebarAnimating) return false;
+      const c = mapRef.current.getContainer?.();
+      if (!c) return false;
+      if (c.offsetParent === null) return false; // hidden
+      const r = c.getBoundingClientRect();
+      if (r.width === 0 || r.height === 0) return false;
+      return true;
+    };
+    const scheduleMapOp = (fn, attempt = 0) => {
+      if (!mapRef.current) return;
+      if (!canOperateMap() || !mapRef.current._loaded) {
+        if (attempt < 15) return setTimeout(() => scheduleMapOp(fn, attempt + 1), 100 + 40 * attempt);
+        return;
+      }
+      if (mapRef.current._mapPane && !mapRef.current._mapPane._leaflet_pos) {
+        try { L.DomUtil.setPosition(mapRef.current._mapPane, L.point(0,0)); } catch {}
+      }
+      try { fn(); }
+      catch (e) {
+        if (e?.message?.includes('_leaflet_pos') && attempt < 10) {
+          return setTimeout(() => scheduleMapOp(fn, attempt + 1), 120 * (attempt + 1));
+        }
+        console.warn('Map op failed (final):', e);
+      }
+    };
+    const flushOpQueue = () => {
+      if (!canOperateMap()) return;
+      while (opQueueRef.current.length) {
+        const fn = opQueueRef.current.shift();
+        scheduleMapOp(fn);
+      }
+    };
+    const safeFitBoundsGlobal = (boundsInput, options = {}) => {
+      if (!mapRef.current || !boundsInput) return;
+      const resolve = () => {
+        if (Array.isArray(boundsInput)) return boundsInput;
+        if (boundsInput.getSouthWest && boundsInput.getNorthEast) return boundsInput;
+        if (typeof boundsInput === 'object' && 'south' in boundsInput) {
+          return [[boundsInput.south, boundsInput.west],[boundsInput.north, boundsInput.east]];
+        }
+        return null;
+      };
+      const b = resolve();
+      if (!b) return;
+      scheduleMapOp(() => {
+        if (!mapRef.current) return;
+        mapRef.current.fitBounds(b, { animate: false, ...options, animate: false });
+      });
+    };
     
     const handleShow = (id) => {
         dispatch(showoffCanvas(id));
@@ -932,28 +985,40 @@ const MapBox = () => {
       
       // Add error handling for map controls
       const handleMapError = (error) => {
-        if (error.message && error.message.includes('_leaflet_pos')) {
-          console.warn('Leaflet position error detected, attempting to recover...');
-          // Force map to recalculate positions
-          if (mapRef.current && mapRef.current.invalidateSize) {
-            setTimeout(() => {
-              try {
-                mapRef.current.invalidateSize();
-              } catch (e) {
-                console.warn('Map invalidateSize failed:', e);
-              }
-            }, 100);
+        if (!error || !error.message) return;
+        if (error.message.includes('_leaflet_pos')) {
+          // Centralised lightweight recovery – no global handler recursion
+          const mapOk = mapRef.current && mapRef.current.getContainer?.();
+          if (!mapOk) return;
+          // Avoid hammering invalidateSize during sidebar animation
+          if (mapRef.current._sidebarAnimating) {
+            mapRef.current._pendingResize = true;
+            return;
           }
+          let attempts = 0;
+          const retry = () => {
+            attempts++;
+            if (!mapRef.current) return;
+            try {
+              mapRef.current.invalidateSize?.();
+            } catch (e) {
+              if (attempts < 3) {
+                return setTimeout(retry, 120 * attempts);
+              }
+            }
+          };
+          setTimeout(retry, 50);
         }
       };
-      
-      // Add global error handler for Leaflet
-      window.addEventListener('error', (event) => {
-        if (event.error && event.error.message && event.error.message.includes('_leaflet_pos')) {
-          event.preventDefault();
-          handleMapError(event.error);
-        }
-      });
+
+      // Helper to check map visibility / readiness before size ops
+      const isMapReady = () => {
+        if (!mapRef.current) return false;
+        const c = mapRef.current.getContainer?.();
+        if (!c) return false;
+        // offsetParent null means display:none in ancestor – wait until visible
+        return c.offsetParent !== null;
+      };
 
       // Create custom share button control
       const ShareButtonControl = L.Control.extend({
@@ -1021,29 +1086,61 @@ const MapBox = () => {
       const shareButtonControl = new ShareButtonControl();
       shareButtonControl.addTo(mapRef.current);
       
-      // Add sidebar collapse/expand handler to fix map positioning
+      // Add sidebar collapse/expand handler to fix map positioning (debounced & guarded)
       const handleSidebarToggle = () => {
-        if (mapRef.current && mapRef.current.invalidateSize) {
-          setTimeout(() => {
-            try {
-              mapRef.current.invalidateSize();
-            } catch (e) {
-              console.warn('Map invalidateSize after sidebar toggle failed:', e);
+        if (!mapRef.current) return;
+        mapRef.current._sidebarAnimating = true;
+        const startTime = Date.now();
+        const finish = () => {
+          if (!mapRef.current) return;
+          mapRef.current._sidebarAnimating = false;
+          if (mapRef.current._pendingResize) {
+            mapRef.current._pendingResize = false;
+            safeInvalidate();
+          }
+          // Try flushing deferred map operations once animation completely ends
+          setTimeout(flushOpQueue, 40);
+        };
+        const safeInvalidate = () => {
+          if (!mapRef.current) return;
+            if (!isMapReady()) {
+              // Try again shortly but bail out after ~2s
+              if (Date.now() - startTime < 2000) {
+                return setTimeout(safeInvalidate, 120);
+              }
+              finish();
+              return;
             }
-          }, 300); // Delay to allow sidebar animation to complete
-        }
-      };
-      
-      // Listen for sidebar toggle events
-      const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-          if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-            if (mutation.target.classList.contains('sb-sidenav-toggled') || 
-                mutation.target.classList.contains('desktop-sidebar')) {
-              handleSidebarToggle();
+          try {
+            mapRef.current.invalidateSize?.();
+          } catch (e) {
+            // Swallow and retry lightly if early
+            if (Date.now() - startTime < 1500) {
+              return setTimeout(safeInvalidate, 160);
             }
           }
-        });
+          // One more delayed pass to stabilize tiles / overlays
+          setTimeout(() => {
+            try { mapRef.current?.invalidateSize?.(); } catch {}
+            finish();
+          }, 250);
+        };
+        // Initial delay to allow CSS transition
+        setTimeout(safeInvalidate, 220);
+      };
+      
+      // Listen for sidebar toggle events (attribute class changes)
+      const observer = new MutationObserver((mutations) => {
+        let shouldHandle = false;
+        for (const mutation of mutations) {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+            const cls = mutation.target.classList;
+            if (cls.contains('sb-sidenav-toggled') || cls.contains('desktop-sidebar')) {
+              shouldHandle = true; break;
+            }
+          }
+        }
+        if (shouldHandle) handleSidebarToggle();
       });
       
       // Observe body for sidebar class changes
@@ -1389,8 +1486,42 @@ const MapBox = () => {
    
         
         if (mapRef.current && isMapInitialized.current) {
-          try {
-        mapRef.current.eachLayer((layer) => {
+          // Guard: defer layer mutation while sidebar animating or container hidden
+          const canOperate = () => {
+            if (!mapRef.current) return false;
+            if (mapRef.current._sidebarAnimating) return false;
+            const c = mapRef.current.getContainer?.();
+            if (!c) return false;
+            if (c.offsetParent === null) return false; // hidden
+            // zero width/height -> layout not settled
+            const r = c.getBoundingClientRect();
+            if (r.width === 0 || r.height === 0) return false;
+            return true;
+          };
+          // If Leaflet not fully loaded yet, wait
+          if (!mapRef.current._loaded) {
+            setTimeout(() => {
+              if (mapRef.current && mapRef.current._loaded) {
+                try { mapRef.current.invalidateSize?.(); } catch {}
+              }
+            }, 120);
+            return; // exit this render cycle
+          }
+          if (!canOperate()) {
+            // schedule a retry shortly; avoid tight loop
+            setTimeout(() => {
+              if (mapRef.current && !mapRef.current._sidebarAnimating) {
+                try { mapRef.current.invalidateSize?.(); } catch {}
+              }
+            }, 240);
+            // Skip this cycle; effect will retrigger via state/prop changes naturally
+          } else {
+            try {
+              // Ensure map pane has a position to avoid _leaflet_pos undefined
+              if (mapRef.current._mapPane && !mapRef.current._mapPane._leaflet_pos) {
+                try { L.DomUtil.setPosition(mapRef.current._mapPane, L.point(0,0)); } catch {}
+              }
+              mapRef.current.eachLayer((layer) => {
         if (layer._url !== 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png') {
           
           
@@ -1408,8 +1539,9 @@ const MapBox = () => {
           mapRef.current.removeLayer(layer);
         }
       });
-          } catch (error) {
-            console.error('Error processing map layers:', error);
+            } catch (error) {
+              console.error('Error processing map layers:', error);
+            }
           }
         }
       
@@ -1421,16 +1553,7 @@ const MapBox = () => {
         }
   
         if (bounds && mapRef.current && isMapInitialized.current) {
-          try {
-          // Use Leaflet's fitBounds method to update the map's bounds
-          const newBounds = [
-            [bounds.south, bounds.west],
-            [bounds.north, bounds.east],
-          ];
-          mapRef.current.fitBounds(newBounds);
-          } catch (error) {
-            console.error('Error fitting map bounds:', error);
-          }
+          safeFitBoundsGlobal(bounds);
         }
         const layerGroup = L.layerGroup();
           console.log('Map useEffect triggered with layers:', layers);
@@ -1616,8 +1739,7 @@ const MapBox = () => {
     //set Bounds
     if(layer.layer_information.zoomToLayer){
       if (bounds === null) {
-      mapRef.current.fitBounds(L.latLngBounds([[layer.south_bound_latitude,
-        layer.east_bound_longitude],[layer.north_bound_latitude, layer.west_bound_longitude]]));
+  safeFitBoundsGlobal(L.latLngBounds([[layer.south_bound_latitude, layer.east_bound_longitude],[layer.north_bound_latitude, layer.west_bound_longitude]]));
      }
     }
         }
@@ -1694,8 +1816,7 @@ const MapBox = () => {
           //set Bounds
           if(layer.layer_information.zoomToLayer){
             if (bounds === null) {
-            mapRef.current.fitBounds(L.latLngBounds([[layer.south_bound_latitude,
-              layer.east_bound_longitude],[layer.north_bound_latitude, layer.west_bound_longitude]]));
+            safeFitBoundsGlobal(L.latLngBounds([[layer.south_bound_latitude, layer.east_bound_longitude],[layer.north_bound_latitude, layer.west_bound_longitude]]));
            }
           }
         }
@@ -1791,8 +1912,7 @@ const MapBox = () => {
           //set Bounds
           if(layer.layer_information.zoomToLayer){
             if (bounds === null) {
-            mapRef.current.fitBounds(L.latLngBounds([[layer.south_bound_latitude,
-              layer.east_bound_longitude],[layer.north_bound_latitude, layer.west_bound_longitude]]));
+            safeFitBoundsGlobal(L.latLngBounds([[layer.south_bound_latitude, layer.east_bound_longitude],[layer.north_bound_latitude, layer.west_bound_longitude]]));
            }
           }
         }
@@ -1940,7 +2060,7 @@ const MapBox = () => {
           [south, west], // Southwest corner
           [north, east] // Northeast corner
         );
-        mapRef.current.fitBounds(newBounds);
+  safeFitBoundsGlobal(newBounds);
         }
       } catch (error) {
         console.error('Error updating map bounds:', error);
