@@ -179,24 +179,29 @@ const MyWorkbench = () => {
 
   // Special handling for shared workbench restoration
   useEffect(() => {
-    // Check if we're restoring from a shared URL
+    // When restoring from a shared URL open ONLY the selected layer accordion
     if (isRestoringFromShare && mapLayer.length > 0 && initialLoadDone.current) {
-      // Open all accordions when restoring from shared URL
-      const layerIds = mapLayer.map(layer => layer.id);
-      setOpenAccordions(new Set(layerIds));
-      console.log('Opening all accordions for shared workbench restoration');
-      
-      // Also ensure enabled layers are properly activated
-      mapLayer.forEach(layer => {
-        if (layer.layer_information.enabled) {
-          console.log(`Layer ${layer.id} should be enabled:`, layer.layer_information.enabled);
+      // Priority:
+      // 1. currentId from offcanvas (if provided)
+      // 2. First enabled layer
+      // 3. First layer in list (fallback)
+      let targetId = null;
+      if (currentId) {
+        targetId = currentId;
+      } else {
+        const enabledLayer = mapLayer.find(l => l.layer_information.enabled);
+        if (enabledLayer) {
+          targetId = enabledLayer.id;
+        } else {
+          targetId = mapLayer[0].id;
         }
-      });
-      
-      // Reset the flag after opening accordions
-      setIsRestoringFromShare(false);
+      }
+
+      setOpenAccordions(new Set(targetId ? [targetId] : []));
+      console.log('Restored from share. Expanding only layer:', targetId);
+      setIsRestoringFromShare(false); // reset flag
     }
-  }, [mapLayer, isRestoringFromShare, initialLoadDone.current]);
+  }, [mapLayer, isRestoringFromShare, currentId, initialLoadDone.current]);
   
   const handleToggle = (eventKey) => {
     const newOpenAccordions = new Set(openAccordions);
