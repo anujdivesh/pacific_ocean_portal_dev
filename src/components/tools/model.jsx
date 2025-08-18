@@ -117,19 +117,19 @@ const ExploreModal = ({ show, onClose, title, bodyContent }) => {
   }, [theme, userId, selectedId]);
 
   return (
-    <Modal show={show} onHide={onClose} centered scrollable size="xl" className="custom-modal explore-modal">
-      <Modal.Header closeButton className="custom-header2" style={{ background: 'var(--color-surface, #fff)', borderBottom: '1px solid var(--color-secondary, #e5e7eb)', paddingTop: '8px', paddingBottom: '8px', minHeight: 'unset' }}>
-      <Modal.Title style={{ fontSize: '18px' }}>
+    <Modal show={show} onHide={onClose} centered scrollable size="xl" backdrop={false} className="custom-modal explore-modal">
+      <Modal.Header closeButton className="custom-header2" style={{ background: '#519ac2', borderBottom: '1px solid #3c7693', paddingTop: '8px', paddingBottom: '8px', minHeight: 'unset', color: '#ffffff' }}>
+  <Modal.Title style={{ fontSize: '18px', color:'#ffffff' }}>
           {/* Show the "Tailored" button only if the user is logged in */}
           {userId && (
             <button
             className={`btn btn-sm rounded-pill ${showTailoredContent ? 'active' : 'btn-light'}`}
             style={{
               padding: '8px',
-              backgroundColor: showTailoredContent ? '#0a58ca' : '',
-              color: showTailoredContent ? 'white !important' : 'var(--color-text, #1e293b)',
+              backgroundColor: showTailoredContent ? '#0a58ca' : 'rgba(255,255,255,0.15)',
+              color: '#ffffff',
               marginLeft: '4px',
-              border: showTailoredContent ? '1px solid #0a58ca' : '1px solid #dee2e6',
+              border: showTailoredContent ? '1px solid #0a58ca' : '1px solid rgba(255,255,255,0.4)',
               fontWeight: '500'
             }}
             onClick={handleTailoredClick}
@@ -145,10 +145,10 @@ const ExploreModal = ({ show, onClose, title, bodyContent }) => {
               className={`btn btn-sm rounded-pill ${selectedId === themeItem.id ? 'active' : 'btn-light'}`}
               style={{ 
                 padding: '8px', 
-                backgroundColor: selectedId === themeItem.id ? '#0a58ca' : '',
-                color: selectedId === themeItem.id ? 'white !important' : 'var(--color-text, #1e293b)', 
+                backgroundColor: selectedId === themeItem.id ? '#0a58ca' : 'rgba(255,255,255,0.15)',
+                color: '#ffffff', 
                 marginLeft: '4px',
-                border: selectedId === themeItem.id ? '1px solid #0a58ca' : '1px solid #dee2e6'
+                border: selectedId === themeItem.id ? '1px solid #0a58ca' : '1px solid rgba(255,255,255,0.4)'
               }}
               onClick={() => handleThemeClick(themeItem.id)}
             >

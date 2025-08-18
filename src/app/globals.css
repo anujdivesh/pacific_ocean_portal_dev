@@ -552,6 +552,8 @@ body.dark-mode .explore-modal .modal-footer {
   background-color: #ffffff !important;
   color: #1e293b !important;
 }
+/* Lighten footer divider line specifically in dark mode */
+body.dark-mode .explore-modal .modal-footer { border-top:1px solid #dddddd !important; }
 body.dark-mode .explore-modal .modal-title {
   color: #2563eb !important;
 }
@@ -1133,6 +1135,33 @@ body.dark-mode .region-select-override {
   background-color: var(--color-surface) !important;
   color: var(--color-text) !important;
   height: 38px !important; /* match light mode */
+}
+
+/* Explore modal header color override (apply in both modes) */
+.explore-modal .modal-header.custom-header2 {
+  background:#519ac2 !important;
+  border-bottom:1px solid #3c7693 !important;
+  color:#ffffff !important;
+}
+.explore-modal .modal-header.custom-header2 .modal-title { color:#ffffff !important; }
+.explore-modal .modal-header.custom-header2 .btn,
+.explore-modal .modal-header.custom-header2 button { color:#ffffff !important; }
+.explore-modal .modal-header.custom-header2 .btn-close { filter: invert(1) brightness(200%); opacity:.85; }
+body.dark-mode .explore-modal .modal-header.custom-header2 { background:#519ac2 !important; }
+body.dark-mode .explore-modal .modal-header.custom-header2 .btn-close { filter: invert(1) brightness(200%) !important; }
+/* Dark mode pill button fixes inside explore modal header so text remains visible */
+body.dark-mode .explore-modal .modal-header.custom-header2 .btn-light {
+  background: rgba(255,255,255,0.15) !important; /* translucent pill */
+  color:#ffffff !important; /* readable on blue */
+  border:1px solid rgba(255,255,255,0.45) !important;
+}
+body.dark-mode .explore-modal .modal-header.custom-header2 .btn-light:hover {
+  background: rgba(255,255,255,0.25) !important;
+}
+body.dark-mode .explore-modal .modal-header.custom-header2 .btn.active {
+  background:#0a58ca !important; /* active darker blue */
+  color:#ffffff !important;
+  border:1px solid #0a58ca !important;
 }
 
 .leaflet-control-zoom-in:hover,
