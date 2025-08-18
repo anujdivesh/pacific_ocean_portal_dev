@@ -930,58 +930,40 @@ const MapBox = () => {
       // Add custom styles for zoom control
       const style = document.createElement('style');
       style.textContent = `
-        .leaflet-control-zoom {
-          border: 1px solid var(--color-border) !important;
-          background: var(--color-surface) !important;
-          border-radius: 4px;
-          overflow: hidden;
-          box-shadow: 0 1px 5px rgba(0,0,0,0.2);
-        }
-        .leaflet-control-zoom a {
-          background-color: var(--color-surface) !important;
-          color: var(--color-text) !important;
-          border-bottom: 1px solid var(--color-border) !important;
-          width: 30px;
-          height: 30px;
-          line-height: 30px;
-          display: block;
-          text-align: center;
-          text-decoration: none;
-          transition: background-color 0.2s;
-        }
-        .leaflet-control-zoom a:hover {
-          background-color: var(--color-background) !important;
-        }
-        .leaflet-control-zoom a:first-child {
-          border-radius: 4px 4px 0 0;
-        }
-        .leaflet-control-zoom a:last-child {
-          border-bottom: none !important;
-          border-radius: 0 0 4px 4px;
-        }
-        .leaflet-control-zoom a.leaflet-disabled {
-          color: var(--color-text-muted) !important;
-          background-color: var(--color-surface-muted) !important;
-          cursor: default;
-        }
-        
-        /* Mobile specific positioning - hide zoom controls, position share button */
-        @media (max-width: 1004px) {
-          .leaflet-control-zoom {
-            display: none !important;
-          }
-          
-          .share-button-control {
-            top: auto !important;
-            bottom: 60px !important;
-            right: 10px !important;
-          }
+        /* Component-specific overrides (most zoom styling in globals.css) */
+        .leaflet-control-zoom a.leaflet-control-zoom-share { font-size:0; }
+        @media (max-width: 700px) {
+          .leaflet-control-zoom { width: 40px !important; }
         }
       `;
       document.head.appendChild(style);
 
       // Add zoom control to map
       zoomControl.addTo(mapRef.current);
+      
+      // Append share button inside the same zoom control container so they behave as one unit
+      try {
+        const zoomContainer = zoomControl.getContainer();
+        if (zoomContainer) {
+          const shareBtn = L.DomUtil.create('a', 'leaflet-control-zoom-share');
+          // Insert as first (top) control above zoom in/out
+          if (zoomContainer.firstChild) {
+            zoomContainer.insertBefore(shareBtn, zoomContainer.firstChild);
+          } else {
+            zoomContainer.appendChild(shareBtn);
+          }
+          shareBtn.href = '#';
+          shareBtn.title = 'Share Workbench';
+          shareBtn.setAttribute('role','button');
+          shareBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>';
+          L.DomEvent.on(shareBtn, 'click', (e) => {
+            L.DomEvent.preventDefault(e);
+            handleShowShareModal();
+          });
+        }
+      } catch(e) {
+        console.warn('Could not append share button to zoom control', e);
+      }
       
       // Add error handling for map controls
       const handleMapError = (error) => {
@@ -1020,71 +1002,7 @@ const MapBox = () => {
         return c.offsetParent !== null;
       };
 
-      // Create custom share button control
-      const ShareButtonControl = L.Control.extend({
-        onAdd: function(map) {
-          const container = L.DomUtil.create('div', 'share-button-control');
-          container.style.position = 'fixed';
-          container.style.right = '20px';
-          container.style.top = 'calc(50% + 60px)'; // Position below zoom controls
-          container.style.zIndex = '1000';
-          
-          // Function to update positioning based on screen size
-          const updatePositioning = () => {
-            if (window.innerWidth <= 1004) {
-              container.style.top = 'auto';
-              container.style.bottom = '80px'; // Bottom positioning for mobile
-              container.style.right = '10px';
-            } else {
-              container.style.top = 'calc(50% + 60px)'; // Original positioning for desktop
-              container.style.bottom = 'auto';
-              container.style.right = '20px';
-            }
-          };
-          
-          // Initial positioning
-          updatePositioning();
-          
-          // Update positioning on window resize
-          window.addEventListener('resize', updatePositioning);
-          
-          const button = L.DomUtil.create('button', 'share-button-map', container);
-          button.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>';
-          button.title = 'Share Workbench';
-          button.style.cssText = `
-            width: 40px;
-            height: 40px;
-            background: var(--color-surface, #fff);
-            color: var(--color-text, #333);
-            border: 1px solid var(--color-border, #ddd);
-            border-radius: 4px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 1px 5px rgba(0,0,0,0.2);
-            transition: all 0.2s ease;           
-          `;
-          
-          button.addEventListener('mouseenter', function() {
-            this.style.background = 'var(--color-background, #f8f9fa)';
-            this.style.transform = 'scale(1.05)';
-          });
-          
-          button.addEventListener('mouseleave', function() {
-            this.style.background = 'var(--color-surface, #fff)';
-            this.style.transform = 'scale(1)';
-          });
-          
-          button.addEventListener('click', handleShowShareModal);
-          
-          return container;
-        }
-      });
-      
-      // Add share button control to map
-      const shareButtonControl = new ShareButtonControl();
-      shareButtonControl.addTo(mapRef.current);
+  // Removed separate ShareButtonControl; share button now part of zoom control
       
       // Add sidebar collapse/expand handler to fix map positioning (debounced & guarded)
       const handleSidebarToggle = () => {
