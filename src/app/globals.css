@@ -1096,6 +1096,45 @@ body.dark-mode .leaflet-control-zoom a:hover,
 body.dark-mode .leaflet-control-zoom a.leaflet-control-zoom-share:hover { background: var(--color-background) !important; }
 body.dark-mode .leaflet-control-zoom a.leaflet-control-zoom-share svg { fill: currentColor; }
 
+/* React DatePicker calendar icon dark mode override */
+body.dark-mode .react-datepicker__calendar-icon {
+  color: #ffffff !important; /* sets icon color */
+  fill: #ffffff !important;  /* for SVG fill */
+  opacity: 0.95;
+}
+/* Ensure input keeps spacing when icon present */
+body.dark-mode .react-datepicker__view-calendar-icon input {
+  color: var(--color-text) !important;
+}
+
+/* Custom region select arrow color */
+.region-select-override {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236b737d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 18px 18px; /* normalized arrow size */
+  padding-right: 2.2rem !important; /* space for arrow */
+  height: 38px !important; /* consistent control height */
+  line-height: 1.4 !important;
+}
+/* High contrast / hover focus states */
+.region-select-override:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(107,115,125,0.25);
+  border-color: #6b737d !important;
+}
+/* Dark mode arrow variant */
+body.dark-mode .region-select-override {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23b0b6bd' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-size: 18px 18px !important; /* keep same size in dark mode */
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  height: 38px !important; /* match light mode */
+}
+
 .leaflet-control-zoom-in:hover,
 .leaflet-control-zoom-out:hover {
   background: #f0f0f0 !important;
