@@ -117,23 +117,49 @@ const ExploreModal = ({ show, onClose, title, bodyContent }) => {
   }, [theme, userId, selectedId]);
 
   return (
-    <Modal show={show} onHide={onClose} centered scrollable size="xl" backdrop={false} className="custom-modal explore-modal">
-      <Modal.Header closeButton className="custom-header2" style={{ background: '#519ac2', borderBottom: '1px solid #3c7693', paddingTop: '8px', paddingBottom: '8px', minHeight: 'unset', color: '#ffffff' }}>
-  <Modal.Title style={{ fontSize: '18px', color:'#ffffff' }}>
+    <>
+      <style>{`
+        .custom-modal.explore-modal .btn.rounded-pill {
+          background: #fff !important;
+          color: #519ac2 !important;
+        }
+        .custom-modal.explore-modal .btn.rounded-pill.active {
+          background: #fff !important;
+          color: #519ac2 !important;
+          border-width: 2px !important;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(81,154,194,0.15);
+        }
+        body.dark-mode .custom-modal.explore-modal .btn.rounded-pill {
+          background: #fff !important;
+          color: #519ac2 !important;
+       
+        }
+        body.dark-mode .custom-modal.explore-modal .btn.rounded-pill.active {
+          background: #fff !important;
+          color: #519ac2 !important;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(81,154,194,0.25);
+        }
+        }
+      `}</style>
+      <Modal show={show} onHide={onClose} centered scrollable size="xl" backdrop={false} className="custom-modal explore-modal">
+        <Modal.Header closeButton className="custom-header2" style={{ background: '#519ac2', borderBottom: '1px solid #3c7693', paddingTop: '8px', paddingBottom: '8px', minHeight: 'unset', color: '#ffffff' }}>
+          <Modal.Title style={{ fontSize: '18px', color:'#ffffff' }}>
           {/* Show the "Tailored" button only if the user is logged in */}
           {userId && (
             <button
-            className={`btn btn-sm rounded-pill ${showTailoredContent ? 'active' : 'btn-light'}`}
-            style={{
-              padding: '8px',
-              backgroundColor: showTailoredContent ? '#0a58ca' : 'rgba(255,255,255,0.15)',
-              color: '#ffffff',
-              marginLeft: '4px',
-              border: showTailoredContent ? '1px solid #0a58ca' : '1px solid rgba(255,255,255,0.4)',
-              fontWeight: '500'
-            }}
-            onClick={handleTailoredClick}
-          >
+              className={`btn btn-sm rounded-pill ${showTailoredContent ? 'active' : 'btn-light'}`}
+              style={{
+                padding: '8px',
+                backgroundColor: '#fff',
+                color: '#519ac2',
+                marginLeft: '4px',
+                border: showTailoredContent ? '2px solid #519ac2' : '1px solid #519ac2',
+                fontWeight: '500'
+              }}
+              onClick={handleTailoredClick}
+            >
               &nbsp;Tailored Products&nbsp;
             </button>
           )}
@@ -143,12 +169,13 @@ const ExploreModal = ({ show, onClose, title, bodyContent }) => {
             <button
               key={themeItem.id}
               className={`btn btn-sm rounded-pill ${selectedId === themeItem.id ? 'active' : 'btn-light'}`}
-              style={{ 
-                padding: '8px', 
-                backgroundColor: selectedId === themeItem.id ? '#0a58ca' : 'rgba(255,255,255,0.15)',
-                color: '#ffffff', 
+              style={{
+                padding: '8px',
+                backgroundColor: '#fff',
+                color: '#519ac2',
                 marginLeft: '4px',
-                border: selectedId === themeItem.id ? '1px solid #0a58ca' : '1px solid rgba(255,255,255,0.4)'
+                border: selectedId === themeItem.id ? '2px solid #519ac2' : '1px solid #519ac2',
+                fontWeight: '500'
               }}
               onClick={() => handleThemeClick(themeItem.id)}
             >
@@ -174,7 +201,8 @@ const ExploreModal = ({ show, onClose, title, bodyContent }) => {
       <Modal.Footer className="custom-header2" style={{ background: 'var(--color-surface, #fff)', borderTop: '1px solid var(--color-secondary, #e5e7eb)', paddingTop: '6px', paddingBottom: '6px', minHeight: 'unset' }}>
         <p style={{ fontSize: '11px', color: 'var(--color-secondary, #64748b)', margin: 0 }}>&copy; All Rights Reserved SPC </p>
       </Modal.Footer>
-    </Modal>
+      </Modal>
+    </>
   );
 };
 
