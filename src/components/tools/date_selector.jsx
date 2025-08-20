@@ -210,7 +210,7 @@ function DateSelector({item,period,startDateStr,endDateStr}) {
   //new
   let content;
   if (item.layer_information.datetime_format === 'DAILY') {
-    content = <div>
+    content = <div style={{ width: '90%' }}>
   <DatePicker
     id="datepicker"
     selected={currentDate}
@@ -295,19 +295,43 @@ else if (item.layer_information.datetime_format === '3MONTHLY') {
   if (!dateArray.current || dateArray.current.length === 0) {
     content = <div>Loading dates...</div>;
   } else {
-    // Extract unique years and months from dateArray
+    // Extract unique years from dateArray
     const years = [...new Set(dateArray.current.map(date => new Date(date).getFullYear()))];
-    const months = [...new Set(dateArray.current.map(date => {
+    
+    // For 3-monthly intervals, we need to find unique 3-month periods
+    // Group dates by year and starting month of 3-month period
+    const monthPeriods = new Map();
+    
+    dateArray.current.forEach(date => {
       const d = new Date(date);
-      return { 
-        value: d.getMonth(), 
-        name: d.toLocaleString('default', { month: 'short' }) 
-      };
-    }))].sort((a, b) => a.value - b.value);
+      const year = d.getFullYear();
+      const month = d.getMonth();
+      
+      // Determine which 3-month period this month belongs to
+      // 0-2 -> Jan-Mar (period 0), 3-5 -> Apr-Jun (period 3), etc.
+      const periodStart = Math.floor(month / 3) * 3;
+      const periodKey = `${year}-${periodStart}`;
+      
+      if (!monthPeriods.has(periodKey)) {
+        monthPeriods.set(periodKey, {
+          year: year,
+          startMonth: periodStart,
+          startMonthName: new Date(year, periodStart, 1).toLocaleString('default', { month: 'short' }),
+          endMonthName: new Date(year, periodStart + 2, 1).toLocaleString('default', { month: 'short' })
+        });
+      }
+    });
+
+    // Convert to sorted array
+    const sortedPeriods = Array.from(monthPeriods.values()).sort((a, b) => {
+      if (a.year !== b.year) return a.year - b.year;
+      return a.startMonth - b.startMonth;
+    });
 
     // Find current year and month from currentDate
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth();
+    const currentPeriodStart = Math.floor(currentMonth / 3) * 3;
 
     content = (
       <div style={{ width: '80%', display: 'flex', gap: '5px', marginLeft: -20  }}>
@@ -320,6 +344,13 @@ else if (item.layer_information.datetime_format === '3MONTHLY') {
             const selectedYear = parseInt(e.target.value);
             const newDate = new Date(currentDate);
             newDate.setFullYear(selectedYear);
+            
+            // Find the first available period for this year
+            const availablePeriod = sortedPeriods.find(p => p.year === selectedYear);
+            if (availablePeriod) {
+              newDate.setMonth(availablePeriod.startMonth);
+            }
+            
             setCurrentDate(newDate);
             handleonchange3month(newDate, item);
           }}
@@ -331,30 +362,26 @@ else if (item.layer_information.datetime_format === '3MONTHLY') {
           ))}
         </select>
 
-        {/* Month Range Select */}
+        {/* 3-Month Period Select */}
         <select 
           className="form-select form-select-sm rounded-pill"
-          value={currentMonth}
+          value={currentPeriodStart}
           style={{ minWidth: '120px' }}
           onChange={(e) => {
-            const selectedMonth = parseInt(e.target.value);
+            const selectedPeriodStart = parseInt(e.target.value);
             const newDate = new Date(currentDate);
-            newDate.setMonth(selectedMonth);
+            newDate.setMonth(selectedPeriodStart);
             setCurrentDate(newDate);
             handleonchange3month(newDate, item);
           }}
         >
-          {months.map((month, index) => {
-            const startMonth = month.name;
-            const endDate = new Date(currentYear, month.value + 2, 1);
-            const endMonth = endDate.toLocaleString('default', { month: 'short' });
-            
-            return (
-              <option key={`month-${index}`} value={month.value}>
-                {startMonth} - {endMonth}
+          {sortedPeriods
+            .filter(period => period.year === currentYear)
+            .map((period, index) => (
+              <option key={`period-${index}`} value={period.startMonth}>
+                {period.startMonthName} - {period.endMonthName}
               </option>
-            );
-          })}
+            ))}
         </select>
       </div>
     );

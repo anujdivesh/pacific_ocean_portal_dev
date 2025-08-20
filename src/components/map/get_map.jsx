@@ -99,6 +99,59 @@ const MapBox = () => {
     const [showNoDataMessage, setShowNoDataMessage] = useState(false);
     const [isCheckingData, setIsCheckingData] = useState(false);
     const [showShareModal, setShowShareModal] = useState(false);
+    // Central guarded map operations / safe fitBounds helpers
+    const opQueueRef = useRef([]);
+    const canOperateMap = () => {
+      if (!mapRef.current) return false;
+      if (mapRef.current._sidebarAnimating) return false;
+      const c = mapRef.current.getContainer?.();
+      if (!c) return false;
+      if (c.offsetParent === null) return false; // hidden
+      const r = c.getBoundingClientRect();
+      if (r.width === 0 || r.height === 0) return false;
+      return true;
+    };
+    const scheduleMapOp = (fn, attempt = 0) => {
+      if (!mapRef.current) return;
+      if (!canOperateMap() || !mapRef.current._loaded) {
+        if (attempt < 15) return setTimeout(() => scheduleMapOp(fn, attempt + 1), 100 + 40 * attempt);
+        return;
+      }
+      if (mapRef.current._mapPane && !mapRef.current._mapPane._leaflet_pos) {
+        try { L.DomUtil.setPosition(mapRef.current._mapPane, L.point(0,0)); } catch {}
+      }
+      try { fn(); }
+      catch (e) {
+        if (e?.message?.includes('_leaflet_pos') && attempt < 10) {
+          return setTimeout(() => scheduleMapOp(fn, attempt + 1), 120 * (attempt + 1));
+        }
+        console.warn('Map op failed (final):', e);
+      }
+    };
+    const flushOpQueue = () => {
+      if (!canOperateMap()) return;
+      while (opQueueRef.current.length) {
+        const fn = opQueueRef.current.shift();
+        scheduleMapOp(fn);
+      }
+    };
+    const safeFitBoundsGlobal = (boundsInput, options = {}) => {
+      if (!mapRef.current || !boundsInput) return;
+      const resolve = () => {
+        if (Array.isArray(boundsInput)) return boundsInput;
+        if (boundsInput.getSouthWest && boundsInput.getNorthEast) return boundsInput;
+        if (typeof boundsInput === 'object' && 'south' in boundsInput) {
+          return [[boundsInput.south, boundsInput.west],[boundsInput.north, boundsInput.east]];
+        }
+        return null;
+      };
+      const b = resolve();
+      if (!b) return;
+      scheduleMapOp(() => {
+        if (!mapRef.current) return;
+        mapRef.current.fitBounds(b, { animate: false, ...options, animate: false });
+      });
+    };
     
     const handleShow = (id) => {
         dispatch(showoffCanvas(id));
@@ -877,52 +930,10 @@ const MapBox = () => {
       // Add custom styles for zoom control
       const style = document.createElement('style');
       style.textContent = `
-        .leaflet-control-zoom {
-          border: 1px solid var(--color-border) !important;
-          background: var(--color-surface) !important;
-          border-radius: 4px;
-          overflow: hidden;
-          box-shadow: 0 1px 5px rgba(0,0,0,0.2);
-        }
-        .leaflet-control-zoom a {
-          background-color: var(--color-surface) !important;
-          color: var(--color-text) !important;
-          border-bottom: 1px solid var(--color-border) !important;
-          width: 30px;
-          height: 30px;
-          line-height: 30px;
-          display: block;
-          text-align: center;
-          text-decoration: none;
-          transition: background-color 0.2s;
-        }
-        .leaflet-control-zoom a:hover {
-          background-color: var(--color-background) !important;
-        }
-        .leaflet-control-zoom a:first-child {
-          border-radius: 4px 4px 0 0;
-        }
-        .leaflet-control-zoom a:last-child {
-          border-bottom: none !important;
-          border-radius: 0 0 4px 4px;
-        }
-        .leaflet-control-zoom a.leaflet-disabled {
-          color: var(--color-text-muted) !important;
-          background-color: var(--color-surface-muted) !important;
-          cursor: default;
-        }
-        
-        /* Mobile specific positioning - hide zoom controls, position share button */
-        @media (max-width: 1004px) {
-          .leaflet-control-zoom {
-            display: none !important;
-          }
-          
-          .share-button-control {
-            top: auto !important;
-            bottom: 60px !important;
-            right: 10px !important;
-          }
+        /* Component-specific overrides (most zoom styling in globals.css) */
+        .leaflet-control-zoom a.leaflet-control-zoom-share { font-size:0; }
+        @media (max-width: 700px) {
+          .leaflet-control-zoom { width: 40px !important; }
         }
       `;
       document.head.appendChild(style);
@@ -930,120 +941,124 @@ const MapBox = () => {
       // Add zoom control to map
       zoomControl.addTo(mapRef.current);
       
+      // Append share button inside the same zoom control container so they behave as one unit
+      try {
+        const zoomContainer = zoomControl.getContainer();
+        if (zoomContainer) {
+          const shareBtn = L.DomUtil.create('a', 'leaflet-control-zoom-share');
+          // Insert as first (top) control above zoom in/out
+          if (zoomContainer.firstChild) {
+            zoomContainer.insertBefore(shareBtn, zoomContainer.firstChild);
+          } else {
+            zoomContainer.appendChild(shareBtn);
+          }
+          shareBtn.href = '#';
+          shareBtn.title = 'Share Workbench';
+          shareBtn.setAttribute('role','button');
+          shareBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>';
+          L.DomEvent.on(shareBtn, 'click', (e) => {
+            L.DomEvent.preventDefault(e);
+            handleShowShareModal();
+          });
+        }
+      } catch(e) {
+        console.warn('Could not append share button to zoom control', e);
+      }
+      
       // Add error handling for map controls
       const handleMapError = (error) => {
-        if (error.message && error.message.includes('_leaflet_pos')) {
-          console.warn('Leaflet position error detected, attempting to recover...');
-          // Force map to recalculate positions
-          if (mapRef.current && mapRef.current.invalidateSize) {
-            setTimeout(() => {
-              try {
-                mapRef.current.invalidateSize();
-              } catch (e) {
-                console.warn('Map invalidateSize failed:', e);
-              }
-            }, 100);
+        if (!error || !error.message) return;
+        if (error.message.includes('_leaflet_pos')) {
+          // Centralised lightweight recovery – no global handler recursion
+          const mapOk = mapRef.current && mapRef.current.getContainer?.();
+          if (!mapOk) return;
+          // Avoid hammering invalidateSize during sidebar animation
+          if (mapRef.current._sidebarAnimating) {
+            mapRef.current._pendingResize = true;
+            return;
           }
-        }
-      };
-      
-      // Add global error handler for Leaflet
-      window.addEventListener('error', (event) => {
-        if (event.error && event.error.message && event.error.message.includes('_leaflet_pos')) {
-          event.preventDefault();
-          handleMapError(event.error);
-        }
-      });
-
-      // Create custom share button control
-      const ShareButtonControl = L.Control.extend({
-        onAdd: function(map) {
-          const container = L.DomUtil.create('div', 'share-button-control');
-          container.style.position = 'fixed';
-          container.style.right = '20px';
-          container.style.top = 'calc(50% + 60px)'; // Position below zoom controls
-          container.style.zIndex = '1000';
-          
-          // Function to update positioning based on screen size
-          const updatePositioning = () => {
-            if (window.innerWidth <= 1004) {
-              container.style.top = 'auto';
-              container.style.bottom = '80px'; // Bottom positioning for mobile
-              container.style.right = '10px';
-            } else {
-              container.style.top = 'calc(50% + 60px)'; // Original positioning for desktop
-              container.style.bottom = 'auto';
-              container.style.right = '20px';
+          let attempts = 0;
+          const retry = () => {
+            attempts++;
+            if (!mapRef.current) return;
+            try {
+              mapRef.current.invalidateSize?.();
+            } catch (e) {
+              if (attempts < 3) {
+                return setTimeout(retry, 120 * attempts);
+              }
             }
           };
-          
-          // Initial positioning
-          updatePositioning();
-          
-          // Update positioning on window resize
-          window.addEventListener('resize', updatePositioning);
-          
-          const button = L.DomUtil.create('button', 'share-button-map', container);
-          button.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>';
-          button.title = 'Share Workbench';
-          button.style.cssText = `
-            width: 40px;
-            height: 40px;
-            background: var(--color-surface, #fff);
-            color: var(--color-text, #333);
-            border: 1px solid var(--color-border, #ddd);
-            border-radius: 4px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 1px 5px rgba(0,0,0,0.2);
-            transition: all 0.2s ease;           
-          `;
-          
-          button.addEventListener('mouseenter', function() {
-            this.style.background = 'var(--color-background, #f8f9fa)';
-            this.style.transform = 'scale(1.05)';
-          });
-          
-          button.addEventListener('mouseleave', function() {
-            this.style.background = 'var(--color-surface, #fff)';
-            this.style.transform = 'scale(1)';
-          });
-          
-          button.addEventListener('click', handleShowShareModal);
-          
-          return container;
-        }
-      });
-      
-      // Add share button control to map
-      const shareButtonControl = new ShareButtonControl();
-      shareButtonControl.addTo(mapRef.current);
-      
-      // Add sidebar collapse/expand handler to fix map positioning
-      const handleSidebarToggle = () => {
-        if (mapRef.current && mapRef.current.invalidateSize) {
-          setTimeout(() => {
-            try {
-              mapRef.current.invalidateSize();
-            } catch (e) {
-              console.warn('Map invalidateSize after sidebar toggle failed:', e);
-            }
-          }, 300); // Delay to allow sidebar animation to complete
+          setTimeout(retry, 50);
         }
       };
+
+      // Helper to check map visibility / readiness before size ops
+      const isMapReady = () => {
+        if (!mapRef.current) return false;
+        const c = mapRef.current.getContainer?.();
+        if (!c) return false;
+        // offsetParent null means display:none in ancestor – wait until visible
+        return c.offsetParent !== null;
+      };
+
+  // Removed separate ShareButtonControl; share button now part of zoom control
       
-      // Listen for sidebar toggle events
-      const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-          if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-            if (mutation.target.classList.contains('sb-sidenav-toggled') || 
-                mutation.target.classList.contains('desktop-sidebar')) {
-              handleSidebarToggle();
+      // Add sidebar collapse/expand handler to fix map positioning (debounced & guarded)
+      const handleSidebarToggle = () => {
+        if (!mapRef.current) return;
+        mapRef.current._sidebarAnimating = true;
+        const startTime = Date.now();
+        const finish = () => {
+          if (!mapRef.current) return;
+          mapRef.current._sidebarAnimating = false;
+          if (mapRef.current._pendingResize) {
+            mapRef.current._pendingResize = false;
+            safeInvalidate();
+          }
+          // Try flushing deferred map operations once animation completely ends
+          setTimeout(flushOpQueue, 40);
+        };
+        const safeInvalidate = () => {
+          if (!mapRef.current) return;
+            if (!isMapReady()) {
+              // Try again shortly but bail out after ~2s
+              if (Date.now() - startTime < 2000) {
+                return setTimeout(safeInvalidate, 120);
+              }
+              finish();
+              return;
+            }
+          try {
+            mapRef.current.invalidateSize?.();
+          } catch (e) {
+            // Swallow and retry lightly if early
+            if (Date.now() - startTime < 1500) {
+              return setTimeout(safeInvalidate, 160);
             }
           }
-        });
+          // One more delayed pass to stabilize tiles / overlays
+          setTimeout(() => {
+            try { mapRef.current?.invalidateSize?.(); } catch {}
+            finish();
+          }, 250);
+        };
+        // Initial delay to allow CSS transition
+        setTimeout(safeInvalidate, 220);
+      };
+      
+      // Listen for sidebar toggle events (attribute class changes)
+      const observer = new MutationObserver((mutations) => {
+        let shouldHandle = false;
+        for (const mutation of mutations) {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+            const cls = mutation.target.classList;
+            if (cls.contains('sb-sidenav-toggled') || cls.contains('desktop-sidebar')) {
+              shouldHandle = true; break;
+            }
+          }
+        }
+        if (shouldHandle) handleSidebarToggle();
       });
       
       // Observe body for sidebar class changes
@@ -1389,8 +1404,42 @@ const MapBox = () => {
    
         
         if (mapRef.current && isMapInitialized.current) {
-          try {
-        mapRef.current.eachLayer((layer) => {
+          // Guard: defer layer mutation while sidebar animating or container hidden
+          const canOperate = () => {
+            if (!mapRef.current) return false;
+            if (mapRef.current._sidebarAnimating) return false;
+            const c = mapRef.current.getContainer?.();
+            if (!c) return false;
+            if (c.offsetParent === null) return false; // hidden
+            // zero width/height -> layout not settled
+            const r = c.getBoundingClientRect();
+            if (r.width === 0 || r.height === 0) return false;
+            return true;
+          };
+          // If Leaflet not fully loaded yet, wait
+          if (!mapRef.current._loaded) {
+            setTimeout(() => {
+              if (mapRef.current && mapRef.current._loaded) {
+                try { mapRef.current.invalidateSize?.(); } catch {}
+              }
+            }, 120);
+            return; // exit this render cycle
+          }
+          if (!canOperate()) {
+            // schedule a retry shortly; avoid tight loop
+            setTimeout(() => {
+              if (mapRef.current && !mapRef.current._sidebarAnimating) {
+                try { mapRef.current.invalidateSize?.(); } catch {}
+              }
+            }, 240);
+            // Skip this cycle; effect will retrigger via state/prop changes naturally
+          } else {
+            try {
+              // Ensure map pane has a position to avoid _leaflet_pos undefined
+              if (mapRef.current._mapPane && !mapRef.current._mapPane._leaflet_pos) {
+                try { L.DomUtil.setPosition(mapRef.current._mapPane, L.point(0,0)); } catch {}
+              }
+              mapRef.current.eachLayer((layer) => {
         if (layer._url !== 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png') {
           
           
@@ -1408,8 +1457,9 @@ const MapBox = () => {
           mapRef.current.removeLayer(layer);
         }
       });
-          } catch (error) {
-            console.error('Error processing map layers:', error);
+            } catch (error) {
+              console.error('Error processing map layers:', error);
+            }
           }
         }
       
@@ -1421,16 +1471,7 @@ const MapBox = () => {
         }
   
         if (bounds && mapRef.current && isMapInitialized.current) {
-          try {
-          // Use Leaflet's fitBounds method to update the map's bounds
-          const newBounds = [
-            [bounds.south, bounds.west],
-            [bounds.north, bounds.east],
-          ];
-          mapRef.current.fitBounds(newBounds);
-          } catch (error) {
-            console.error('Error fitting map bounds:', error);
-          }
+          safeFitBoundsGlobal(bounds);
         }
         const layerGroup = L.layerGroup();
           console.log('Map useEffect triggered with layers:', layers);
@@ -1616,8 +1657,7 @@ const MapBox = () => {
     //set Bounds
     if(layer.layer_information.zoomToLayer){
       if (bounds === null) {
-      mapRef.current.fitBounds(L.latLngBounds([[layer.south_bound_latitude,
-        layer.east_bound_longitude],[layer.north_bound_latitude, layer.west_bound_longitude]]));
+  safeFitBoundsGlobal(L.latLngBounds([[layer.south_bound_latitude, layer.east_bound_longitude],[layer.north_bound_latitude, layer.west_bound_longitude]]));
      }
     }
         }
@@ -1694,8 +1734,7 @@ const MapBox = () => {
           //set Bounds
           if(layer.layer_information.zoomToLayer){
             if (bounds === null) {
-            mapRef.current.fitBounds(L.latLngBounds([[layer.south_bound_latitude,
-              layer.east_bound_longitude],[layer.north_bound_latitude, layer.west_bound_longitude]]));
+            safeFitBoundsGlobal(L.latLngBounds([[layer.south_bound_latitude, layer.east_bound_longitude],[layer.north_bound_latitude, layer.west_bound_longitude]]));
            }
           }
         }
@@ -1791,8 +1830,7 @@ const MapBox = () => {
           //set Bounds
           if(layer.layer_information.zoomToLayer){
             if (bounds === null) {
-            mapRef.current.fitBounds(L.latLngBounds([[layer.south_bound_latitude,
-              layer.east_bound_longitude],[layer.north_bound_latitude, layer.west_bound_longitude]]));
+            safeFitBoundsGlobal(L.latLngBounds([[layer.south_bound_latitude, layer.east_bound_longitude],[layer.north_bound_latitude, layer.west_bound_longitude]]));
            }
           }
         }
@@ -1940,7 +1978,7 @@ const MapBox = () => {
           [south, west], // Southwest corner
           [north, east] // Northeast corner
         );
-        mapRef.current.fitBounds(newBounds);
+  safeFitBoundsGlobal(newBounds);
         }
       } catch (error) {
         console.error('Error updating map bounds:', error);

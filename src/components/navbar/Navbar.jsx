@@ -367,11 +367,11 @@ function Navigationbar({ children }) {
               Library
             </Link>
           </li>
-          <li>
+          {/* <li>
             <Link className={pathname === "/experts" ? "active-nav nav-link" : "nav-link"} href="/experts" style={{textShadow: "0 0 0.5px rgba(255, 255, 255, 0.8)"}}>
               Experts
             </Link>
-          </li>
+          </li> */}
           <li>
             <Link className={pathname === "/aboutus" ? "active-nav nav-link" : "nav-link"} href="/aboutus" style={{textShadow: "0 0 0.5px rgba(255, 255, 255, 0.8)"}}>
               About Us

@@ -20,6 +20,7 @@ import RangeSlider from './range_slider';
 import { IoMdRemoveCircleOutline } from "react-icons/io";
 import { get_url } from '@/components/json/urls';
 import SofarTypeFilter from './sofarTypeFilter';
+import { toast } from 'react-hot-toast';
 import { 
   getShareIdFromUrl, 
   loadSharedWorkbench, 
@@ -63,6 +64,7 @@ const MyWorkbench = () => {
   const _isMounted = useRef(true);
   const [openAccordions, setOpenAccordions] = useState(new Set());
   const [lastAddedId, setLastAddedId] = useState(null);
+  const [isRestoringFromShare, setIsRestoringFromShare] = useState(false);
 
   // Clean up any existing duplicates when component mounts
   useEffect(() => {
@@ -73,34 +75,51 @@ const MyWorkbench = () => {
   useEffect(() => {
     if (_isMounted.current && !initialLoadDone.current) {
       async function loadLayers() {
-        // Check if there's a share parameter in the URL
-        if (hasShareParameter()) {
-          // console.log('Share parameter detected in URL');
-          const shareId = getShareIdFromUrl();
-          // console.log('Share ID from URL:', shareId ? shareId.substring(0, 50) + '...' : 'null');
-          const sharedState = loadSharedWorkbench(shareId);
-          
-          if (sharedState) {
-            console.log('Loading shared workbench state...');
-            const success = await restoreWorkbenchState(sharedState, dispatch);
-            if (success) {
-              // Clean up the URL after successful restoration
-              cleanupShareUrl();
-              // Show a success message (you could add a toast notification here)
-              console.log('Shared workbench loaded successfully!');
-            } else {
-              console.error('Failed to restore shared workbench state');
-            }
-          } else {
-            console.warn('No shared workbench found, loading default state');
-            // Clean up the URL if no shared state found
-            cleanupShareUrl();
-            loadDefaultLayers();
-          }
-        } else {
-          // Load default layers from localStorage
-          loadDefaultLayers();
-        }
+                 // Check if there's a share parameter in the URL
+         if (hasShareParameter()) {
+           // console.log('Share parameter detected in URL');
+           const shareId = getShareIdFromUrl();
+           // console.log('Share ID from URL:', shareId ? shareId.substring(0, 50) + '...' : 'null');
+           const sharedState = loadSharedWorkbench(shareId);
+           
+           if (sharedState) {
+             console.log('Loading shared workbench state...');
+             setIsRestoringFromShare(true); // Mark that we're restoring from share
+             const success = await restoreWorkbenchState(sharedState, dispatch);
+             if (success) {
+               // Clean up the URL after successful restoration
+               cleanupShareUrl();
+               // Show a success toast message
+              //  toast('Shared workbench loaded successfully!', {
+              //    icon: '✅',
+              //    style: { background: '#f0f9ff', color: '#0369a1' },
+              //    duration: 4000
+              //  });
+              //  console.log('Shared workbench loaded successfully!');
+             } else {
+              //  console.error('Failed to restore shared workbench state');
+              //  toast('Failed to load shared workbench. Please try again.', {
+              //    icon: '❌',
+              //    style: { background: '#fef2f2', color: '#dc2626' },
+              //    duration: 4000
+              //  });
+               setIsRestoringFromShare(false);
+             }
+           } else {
+             console.warn('No shared workbench found, loading default state');
+             // Clean up the URL if no shared state found
+             cleanupShareUrl();
+            //  toast('Invalid or corrupted share link. Loading default workbench.', {
+            //    icon: '⚠️',
+            //    style: { background: '#fffbe6', color: '#ad8b00' },
+            //    duration: 4000
+            //  });
+             loadDefaultLayers();
+           }
+         } else {
+           // Load default layers from localStorage
+           loadDefaultLayers();
+         }
         
         initialLoadDone.current = true;
       }
@@ -152,10 +171,37 @@ const MyWorkbench = () => {
   
       if (lastLayer.id !== lastAddedId) {
         setLastAddedId(lastLayer.id);
-        setOpenAccordions(new Set([lastLayer.id])); // open only the new one
+        // Open the accordion for the newly added layer
+        setOpenAccordions(new Set([lastLayer.id]));
       }
     }
   }, [mapLayer, lastAddedId]);
+
+  // Special handling for shared workbench restoration
+  useEffect(() => {
+    // When restoring from a shared URL open ONLY the selected layer accordion
+    if (isRestoringFromShare && mapLayer.length > 0 && initialLoadDone.current) {
+      // Priority:
+      // 1. currentId from offcanvas (if provided)
+      // 2. First enabled layer
+      // 3. First layer in list (fallback)
+      let targetId = null;
+      if (currentId) {
+        targetId = currentId;
+      } else {
+        const enabledLayer = mapLayer.find(l => l.layer_information.enabled);
+        if (enabledLayer) {
+          targetId = enabledLayer.id;
+        } else {
+          targetId = mapLayer[0].id;
+        }
+      }
+
+      setOpenAccordions(new Set(targetId ? [targetId] : []));
+      console.log('Restored from share. Expanding only layer:', targetId);
+      setIsRestoringFromShare(false); // reset flag
+    }
+  }, [mapLayer, isRestoringFromShare, currentId, initialLoadDone.current]);
   
   const handleToggle = (eventKey) => {
     const newOpenAccordions = new Set(openAccordions);

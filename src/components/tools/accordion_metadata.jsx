@@ -38,7 +38,7 @@ function AccordionMetadata() {
                         <Accordion.Item eventKey="1" style={{ borderRadius: 0, border: 'none', borderTopLeftRadius: 0, borderTopRightRadius: 0, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}>
                             <Accordion.Header style={{ borderRadius: 0, border: 'none', borderTopLeftRadius: 0, borderTopRightRadius: 0, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}>{dataset_list.metadata_one_id}</Accordion.Header>
                             <Accordion.Body style={{ borderRadius: 0, border: 'none', borderTopLeftRadius: 0, borderTopRightRadius: 0, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}>
-                                {dataset_list.metadata_one_value} 
+                                {dataset_list.metadata_one_value}
                             </Accordion.Body>
                         </Accordion.Item>
                     </Accordion>

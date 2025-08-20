@@ -473,6 +473,11 @@ body.dark-mode .navbar {
   border: none !important;
 }
 
+/* Ensure navbar title stays blue in dark mode */
+body.dark-mode .navbar .navbar-title {
+  color: var(--color-primary) !important;
+}
+
 /* Chart.js text styling for dark mode */
 body.dark-mode canvas {
   color: #ffffff !important;
@@ -547,6 +552,8 @@ body.dark-mode .explore-modal .modal-footer {
   background-color: #ffffff !important;
   color: #1e293b !important;
 }
+/* Lighten footer divider line specifically in dark mode */
+body.dark-mode .explore-modal .modal-footer { border-top:1px solid #dddddd !important; }
 body.dark-mode .explore-modal .modal-title {
   color: #2563eb !important;
 }
@@ -1007,7 +1014,7 @@ body.dark-mode .offcanvas .offcanvas-body {
   .leaflet-right .leaflet-control-zoom {
     right: 20px !important;
     left: auto !important;
-    top: 93% !important;
+    top: 90% !important; /* zoom share button control% */
     transform: translateY(-50%) !important;
     bottom: auto !important;
     position: fixed !important;
@@ -1049,6 +1056,112 @@ body.dark-mode .offcanvas .offcanvas-body {
 
 .leaflet-control-zoom-out {
   border-bottom: none !important;
+}
+
+/* Integrated share button at top of zoom stack */
+.leaflet-control-zoom a.leaflet-control-zoom-share {
+  background: #fff !important;
+  color: #223 !important;
+  border: none !important;
+  width: 40px !important;
+  height: 40px !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0 !important; /* hide any text */
+  box-shadow: none !important;
+  transition: background 0.2s;
+  border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+  border-radius: 0 !important; /* interior */
+}
+.leaflet-control-zoom a.leaflet-control-zoom-share svg { width:22px; height:22px; }
+.leaflet-control-zoom a.leaflet-control-zoom-share:hover { background:#f0f0f0 !important; }
+
+/* First child (share) should keep top rounding; last child keep bottom rounding */
+.leaflet-control-zoom a:first-child { border-radius:16px 16px 0 0 !important; }
+.leaflet-control-zoom a:last-child { border-radius:0 0 16px 16px !important; }
+
+/* Dark mode variants for zoom + share control */
+body.dark-mode .leaflet-control-zoom {
+  background: var(--color-surface) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.35) !important;
+}
+body.dark-mode .leaflet-control-zoom a,
+body.dark-mode .leaflet-control-zoom a.leaflet-control-zoom-share {
+  background: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+}
+body.dark-mode .leaflet-control-zoom a:last-child { border-bottom: none !important; }
+body.dark-mode .leaflet-control-zoom a:hover,
+body.dark-mode .leaflet-control-zoom a.leaflet-control-zoom-share:hover { background: var(--color-background) !important; }
+body.dark-mode .leaflet-control-zoom a.leaflet-control-zoom-share svg { fill: currentColor; }
+
+/* React DatePicker calendar icon dark mode override */
+body.dark-mode .react-datepicker__calendar-icon {
+  color: #ffffff !important; /* sets icon color */
+  fill: #ffffff !important;  /* for SVG fill */
+  opacity: 0.95;
+}
+/* Ensure input keeps spacing when icon present */
+body.dark-mode .react-datepicker__view-calendar-icon input {
+  color: var(--color-text) !important;
+}
+
+/* Custom region select arrow color */
+.region-select-override {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236b737d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 18px 18px; /* normalized arrow size */
+  padding-right: 2.2rem !important; /* space for arrow */
+  height: 38px !important; /* consistent control height */
+  line-height: 1.4 !important;
+}
+/* High contrast / hover focus states */
+.region-select-override:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(107,115,125,0.25);
+  border-color: #6b737d !important;
+}
+/* Dark mode arrow variant */
+body.dark-mode .region-select-override {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23b0b6bd' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-size: 18px 18px !important; /* keep same size in dark mode */
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  height: 38px !important; /* match light mode */
+}
+
+/* Explore modal header color override (apply in both modes) */
+.explore-modal .modal-header.custom-header2 {
+  background:#519ac2 !important;
+  border-bottom:1px solid #3c7693 !important;
+  color:#ffffff !important;
+}
+.explore-modal .modal-header.custom-header2 .modal-title { color:#ffffff !important; }
+.explore-modal .modal-header.custom-header2 .btn,
+.explore-modal .modal-header.custom-header2 button { color:#ffffff !important; }
+.explore-modal .modal-header.custom-header2 .btn-close { filter: invert(1) brightness(200%); opacity:.85; }
+body.dark-mode .explore-modal .modal-header.custom-header2 { background:#519ac2 !important; }
+body.dark-mode .explore-modal .modal-header.custom-header2 .btn-close { filter: invert(1) brightness(200%) !important; }
+/* Dark mode pill button fixes inside explore modal header so text remains visible */
+body.dark-mode .explore-modal .modal-header.custom-header2 .btn-light {
+  background: rgba(255,255,255,0.15) !important; /* translucent pill */
+  color:#ffffff !important; /* readable on blue */
+  border:1px solid rgba(255,255,255,0.45) !important;
+}
+body.dark-mode .explore-modal .modal-header.custom-header2 .btn-light:hover {
+  background: rgba(255,255,255,0.25) !important;
+}
+body.dark-mode .explore-modal .modal-header.custom-header2 .btn.active {
+  background:#0a58ca !important; /* active darker blue */
+  color:#ffffff !important;
+  border:1px solid #0a58ca !important;
 }
 
 .leaflet-control-zoom-in:hover,
