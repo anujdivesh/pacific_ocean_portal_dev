@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
-import { Spinner, Form } from 'react-bootstrap'; 
+import { Spinner, Form, Button } from 'react-bootstrap'; 
 import { Line } from 'react-chartjs-2'; 
 import 'chart.js/auto'; 
 import { useAppSelector } from '@/app/GlobalRedux/hooks';
@@ -33,10 +33,117 @@ function TimeseriesSofar({ height }) {
   const [enabledChart, setEnabledChart] = useState(true);
   const [liveMode, setLiveMode] = useState(false);
   const [dataLimit, setDataLimit] = useState(100);
+  // Separate date and time controls for better control over defaults
+  const [startDate, setStartDate] = useState("");
+  const [startTime, setStartTime] = useState("00:00");
+  const [endDate, setEndDate] = useState("");
+  const [endTime, setEndTime] = useState("23:59");
+  const [appliedStartDate, setAppliedStartDate] = useState("");
+  const [appliedStartTime, setAppliedStartTime] = useState("");
+  const [appliedEndDate, setAppliedEndDate] = useState("");
+  const [appliedEndTime, setAppliedEndTime] = useState("");
   const refreshIntervalRef = useRef(null);
+  const lastRequestRef = useRef(null); // Store {url, timestamp} of last request
+
+  // Extract min/max dates from current chart data and populate date inputs
+  useEffect(() => {
+    if (chartData.labels && chartData.labels.length > 0) {
+      // Parse the formatted labels back to dates to find min/max
+      const dates = chartData.labels.map(label => {
+        // Labels are in format: DD-MM-YYTHH:MM, convert to proper date
+        const [datePart, timePart] = label.split('T');
+        const [day, month, year] = datePart.split('-');
+        const fullYear = `20${year}`; // Convert YY to 20YY
+        return new Date(`${fullYear}-${month}-${day}T${timePart}:00`);
+      }).filter(date => !isNaN(date.getTime()));
+
+      if (dates.length > 0) {
+        const minDate = new Date(Math.min(...dates));
+        const maxDate = new Date(Math.max(...dates));
+        
+        // Format dates for date inputs (YYYY-MM-DD)
+        const formatDateForInput = (date) => {
+          return date.toISOString().split('T')[0];
+        };
+        
+        const minDateStr = formatDateForInput(minDate);
+        const maxDateStr = formatDateForInput(maxDate);
+        
+        // Only update if dates are different from current values
+        if (startDate !== minDateStr || endDate !== maxDateStr) {
+          setStartDate(minDateStr);
+          setEndDate(maxDateStr);
+          
+          // DO NOT auto-update applied dates - only update them when user clicks Apply
+          // setAppliedStartDate(minDateStr);
+          // setAppliedEndDate(maxDateStr);
+        }
+      }
+    }
+  }, [chartData.labels, dataLimit]); // Re-run when chart data or data limit changes
 
   const isCoordinatesValid = station !== null;
   const isActive = y === 'TRUE';
+
+  // Add dark mode styles for date picker
+  useEffect(() => {
+    const styleId = 'date-picker-dark-mode';
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = `
+        /* Force dark theme on date/time inputs */
+        .dark-mode input[type="date"],
+        .dark-mode input[type="time"] {
+          color-scheme: dark !important;
+          background: var(--color-surface, #2d3748) !important;
+          color: var(--color-text, #ffffff) !important;
+          border: 1px solid var(--color-secondary, #4a5568) !important;
+        }
+        
+        /* Calendar picker indicator */
+        .dark-mode input[type="date"]::-webkit-calendar-picker-indicator,
+        .dark-mode input[type="time"]::-webkit-calendar-picker-indicator {
+          filter: invert(1) brightness(0.8);
+          cursor: pointer;
+        }
+        
+        /* Text content styling */
+        .dark-mode input[type="date"]::-webkit-datetime-edit,
+        .dark-mode input[type="time"]::-webkit-datetime-edit,
+        .dark-mode input[type="date"]::-webkit-datetime-edit-text,
+        .dark-mode input[type="time"]::-webkit-datetime-edit-text,
+        .dark-mode input[type="date"]::-webkit-datetime-edit-month-field,
+        .dark-mode input[type="time"]::-webkit-datetime-edit-hour-field,
+        .dark-mode input[type="date"]::-webkit-datetime-edit-day-field,
+        .dark-mode input[type="time"]::-webkit-datetime-edit-minute-field,
+        .dark-mode input[type="date"]::-webkit-datetime-edit-year-field,
+        .dark-mode input[type="time"]::-webkit-datetime-edit-ampm-field {
+          color: var(--color-text, #ffffff) !important;
+        }
+        
+        /* Force system dark theme for calendar popup */
+        .dark-mode input[type="date"]::-webkit-calendar-picker-indicator {
+          background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='%23ffffff' d='M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM2 2a1 1 0 0 0-1 1v1h14V3a1 1 0 0 0-1-1H2zm13 3H1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V5z'/%3e%3c/svg%3e");
+        }
+        
+        /* Focus states */
+        .dark-mode input[type="date"]:focus,
+        .dark-mode input[type="time"]:focus {
+          outline: 2px solid #0d6efd;
+          outline-offset: -1px;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+    
+    return () => {
+      const existingStyle = document.getElementById(styleId);
+      if (existingStyle) {
+        existingStyle.remove();
+      }
+    };
+  }, []);
 
   function getValueByKey(key) {
     const keyValuePairs = {
@@ -52,8 +159,8 @@ function TimeseriesSofar({ height }) {
   }
 
   function generateWaveDataUrl(spotterId, token) {
-    // const baseUrl = "https://api.sofarocean.com/api/wave-data";
-    const baseUrl = get_url('insitu-station');
+  // const baseUrl = "https://api.sofarocean.com/api/wave-data";
+  const baseUrl = get_url('insitu-station');
   
     // console.log(`${baseUrl}/${spotterId.toString()}`)
     // const queryParams = new URLSearchParams({
@@ -66,9 +173,43 @@ function TimeseriesSofar({ height }) {
     //     includeTrack: true
     // });
     // return `${baseUrl}?${queryParams.toString()}`;
-    return `${baseUrl}/${spotterId.toString()}?limit=1000`;
+    return `${baseUrl}/${spotterId.toString()}?limit=${dataLimit}`;
     // return `${baseUrl}`
   }
+
+  // Combine separate date and time into ISO format
+  function getCombinedDateTime(date, time, role = 'start') {
+    if (!date) return "";
+    const timeToUse = time || (role === 'start' ? '00:00' : '23:59');
+    
+    // Add appropriate seconds based on role
+    const seconds = role === 'start' ? '00' : '59';
+    
+    // Create the datetime string directly as UTC to avoid timezone issues
+    const isoString = `${date}T${timeToUse}:${seconds}Z`;
+    
+    // Validate the date format
+    const dt = new Date(isoString);
+    if (isNaN(dt.getTime())) return "";
+    
+    return isoString;
+  }
+
+  const handleStartDateChange = (e) => {
+    setStartDate(e.target.value);
+  };
+
+  const handleStartTimeChange = (e) => {
+    setStartTime(e.target.value);
+  };
+
+  const handleEndDateChange = (e) => {
+    setEndDate(e.target.value);
+  };
+
+  const handleEndTimeChange = (e) => {
+    setEndTime(e.target.value);
+  };
 
   const fetchWaveData = async (url, setDataFn) => {
     try {
@@ -77,19 +218,35 @@ function TimeseriesSofar({ height }) {
         return;
       }
    
+      console.log('🔍 Fetching URL:', url);
       setIsLoading(true);
       const res = await fetch(url, {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        credentials: 'include', // Include cookies for authentication
       });
+
+      console.log('🔍 Response status:', res.status);
+      console.log('🔍 Response headers:', Object.fromEntries(res.headers.entries()));
 
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
 
       const data = await res.json();
+      console.log('🔍 Response data:', data);
+      
       const waveData = data.data;
       const dataLabels = data.data_labels ? data.data_labels.split(',') : [];
+
+      if (!waveData || waveData.length === 0) {
+        console.log('⚠️  No data returned from API');
+        setDataFn([], []);
+        return;
+      }
   
       // data.data.forEach((entry, idx) => {
       //   console.log(`Entry ${idx}:`, entry);
@@ -232,20 +389,45 @@ function TimeseriesSofar({ height }) {
   };
 
   useEffect(() => {
+    // console.log('🔍 MAIN useEffect triggered - Dependencies:', {
+    //   isCoordinatesValid, 
+    //   enabledChart, 
+    //   mapLayerLength: mapLayer.length, 
+    //   station, 
+    //   country_code, 
+    //   liveMode, 
+    //   isActive, 
+    //   dataLimit
+    // });
+    
     const layerInformation = mapLayer[mapLayer.length - 1]?.layer_information;
     if (country_code !== "PACIOOS"){
     
     if (isCoordinatesValid && mapLayer.length > 0) {
+      // Prevent duplicate calls by checking if same URL was called recently (within 1 second)
+      var token = getValueByKey(x);
+      let waveDataUrl = generateWaveDataUrl(station, token);
+      const now = Date.now();
+      
+      if (lastRequestRef.current && 
+          lastRequestRef.current.url === waveDataUrl && 
+          now - lastRequestRef.current.timestamp < 1000) {
+        // console.log('🚫 Skipping duplicate API call - same URL called recently');
+        return;
+      }
+
       const { timeseries_url } = layerInformation;
       
       if (refreshIntervalRef.current) {
         clearInterval(refreshIntervalRef.current);
         refreshIntervalRef.current = null;
       }
-      
-      var token = getValueByKey(x);
-      const waveDataUrl = generateWaveDataUrl(station, token);
-      
+
+      // Store this request info
+      lastRequestRef.current = { url: waveDataUrl, timestamp: now };
+
+      // NO date/time filters on initial load or data limit changes
+      // console.log('🚀 Making API call (non-PACIOOS):', waveDataUrl);
       fetchWaveData(waveDataUrl, setChartDataFn);
 
       if (liveMode && isActive) {
@@ -263,26 +445,24 @@ function TimeseriesSofar({ height }) {
   }
   else{
     if (isCoordinatesValid && mapLayer.length > 0) {
-    const now = new Date();
-
-    // Calculate start date (7 days back)
-    const startDate = new Date(now);
-    startDate.setDate(now.getDate() - 5);
-    
-    // Format dates in YYYY-MM-DDThh:mm:ssZ format
-    const formatDate = (date) => {
-        return date.toISOString().slice(0, 19) + 'Z';
-    };
-    
+    // Prevent duplicate calls by checking if same URL was called recently (within 1 second)
     const baseUrl = 'https://erddap.cdip.ucsd.edu/erddap/tabledap/wave_agg.geoJson';
     const parameters = 'station_id,time,waveHs,waveTp,waveTa,waveDp,latitude,longitude';
-    const startDateStr = formatDate(startDate);
-    const endDateStr = formatDate(now);
     const waveFlagPrimary = 1;
+    const url = `${baseUrl}?${parameters}&station_id="${station}"&waveFlagPrimary=${waveFlagPrimary}`;
+    const now = Date.now();
+    
+    if (lastRequestRef.current && 
+        lastRequestRef.current.url === url && 
+        now - lastRequestRef.current.timestamp < 1000) {
+      // console.log('� Skipping duplicate API call (PACIOOS) - same URL called recently');
+      return;
+    }
 
-    // Construct URL with variables
-    const url = `${baseUrl}?${parameters}&station_id="${station}"&time>=${startDateStr}&time<=${endDateStr}&waveFlagPrimary=${waveFlagPrimary}`;
+    // Store this request info
+    lastRequestRef.current = { url, timestamp: now };
 
+    // console.log('🚀 Making API call (PACIOOS):', url);
     fetchWaveDataV2(url, setChartDataFn);
 
       if (liveMode && isActive) {
@@ -296,11 +476,91 @@ function TimeseriesSofar({ height }) {
           clearInterval(refreshIntervalRef.current);
         }
       };
-
+    }
   }
+  }, [isCoordinatesValid, enabledChart, mapLayer, station, country_code, liveMode, isActive, dataLimit]); // Removed applied date/time from dependencies
 
-  }
-  }, [isCoordinatesValid, enabledChart, mapLayer, station,country_code, liveMode, isActive, dataLimit]);
+  // Separate effect that only runs when user clicks Apply (when applied dates change)
+  useEffect(() => {
+    const layerInformation = mapLayer[mapLayer.length - 1]?.layer_information;
+    if (country_code !== "PACIOOS"){
+    
+    if (isCoordinatesValid && mapLayer.length > 0 && appliedStartDate && appliedEndDate) {      
+      if (refreshIntervalRef.current) {
+        clearInterval(refreshIntervalRef.current);
+        refreshIntervalRef.current = null;
+      }
+      
+      var token = getValueByKey(x);
+      let waveDataUrl = generateWaveDataUrl(station, token);
+
+      // Apply date/time filters when user clicked Apply
+      if (appliedStartDate) {
+        const startIso = getCombinedDateTime(appliedStartDate, appliedStartTime, 'start');
+        if (startIso) waveDataUrl += `&start=${encodeURIComponent(startIso)}`;
+      }
+      if (appliedEndDate) {
+        const endIso = getCombinedDateTime(appliedEndDate, appliedEndTime, 'end');
+        if (endIso) waveDataUrl += `&end=${encodeURIComponent(endIso)}`;
+      }
+
+      fetchWaveData(waveDataUrl, setChartDataFn);
+
+      if (liveMode && isActive) {
+        refreshIntervalRef.current = setInterval(() => {
+          fetchWaveData(waveDataUrl, setChartDataFn);
+        }, 1800000);
+      }
+
+      return () => {
+        if (refreshIntervalRef.current) {
+          clearInterval(refreshIntervalRef.current);
+        }
+      };
+    }
+    }
+    else{
+      if (isCoordinatesValid && mapLayer.length > 0 && appliedStartDate && appliedEndDate) {
+      const now = new Date();
+
+      // Use applied datetimes 
+      let startDateStr, endDateStr;
+
+      if (appliedStartDate && appliedEndDate) {
+        startDateStr = getCombinedDateTime(appliedStartDate, appliedStartTime, 'start');
+        endDateStr = getCombinedDateTime(appliedEndDate, appliedEndTime, 'end');
+      } else {
+        // Fallback to default range if only partial dates applied
+        const startDateObj = new Date(now);
+        startDateObj.setDate(now.getDate() - 5);
+        const formatDate = (date) => date.toISOString().slice(0, 19) + 'Z';
+        startDateStr = formatDate(startDateObj);
+        endDateStr = formatDate(now);
+      }
+
+      const baseUrl = 'https://erddap.cdip.ucsd.edu/erddap/tabledap/wave_agg.geoJson';
+      const parameters = 'station_id,time,waveHs,waveTp,waveTa,waveDp,latitude,longitude';
+      const waveFlagPrimary = 1;
+
+      // Construct URL with variables
+      const url = `${baseUrl}?${parameters}&station_id="${station}"&time>=${encodeURIComponent(startDateStr)}&time<=${encodeURIComponent(endDateStr)}&waveFlagPrimary=${waveFlagPrimary}`;
+
+      fetchWaveDataV2(url, setChartDataFn);
+
+      if (liveMode && isActive) {
+        refreshIntervalRef.current = setInterval(() => {
+          fetchWaveDataV2(url, setChartDataFn);
+        }, 1800000);
+      }
+
+      return () => {
+        if (refreshIntervalRef.current) {
+          clearInterval(refreshIntervalRef.current);
+        }
+      };
+      }
+    }
+  }, [appliedStartDate, appliedStartTime, appliedEndDate, appliedEndTime, isCoordinatesValid, mapLayer, station, country_code, liveMode, isActive]);
 
   if (isLoading) {
     return (
@@ -399,7 +659,7 @@ function TimeseriesSofar({ height }) {
           </span>
         </div>
 
-        <div style={{  display: 'flex', alignItems: 'center', color: 'var(--color-text, #181c20)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', color: 'var(--color-text, #181c20)' }}>
           <span style={{ fontSize: '12px', marginRight: '5px' }}>Data Points:</span>
           <Form.Control
             type="number"
@@ -417,6 +677,83 @@ function TimeseriesSofar({ height }) {
               border: '1px solid var(--color-secondary, #dee2e6)'
             }}
           />
+        </div>
+
+        {/* Date controls moved to far right */}
+        <div style={{ display: 'flex', alignItems: 'center', marginLeft: 'auto', color: 'var(--color-text, #181c20)' }}>
+          <span style={{ fontSize: '12px', marginRight: '6px' }}>Start:</span>
+          <Form.Control
+            type="date"
+            value={startDate}
+            onChange={handleStartDateChange}
+            style={{ 
+              width: '140px', 
+              height: '25px', 
+              fontSize: '12px', 
+              padding: '0 5px',
+              background: 'var(--color-surface, #fff)',
+              color: 'var(--color-text, #181c20)',
+              border: '1px solid var(--color-secondary, #dee2e6)'
+            }}
+          />
+          <Form.Control
+            type="time"
+            value={startTime}
+            onChange={handleStartTimeChange}
+            style={{ 
+              width: '100px', 
+              height: '25px', 
+              fontSize: '12px', 
+              padding: '0 5px', 
+              marginLeft: '4px',
+              background: 'var(--color-surface, #fff)',
+              color: 'var(--color-text, #181c20)',
+              border: '1px solid var(--color-secondary, #dee2e6)'
+            }}
+          />
+          <span style={{ fontSize: '12px', marginLeft: '8px', marginRight: '6px' }}>End:</span>
+          <Form.Control
+            type="date"
+            value={endDate}
+            onChange={handleEndDateChange}
+            style={{ 
+              width: '140px', 
+              height: '25px', 
+              fontSize: '12px', 
+              padding: '0 5px',
+              background: 'var(--color-surface, #fff)',
+              color: 'var(--color-text, #181c20)',
+              border: '1px solid var(--color-secondary, #dee2e6)'
+            }}
+          />
+          <Form.Control
+            type="time"
+            value={endTime}
+            onChange={handleEndTimeChange}
+            style={{ 
+              width: '100px', 
+              height: '25px', 
+              fontSize: '12px', 
+              padding: '0 5px', 
+              marginLeft: '4px',
+              background: 'var(--color-surface, #fff)',
+              color: 'var(--color-text, #181c20)',
+              border: '1px solid var(--color-secondary, #dee2e6)'
+            }}
+          />
+          <Button
+            variant="primary"
+            size="sm"
+            style={{ marginLeft: '8px' }}
+            onClick={() => {
+              setAppliedStartDate(startDate);
+              setAppliedStartTime(startTime);
+              setAppliedEndDate(endDate);
+              setAppliedEndTime(endTime);
+            }}
+          >
+            Apply
+          </Button>
         </div>
       </div>
       {/* <<<<<<<<<<Spotter ID Heading */}
@@ -437,6 +774,35 @@ function TimeseriesSofar({ height }) {
       }}>
         {/* Dynamic y-axes logic */}
         {(() => {
+          // Check if there's no data
+          const hasData = chartData.datasets && chartData.datasets.length > 0 && 
+                         chartData.datasets.some(dataset => dataset.data && dataset.data.length > 0);
+
+          if (!hasData) {
+            // Show no data message
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            const textColor = isDarkMode ? '#ffffff' : '#666666';
+           
+            
+            return (
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '100%',
+             
+                color: textColor,
+                fontSize: '18px',
+                fontWeight: '500',
+                textAlign: 'center',
+                border: `1px solid ${isDarkMode ? '#4a5568' : '#dee2e6'}`,
+                borderRadius: '4px'
+              }}>
+                No available data for this station
+              </div>
+            );
+          }
+
           // Check if dark mode is active
           const isDarkMode = document.body.classList.contains('dark-mode');
           const textColor = isDarkMode ? '#ffffff' : '#333';

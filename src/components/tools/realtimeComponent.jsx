@@ -35,6 +35,7 @@ const RealtimeComponent = ({
     const [stationData, setStationData] = useState({});
     const [chartData, setChartData] = useState({});
     const [dataLimit, setDataLimit] = useState(30);
+    // date/time controls moved to TimeseriesSofar; not used here
     const [liveMode, setLiveMode] = useState(false);
     const refreshIntervalRef = useRef(null);
     
@@ -138,36 +139,31 @@ const RealtimeComponent = ({
         try {
             let url;
             if (owner === "PACIOOS") {
-                const now = new Date();
-                const startDate = new Date(now);
-                startDate.setHours(now.getHours() - dataLimit);
-                
+                // If start/end date are set, use them; else use default
                 const formatDate = (date) => {
                     return date.toISOString().slice(0, 19) + 'Z';
                 };
-                
                 const baseUrl = 'https://erddap.cdip.ucsd.edu/erddap/tabledap/wave_agg.geoJson';
                 const parameters = 'station_id,time,waveHs,waveTp,waveTa,waveDp,latitude,longitude';
-                const startDateStr = formatDate(startDate);
+                const now = new Date();
+                const startDateObj = new Date(now);
+                startDateObj.setHours(now.getHours() - dataLimit);
+                const startDateStr = formatDate(startDateObj);
                 const endDateStr = formatDate(now);
                 const waveFlagPrimary = 1;
-    
                 url = `${baseUrl}?${parameters}&station_id="${stationId}"&time>=${startDateStr}&time<=${endDateStr}&waveFlagPrimary=${waveFlagPrimary}`;
             } else {
                 const token = getValueByKey(owner);
                 url = generateWaveDataUrl(stationId, token);
             }
-    
             const res = await fetch(url, {
                 method: 'GET',
                 credentials: 'omit',
                 headers: { 'Accept': 'application/json' },
             });
-    
             if (!res.ok) {
                 throw new Error(`HTTP error! status: ${res.status}`);
             }
-    
             return await res.json();
         } catch (error) {
             console.log(`Error fetching wave data:`, error);
@@ -275,6 +271,8 @@ const RealtimeComponent = ({
             setDataLimit(clampedLimit);
         }
     };
+
+    // date/time handlers moved to TimeseriesSofar
 
     const getStationDetails = (stationId) => {
         return buoyOptions.find(b => b.spotter_id === stationId) || {};
@@ -528,8 +526,8 @@ const RealtimeComponent = ({
                     
                     {renderLiveModeIndicator()}
                     
-                    <div className="data-limit-control">
-                    <span style={{ fontSize: '0.875rem', marginRight: '8px' }}>Data Points:</span>
+                    <div className="data-limit-control" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <span style={{ fontSize: '0.875rem', marginRight: '8px' }}>Data Pointsss:</span>
                         <Form.Control
                             type="number"
                             value={dataLimit}
@@ -543,6 +541,7 @@ const RealtimeComponent = ({
                                 padding: '0.25rem 0.5rem'
                             }}
                         />
+                        {/* date/time controls moved to TimeseriesSofar */}
                     </div>
                 </div>
             </div>
