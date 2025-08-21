@@ -17,6 +17,7 @@ import TideImageComponent from './tide_image';
 import Histogram from './histogram';
 import ShareWorkbench from './shareWorkbench';
 import { FaShare } from 'react-icons/fa';
+import GetMapIcon from '@/components/icons/GetMapIcon';
 
 // Custom tab styles
 const customTabStyles = `
@@ -255,7 +256,7 @@ function BottomOffCanvas({ isVisible, id }) {
       </div>
 
       {/* Share Button */}
-      <Button
+  <Button
         onClick={handleShowShareModal}
         style={{
           position: 'absolute',
@@ -285,7 +286,7 @@ function BottomOffCanvas({ isVisible, id }) {
         }}
         title="Share Workbench"
       >
-        <FaShare size={16} />
+        <GetMapIcon width={16} height={16} color={'#333'} />
       </Button>
 
       {/* Close Button */}

@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Form, Alert, Spinner } from 'react-bootstrap';
 import { useAppSelector } from '@/app/GlobalRedux/hooks';
-import { FaShare, FaCopy, FaLink, FaCompress } from 'react-icons/fa';
+import { FaCopy, FaLink, FaCompress } from 'react-icons/fa';
+import GetMapIcon from '@/components/icons/GetMapIcon';
 import { get_url } from '@/components/json/urls';
 import LZString from 'lz-string';
 
@@ -222,7 +223,7 @@ const ShareWorkbench = ({ show, onHide }) => {
     <Modal show={show} onHide={onHide} size="lg" className="share-modal">
       <Modal.Header closeButton>
         <Modal.Title>
-          <FaShare className="me-2" />
+          <GetMapIcon className="me-2" width={18} height={18} color={'#0d6efd'} />
           Share Workbench
         </Modal.Title>
       </Modal.Header>
