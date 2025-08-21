@@ -48,9 +48,28 @@ function Navigationbar({ children }) {
   const [loginState, setLoginState] = useState(null);
   const pathname = usePathname();
   const dispatch = useAppDispatch();
-  const isLoggedin = useAppSelector((state) => state.auth.isLoggedin);
   const mapLayer = useAppSelector((state) => state.mapbox.layers);
   const userCountry = useAppSelector((state) => state.auth.country);
+  const isLoggedin = useAppSelector((state) => state.auth.isLoggedin);
+  const selectedRegionRedux = useAppSelector((state) => state.country.short_name);
+  const [previewRegion, setPreviewRegion] = useState(null);
+
+  // Listen for transient region selections from Sidebar so logged-in users see a preview flag
+  useEffect(() => {
+    function handleRegionSelected(e) {
+      if (e && e.detail && e.detail.regionId) {
+        setPreviewRegion(e.detail.regionId);
+      }
+    }
+    if (typeof window !== 'undefined') {
+      window.addEventListener('regionSelected', handleRegionSelected);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('regionSelected', handleRegionSelected);
+      }
+    };
+  }, []);
   const isVisible = useAppSelector((state) => state.offcanvas.isVisible);
   const currentId = useAppSelector((state) => state.offcanvas.currentId);
   const prevPathnameRef = useRef(pathname);
@@ -295,29 +314,46 @@ function Navigationbar({ children }) {
         {/* Left: Flag, logo, and company name */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0px' }}> 
           {/* Country Flag Display - moved further left and made bigger */}
-          {isLoggedin && userCountry && (
-            <div style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              marginRight: '0px', // removed spacing between flag and logo
-              padding: '4px 4px'
-             
-            }}>
-              <img 
-                src={getCountryFlag(userCountry)}
-                alt="Country flag"
-                style={{
-                  width: 56, // increased size
-                  height: 42, // increased size          
-                  objectFit: 'cover',
-                  border: '1px solid rgba(0, 0, 0, 0.1)'
-                }}
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                }}
-              />
-            </div>
-          )}
+          {/* Show persisted selection for anonymous users, and auth country for logged-in users. */}
+          {(() => {
+            // Resolve which country id to show as a flag
+            // Priority: previewRegion (transient for logged-in preview) -> auth.userCountry -> persisted selectedRegion (anonymous)
+            let flagCountryId = null;
+            if (previewRegion) {
+              flagCountryId = previewRegion;
+            } else if (isLoggedin && userCountry) {
+              flagCountryId = userCountry;
+            } else {
+              // anonymous user: respect persisted selection in localStorage
+              const persisted = typeof window !== 'undefined' ? localStorage.getItem('selectedRegion') : null;
+              flagCountryId = persisted || null;
+            }
+
+            if (!flagCountryId) return null;
+
+            return (
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                marginRight: '0px', // removed spacing between flag and logo
+                padding: '4px 4px'
+              }}>
+                <img 
+                  src={getCountryFlag(flagCountryId)}
+                  alt="Country flag"
+                  style={{
+                    width: 56, // increased size
+                    height: 42, // increased size          
+                    objectFit: 'cover',
+                    border: '1px solid rgba(0, 0, 0, 0.1)'
+                  }}
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                  }}
+                />
+              </div>
+            );
+          })()}
           <button
             onClick={toggleSidebar}
             style={{

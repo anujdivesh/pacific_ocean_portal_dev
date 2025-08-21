@@ -29,6 +29,7 @@ const SideBar = () => {
 
     const isVisiblecanvas = useAppSelector((state) => state.sideoffcanvas.isVisible);
     const short_name = useAppSelector((state) => state.country.short_name);
+  const isLoggedin = useAppSelector((state) => state.auth.isLoggedin);
     //const [showModal, setShowModal] = useState(false);
     const isVisible = useAppSelector((state) => state.modal.isVisible);
     const dispatch = useAppDispatch();
@@ -383,14 +384,15 @@ const SideBar = () => {
           const sortedData = [...data].sort((a, b) => a.long_name.localeCompare(b.long_name));
           setRegions(sortedData); // Set regions data to state
           const savedRegion = localStorage.getItem('selectedRegion'); // Check localStorage for saved region
-          if (savedRegion) {
+          // Only apply persisted selection for anonymous users. If a user is logged in, prefer their session country.
+          if (savedRegion && !isLoggedin) {
             // Check if the saved region exists in the fetched data
             const regionExists = data.find((region) => region.id.toString() === savedRegion);
             if (regionExists) {
               setSelectedRegion(savedRegion); // Set the region from localStorage if valid
-              localStorage.setItem('selectedRegion', savedRegion);
-              // Set bounds based on the saved region
+              // Persisting already done; ensure redux gets current selection
               dispatch(setShortName(savedRegion));
+              // Set bounds based on the saved region
               dispatch(
                 setBounds({
                   west: regionExists.west_bound_longitude,
@@ -410,8 +412,22 @@ const SideBar = () => {
       dispatch(hideoffCanvas());
       const regionId = e.target.value;
       setSelectedRegion(regionId);
-      localStorage.setItem('selectedRegion', regionId);
+      // If user is not logged in, persist selection to localStorage so it survives refresh.
+      if (!isLoggedin) {
+        localStorage.setItem('selectedRegion', regionId);
+      }
+      // Always update the redux country short_name so the UI can preview the selection.
       dispatch(setShortName(regionId))
+
+      // If user is logged in, emit a transient event so Navbar can preview the flag without persisting
+      try {
+        if (isLoggedin && typeof window !== 'undefined') {
+          const ev = new CustomEvent('regionSelected', { detail: { regionId } });
+          window.dispatchEvent(ev);
+        }
+      } catch (err) {
+        // ignore
+      }
   
       // Find the selected region by its id
       const region = regions.find((region) => region.id === parseInt(regionId));
