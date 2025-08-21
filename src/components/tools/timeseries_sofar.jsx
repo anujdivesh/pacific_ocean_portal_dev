@@ -220,19 +220,24 @@ function TimeseriesSofar({ height }) {
    
       console.log('🔍 Fetching URL:', url);
       setIsLoading(true);
+
+      // Avoid sending Content-Type or credentials for simple GET requests
+      // which can trigger CORS preflight failures on some APIs.
       const res = await fetch(url, {
         method: 'GET',
-        headers: { 
-          'Content-Type': 'application/json',
+        mode: 'cors',
+        headers: {
           'Accept': 'application/json'
         },
-        credentials: 'include', // Include cookies for authentication
+        credentials: 'omit',
       });
 
-      console.log('🔍 Response status:', res.status);
-      console.log('🔍 Response headers:', Object.fromEntries(res.headers.entries()));
+      // console.log('🔍 Response status:', res.status);
+      // console.log('🔍 Response headers:', Object.fromEntries(res.headers.entries()));
 
       if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        console.error('Fetch failed, status:', res.status, 'body:', text);
         throw new Error(`HTTP error! status: ${res.status}`);
       }
 
@@ -290,6 +295,7 @@ function TimeseriesSofar({ height }) {
       setIsLoading(true);
       const res = await fetch(url, {
         method: 'GET',
+        mode: 'cors',
         credentials: 'omit', // Fixes CORS for public ERDDAP
         headers: {
           'Accept': 'application/json',

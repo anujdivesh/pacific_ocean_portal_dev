@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button, Modal, Form, Alert, Spinner } from 'react-bootstrap';
 import { useAppSelector } from '@/app/GlobalRedux/hooks';
-import { FaShare, FaCopy, FaLink, FaCompress } from 'react-icons/fa';
+import { FaCopy, FaLink, FaCompress } from 'react-icons/fa';
+import GetMapIcon from '@/components/icons/GetMapIcon';
 import { get_url } from '@/components/json/urls';
 import LZString from 'lz-string';
 
@@ -14,6 +15,8 @@ const ShareWorkbench = ({ show, onHide }) => {
   const [isShortening, setIsShortening] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [error, setError] = useState('');
+  // Only auto-shorten very long URLs above this length
+  const AUTO_SHORTEN_THRESHOLD = 2000;
   
   // Get current workbench state from Redux
   const mapLayers = useAppSelector((state) => state.mapbox.layers);
@@ -33,7 +36,11 @@ const ShareWorkbench = ({ show, onHide }) => {
       setShortenedUrl('');
       setError('');
       setIsCopied(false);
-      generateShareUrl();
+      // Defer heavy work so the modal can paint and remain responsive.
+      const t = setTimeout(() => {
+        generateShareUrl();
+      }, 50);
+      return () => clearTimeout(t);
     } else if (!show) {
       // Clear URL when modal closes
       setShareUrl('');
@@ -42,6 +49,13 @@ const ShareWorkbench = ({ show, onHide }) => {
       setIsCopied(false);
     }
   }, [show]);
+
+  // Track mounted state to avoid setting state after unmount
+  const isMounted = useRef(true);
+  useEffect(() => {
+    isMounted.current = true;
+    return () => { isMounted.current = false; };
+  }, []);
 
   const generateShareUrl = async () => {
     if (mapLayers.length === 0) {
@@ -57,50 +71,49 @@ const ShareWorkbench = ({ show, onHide }) => {
       const workbenchState = {
                  layers: mapLayers.map(layer => {
            // Only save essential layer information to reduce URL size
-           const layerState = {
-             id: layer.id,
-             // Save ALL essential layer_information fields to ensure complete restoration
-             layer_information: {
-               id: layer.layer_information.id,
-               layer_title: layer.layer_information.layer_title,
-               layer_type: layer.layer_information.layer_type,
-               url: layer.layer_information.url,
-               enabled: layer.layer_information?.enabled || false,
-               selectedSofarTypes: layer.layer_information?.selectedSofarTypes || [],
-               // Date and time properties
-               specific_timestemps: layer.layer_information.specific_timestemps || null,
-               interval_step: layer.layer_information.interval_step || null,
-               timeIntervalStart: layer.layer_information.timeIntervalStart || null,
-               timeIntervalEnd: layer.layer_information.timeIntervalEnd || null,
-               timeIntervalStartOriginal: layer.layer_information.timeIntervalStartOriginal || null,
-               timeIntervalEndOriginal: layer.layer_information.timeIntervalEndOriginal || null,
-               is_timeseries: layer.layer_information.is_timeseries || false,
-               is_composite: layer.layer_information.is_composite || false,
-               // Layer properties
-               layer_name: layer.layer_information.layer_name || '',
-               style: layer.layer_information.style || '',
-               opacity: layer.layer_information.opacity || 1,
-               // Color scale properties
-               colormin: layer.layer_information.colormin || 0,
-               colormax: layer.layer_information.colormax || 1,
-               abovemaxcolor: layer.layer_information.abovemaxcolor || 'extend',
-               belowmincolor: layer.layer_information.belowmincolor || 'transparent',
-               numcolorbands: layer.layer_information.numcolorbands || 250,
-               logscale: layer.layer_information.logscale || false,
-               // Map properties
-               zoomToLayer: layer.layer_information.zoomToLayer || false,
-               // Additional properties that might be needed
-               datetime_format: layer.layer_information.datetime_format || null,
-               restricted: layer.layer_information.restricted || false,
-               timeseries_url: layer.layer_information.timeseries_url || null,
-               composite_layer_id: layer.layer_information.composite_layer_id || null,
-               // Preserve all other properties that might exist
-               ...layer.layer_information
-             },
-             enabled: layer.layer_information?.enabled || false,
-             opacity: layer.opacity || 1,
-             selectedSofarTypes: layer.layer_information?.selectedSofarTypes || [],
-           };
+          const layerState = {
+            id: layer.id,
+            // Save a curated set of layer_information fields to avoid reintroducing
+            // any very large nested properties (tile data, large arrays, etc.).
+            layer_information: {
+              id: layer.layer_information.id,
+              layer_title: layer.layer_information.layer_title,
+              layer_type: layer.layer_information.layer_type,
+              url: layer.layer_information.url,
+              enabled: layer.layer_information?.enabled || false,
+              selectedSofarTypes: layer.layer_information?.selectedSofarTypes || [],
+              // Date and time properties
+              specific_timestemps: layer.layer_information.specific_timestemps || null,
+              interval_step: layer.layer_information.interval_step || null,
+              timeIntervalStart: layer.layer_information.timeIntervalStart || null,
+              timeIntervalEnd: layer.layer_information.timeIntervalEnd || null,
+              timeIntervalStartOriginal: layer.layer_information.timeIntervalStartOriginal || null,
+              timeIntervalEndOriginal: layer.layer_information.timeIntervalEndOriginal || null,
+              is_timeseries: layer.layer_information.is_timeseries || false,
+              is_composite: layer.layer_information.is_composite || false,
+              // Layer properties
+              layer_name: layer.layer_information.layer_name || '',
+              style: layer.layer_information.style || '',
+              opacity: layer.layer_information.opacity || 1,
+              // Color scale properties
+              colormin: layer.layer_information.colormin || 0,
+              colormax: layer.layer_information.colormax || 1,
+              abovemaxcolor: layer.layer_information.abovemaxcolor || 'extend',
+              belowmincolor: layer.layer_information.belowmincolor || 'transparent',
+              numcolorbands: layer.layer_information.numcolorbands || 250,
+              logscale: layer.layer_information.logscale || false,
+              // Map properties
+              zoomToLayer: layer.layer_information.zoomToLayer || false,
+              // Additional properties that might be needed
+              datetime_format: layer.layer_information.datetime_format || null,
+              restricted: layer.layer_information.restricted || false,
+              timeseries_url: layer.layer_information.timeseries_url || null,
+              composite_layer_id: layer.layer_information.composite_layer_id || null,
+            },
+            enabled: layer.layer_information?.enabled || false,
+            opacity: layer.opacity || 1,
+            selectedSofarTypes: layer.layer_information?.selectedSofarTypes || [],
+          };
           
           console.log(`Sharing layer:`, {
             id: layerState.id,
@@ -128,8 +141,8 @@ const ShareWorkbench = ({ show, onHide }) => {
         timestamp: new Date().toISOString(),
       };
 
-      // Compress and encode the workbench state
-      const compressedState = await compressWorkbenchState(workbenchState);
+  // Compress and encode the workbench state (non-blocking)
+  const compressedState = await compressWorkbenchState(workbenchState);
       
              // Check if the URL would be too long (browsers have URL length limits)
        const baseUrl = window.location.origin + window.location.pathname;
@@ -142,7 +155,27 @@ const ShareWorkbench = ({ show, onHide }) => {
          return;
        }
       
-      setShareUrl(url);
+  // If URL is very long, trigger auto-shortening in background to avoid
+  // blocking the UI. We set a local flag so the UI can show a spinner
+  // if desired while the shortener runs.
+  if (isMounted.current) setShareUrl(url);
+      if (url.length > AUTO_SHORTEN_THRESHOLD) {
+        if (isMounted.current) setIsShortening(true);
+        // Fire-and-forget the network shortening so the modal remains responsive
+        shortenUrlDirect(url).then((short) => {
+          if (!isMounted.current) return;
+          if (short) {
+            setShortenedUrl(short);
+            console.log('Auto-shortened share URL:', short);
+          } else {
+            console.warn('Auto-shortening failed; URL remains long.');
+          }
+        }).catch((err) => {
+          console.error('Auto-shortening error:', err);
+        }).finally(() => {
+          if (isMounted.current) setIsShortening(false);
+        });
+      }
       // console.log('Share link generated successfully!');
     } catch (err) {
       setError('Failed to generate share URL. Please try again.');
@@ -154,17 +187,20 @@ const ShareWorkbench = ({ show, onHide }) => {
 
   // Compress workbench state to reduce URL length
   const compressWorkbenchState = async (workbenchState) => {
-    try {
-      // Convert to JSON string
-      const jsonString = JSON.stringify(workbenchState);
-      
-      // Compress using LZ-string for better compression
-      return LZString.compressToEncodedURIComponent(jsonString);
-    } catch (error) {
-      console.error('Error compressing workbench state:', error);
-      // Fallback to simple base64 encoding
-      return btoa(JSON.stringify(workbenchState));
-    }
+    // Wrap heavy serialization/compression in a Promise and defer to the
+    // event loop so it doesn't block rendering for large workbench states.
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        try {
+          const jsonString = JSON.stringify(workbenchState);
+          const compressed = LZString.compressToEncodedURIComponent(jsonString);
+          resolve(compressed);
+        } catch (error) {
+          console.error('Error compressing workbench state:', error);
+          resolve(btoa(JSON.stringify(workbenchState)));
+        }
+      }, 0);
+    });
   };
 
   const copyToClipboard = async (urlToCopy = shareUrl) => {
@@ -216,13 +252,34 @@ const ShareWorkbench = ({ show, onHide }) => {
     }
   };
 
+  // Direct shortener used internally (returns shortened URL or null)
+  const shortenUrlDirect = async (fullUrl) => {
+    try {
+      const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(fullUrl)}`);
+      if (response.ok) {
+        const short = await response.text();
+        return short;
+      }
+      // fallback
+      const fallbackResponse = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(fullUrl)}`);
+      if (fallbackResponse.ok) {
+        const data = await fallbackResponse.json();
+        if (data.shorturl) return data.shorturl;
+      }
+      return null;
+    } catch (err) {
+      console.error('Direct shortener failed:', err);
+      return null;
+    }
+  };
+
 
 
   return (
     <Modal show={show} onHide={onHide} size="lg" className="share-modal">
       <Modal.Header closeButton>
         <Modal.Title>
-          <FaShare className="me-2" />
+          <GetMapIcon className="me-2" width={18} height={18} color={'#0d6efd'} />
           Share Workbench
         </Modal.Title>
       </Modal.Header>

@@ -28,6 +28,7 @@ import {
   cleanupShareUrl,
   hasShareParameter 
 } from '../functions/shareUtils';
+import{FaLightbulb} from 'react-icons/fa';
 
 const MyWorkbench = () => {
   const dispatch = useAppDispatch();
@@ -217,8 +218,43 @@ const MyWorkbench = () => {
   return (
     <>
       {mapLayer.length === 0 ? (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100px' }}>
-          <div className="item" style={{ color: 'grey' }}>Your Workbench is empty</div>
+        <div style={{ padding: '20px', textAlign: 'center' }}>
+          <div style={{ marginBottom: '150px' }}>
+            <div className="item" style={{ color: '#9CA3AF', fontSize: '16px', fontWeight: '500' }}>
+              Your workbench is empty
+            </div>
+          </div>
+          
+          <div style={{ textAlign: 'left' }}>
+            <h5 className="workbench-hints-title" style={{ 
+              marginBottom: '15px', 
+              marginTop: 0, 
+              fontSize: '14px',
+              fontWeight: '600'
+            }}>
+              Helpful hints
+            </h5>
+            <ul className="list-unstyled small">
+              <li className="d-flex align-items-start mb-2">
+                <FaLightbulb className="me-2" style={{ color: '#cacacaff', marginTop: 4, minWidth: '16px' }} />
+                <span className="workbench-hints-text">
+                  Browse datasets by selecting "Explore map data."
+                </span>
+              </li>
+              <li className="d-flex align-items-start mb-2">
+                <FaLightbulb className="me-2" style={{ color: '#cacacaff', marginTop: 4, minWidth: '16px' }} />
+                <span className="workbench-hints-text">
+                  Once you've added data to the map, your active layers will appear in the workbench, where you can create plots, view timeseries at any point, adjust opacity, and control how they get displayed on the map.
+                </span>
+              </li>
+              <li className="d-flex align-items-start mb-0">
+                <FaLightbulb className="me-2" style={{ color: '#cacacaff', marginTop: 4, minWidth: '16px' }} />
+                <span className="workbench-hints-text">
+                  You can share your current map view and configuration with others by clicking the Share button.
+                </span>
+              </li>
+            </ul>
+          </div>
         </div>
       ) : (
         <Col md={12} style={{ marginTop: -13, overflowY: 'auto' }}>

@@ -26,6 +26,8 @@ function DynamicImage({ height }) {
   const [loadingTime, setLoadingTime] = useState(0);
   const MAX_VISIBLE_DOTS = 25;
   const imgHeight = height || 200;
+  // whether to use cached images; default true
+  const [useCache, setUseCache] = useState(true);
 
   function generateDateArray(start_date, end_date, stepHours) {
     const dateArray = [];
@@ -119,9 +121,12 @@ function DynamicImage({ height }) {
         if (layerInformation.id == 4 || layerInformation.id == 19){
           coral = 'True'
         }
-        const dynamicImages = result.map((date) =>
-          get_url('getMap')+`region=`+short_name+`&layer_map=`+layerInformation.id+`&time=${date}&nocache=${Date.now()}&token=${token_id}`
-        );
+        const dynamicImages = result.map((date) => {
+          const base = get_url('getMap') + `region=` + short_name + `&layer_map=` + layerInformation.id + `&time=${date}`;
+          const cacheParam = `&use_cache=${useCache ? 'True' : 'False'}`;
+          const nocache = useCache ? '' : `&nocache=${Date.now()}`;
+          return base + cacheParam + nocache + `&token=${token_id}`;
+        });
         setImages(dynamicImages);
         setTimestamps(result);
         setLoading(true);
@@ -143,9 +148,13 @@ function DynamicImage({ height }) {
         if (layerInformation.id == 4 || layerInformation.id == 19){
           coral = 'True'
         }
-        const dynamicImages = result.map((date) =>
-          get_url('getMap')+`region=`+short_name+`&layer_map=`+layerInformation.id+`&time=${date.replace(/\s/g, "")}&nocache=${Date.now()}&token=${token_id}`
-        );
+        const dynamicImages = result.map((date) => {
+          const cleanDate = date.replace(/\s/g, "");
+          const base = get_url('getMap') + `region=` + short_name + `&layer_map=` + layerInformation.id + `&time=${cleanDate}`;
+          const cacheParam = `&use_cache=${useCache ? 'True' : 'False'}`;
+          const nocache = useCache ? '' : `&nocache=${Date.now()}`;
+          return base + cacheParam + nocache + `&token=${token_id}`;
+        });
 
         setImages(dynamicImages);
         setTimestamps(result);
@@ -153,7 +162,7 @@ function DynamicImage({ height }) {
         setDotOffset(0);
       }
     }
-  }, [mapLayer, savedRegion,short_name,enabledMap,currentId]);
+  }, [mapLayer, savedRegion,short_name,enabledMap,currentId, useCache]);
 
   useEffect(() => {
     if (images.length > 0 && currentIndex >= images.length) {
@@ -513,6 +522,23 @@ const visibleDots = timestamps.slice(
           >
             Next <FaChevronRight style={{ marginLeft: '8px' }} />
           </button>
+        </div>
+
+        {/* Use Cache toggle (Bootstrap switch) */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '2px'}}>
+          <div className="form-check form-switch">
+            <input
+              className="form-check-input"
+              id="use-cache-toggle"
+              type="checkbox"
+              role="switch"
+              checked={useCache}
+              onChange={(e) => setUseCache(e.target.checked)}
+            />
+            <label className="form-check-label" htmlFor="use-cache-toggle" style={{ fontSize: '13px', color: 'var(--color-text, #333)' }}>
+              Use cache for images
+            </label>
+          </div>
         </div>
 
         {timestamps.length > 0 && (

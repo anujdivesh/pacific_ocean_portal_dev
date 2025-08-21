@@ -145,7 +145,7 @@ const ExploreModal = ({ show, onClose, title, bodyContent }) => {
         }
         }
       `}</style>
-      <Modal show={show} onHide={onClose} centered scrollable size="xl" backdrop={false} className="custom-modal explore-modal">
+  <Modal show={show} onHide={onClose} centered scrollable size="xl" backdrop={true} keyboard={true} className="custom-modal explore-modal">
         <Modal.Header closeButton className="custom-header2" style={{ background: '#519ac2', borderBottom: '1px solid #3c7693', paddingTop: '8px', paddingBottom: '8px', minHeight: 'unset', color: '#ffffff' }}>
           <Modal.Title style={{ fontSize: '18px', color:'#ffffff' }}>
           {/* Show the "Tailored" button only if the user is logged in */}
