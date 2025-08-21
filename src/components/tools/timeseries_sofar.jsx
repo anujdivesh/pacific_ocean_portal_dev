@@ -232,8 +232,8 @@ function TimeseriesSofar({ height }) {
         credentials: 'omit',
       });
 
-      console.log('🔍 Response status:', res.status);
-      console.log('🔍 Response headers:', Object.fromEntries(res.headers.entries()));
+      // console.log('🔍 Response status:', res.status);
+      // console.log('🔍 Response headers:', Object.fromEntries(res.headers.entries()));
 
       if (!res.ok) {
         const text = await res.text().catch(() => '');

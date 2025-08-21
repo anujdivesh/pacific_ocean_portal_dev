@@ -127,4 +127,31 @@ body.dark-mode .remove-all-button:hover {
     color: #4da6ff;
 }
 
+/* Workbench empty state text styles */
+.workbench-hints-text {
+    color: #555;
+}
+
+.workbench-hints-title {
+    color: #333;
+}
+
+/* Dark mode text styles for workbench hints */
+body.dark-mode .workbench-hints-text {
+    color: white !important;
+}
+
+body.dark-mode .workbench-hints-title {
+    color: white !important;
+}
+
+/* Override Bootstrap text-light for light mode */
+body:not(.dark-mode) .text-light {
+    color: #555 !important;
+}
+
+body:not(.dark-mode) .workbench-hints-title {
+    color: #333 !important;
+}
+
 
