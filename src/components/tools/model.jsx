@@ -124,9 +124,10 @@ const ExploreModal = ({ show, onClose, title, bodyContent }) => {
           color: #519ac2 !important;
         }
         .custom-modal.explore-modal .btn.rounded-pill.active {
-          background: #fff !important;
-          color: #519ac2 !important;
-          border-width: 2px !important;
+          background: #519ac2 !important;
+          color: #fff !important;
+          border:1px solid #fff !important; 
+          border-width: 1px !important;
           transform: translateY(-2px);
           box-shadow: 0 6px 20px rgba(81,154,194,0.15);
         }
@@ -136,8 +137,9 @@ const ExploreModal = ({ show, onClose, title, bodyContent }) => {
        
         }
         body.dark-mode .custom-modal.explore-modal .btn.rounded-pill.active {
-          background: #fff !important;
-          color: #519ac2 !important;
+          background: #519ac2 !important;
+          color: #fff !important;
+          border:1px solid #fff !important; 
           transform: translateY(-2px);
           box-shadow: 0 6px 20px rgba(81,154,194,0.25);
         }
