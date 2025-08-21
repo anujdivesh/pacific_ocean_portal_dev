@@ -147,22 +147,25 @@ const ExploreModal = ({ show, onClose, title, bodyContent }) => {
         <Modal.Header closeButton className="custom-header2" style={{ background: '#519ac2', borderBottom: '1px solid #3c7693', paddingTop: '8px', paddingBottom: '8px', minHeight: 'unset', color: '#ffffff' }}>
           <Modal.Title style={{ fontSize: '18px', color:'#ffffff' }}>
           {/* Show the "Tailored" button only if the user is logged in */}
-          {userId && (
-            <button
-              className={`btn btn-sm rounded-pill ${showTailoredContent ? 'active' : 'btn-light'}`}
-              style={{
-                padding: '8px',
-                backgroundColor: '#fff',
-                color: '#519ac2',
-                marginLeft: '4px',
-                border: showTailoredContent ? '2px solid #519ac2' : '1px solid #519ac2',
-                fontWeight: '500'
-              }}
-              onClick={handleTailoredClick}
-            >
-              &nbsp;Tailored Products&nbsp;
-            </button>
-          )}
+          {/*
+            Temporarily disabled: Tailored Products pill (visible when userId exists)
+            {userId && (
+              <button
+                className={`btn btn-sm rounded-pill ${showTailoredContent ? 'active' : 'btn-light'}`}
+                style={{
+                  padding: '8px',
+                  backgroundColor: '#fff',
+                  color: '#519ac2',
+                  marginLeft: '4px',
+                  border: showTailoredContent ? '2px solid #519ac2' : '1px solid #519ac2',
+                  fontWeight: '500'
+                }}
+                onClick={handleTailoredClick}
+              >
+                &nbsp;Tailored Products&nbsp;
+              </button>
+            )}
+          */}
 
           {/* Render the theme buttons */}
           {theme.map((themeItem) => (
