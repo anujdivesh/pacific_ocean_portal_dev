@@ -439,7 +439,7 @@ const MapBox = () => {
                 </div>
               `);
 
-                             marker.on('click', () => {
+              marker.on('click', () => {
                  // COMMENTED OUT - Data availability checking
                  // setIsCheckingData(true);
                  // try {
@@ -454,7 +454,8 @@ const MapBox = () => {
                           station: feature.properties.spotter_id,
                           country_code: feature.properties.owner 
                         }));
-                        dispatch(showoffCanvas(id));
+            // Use the active layer id to open the correct bottom canvas
+            dispatch(showoffCanvas(layer?.layer_information?.id));
                  //   } else {
                  //       showNoDataAlert(`No data available for ${feature.properties.spotter_id}`);
                  //   }
@@ -706,7 +707,8 @@ const MapBox = () => {
                           // const isDataAvailable = await checkDataAvailability('WFS', station, id);
                           // if (isDataAvailable) {
                             dispatch(setCoordinates({ x, y, sizex, sizey, bbox, station }));
-                            dispatch(showoffCanvas(id));
+                            // Use the active layer id to open the correct bottom canvas
+                            dispatch(showoffCanvas(layer?.layer_information?.id));
                           // } else {
                           //   showNoDataAlert(`No data available for ${station}`);
                           // }
@@ -842,7 +844,7 @@ const MapBox = () => {
                     }
                 });
     
-                                 marker.on('click', () => {
+               marker.on('click', () => {
                      // COMMENTED OUT - Data availability checking
                      // setIsCheckingData(true);
                      // try {
@@ -855,7 +857,8 @@ const MapBox = () => {
                        // const isDataAvailable = await checkDataAvailability('TIDE', station, id);
                        // if (isDataAvailable) {
                             dispatch(setCoordinates({ x, y, sizex, sizey, bbox, station }));
-                            dispatch(showoffCanvas(id));
+             // Use the active layer id to open the correct bottom canvas
+             dispatch(showoffCanvas(layer?.layer_information?.id));
                        // } else {
                        //     showNoDataAlert(`No data available for ${station}`);
                        // }

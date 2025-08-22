@@ -81,7 +81,7 @@ export const restoreWorkbenchState = async (workbenchState, dispatch) => {
   try {
     // Import all required actions
     const mapSlice = await import('@/app/GlobalRedux/Features/map/mapSlice');
-    const offcanvasSlice = await import('@/app/GlobalRedux/Features/offcanvas/offcanvasSlice');
+  const offcanvasSlice = await import('@/app/GlobalRedux/Features/offcanvas/offcanvasSlice');
     const countrySlice = await import('@/app/GlobalRedux/Features/country/countrySlice');
     const coordinateSlice = await import('@/app/GlobalRedux/Features/coordinate/mapSlice');
 
@@ -162,6 +162,10 @@ export const restoreWorkbenchState = async (workbenchState, dispatch) => {
 
     // Restore offcanvas state
     if (workbenchState.offCanvas) {
+      // Restore selected bottom tab if provided
+      if (workbenchState.offCanvas.selectedTabKey) {
+        dispatch(offcanvasSlice.setSelectedTab(workbenchState.offCanvas.selectedTabKey));
+      }
       if (workbenchState.offCanvas.isVisible && workbenchState.offCanvas.currentId) {
         dispatch(offcanvasSlice.showoffCanvas(workbenchState.offCanvas.currentId));
       } else {
