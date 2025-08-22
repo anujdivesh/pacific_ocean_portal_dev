@@ -6,6 +6,7 @@ const offcanvasSlice = createSlice({
   initialState: {
     isVisible: false,
     currentId: null, // Add this to track the current item id
+    selectedTabKey: 'tab4', // Track which tab is active in bottom offcanvas
   },
   reducers: {
     showoffCanvas: (state, action) => {
@@ -16,8 +17,11 @@ const offcanvasSlice = createSlice({
       state.isVisible = false;
       state.currentId = null; // Reset the current id
     },
+    setSelectedTab: (state, action) => {
+      state.selectedTabKey = action.payload || 'tab4';
+    },
   },
 });
 
-export const { showoffCanvas, hideoffCanvas } = offcanvasSlice.actions;
+export const { showoffCanvas, hideoffCanvas, setSelectedTab } = offcanvasSlice.actions;
 export default offcanvasSlice.reducer;

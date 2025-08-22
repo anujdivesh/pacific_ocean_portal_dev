@@ -81,7 +81,7 @@ export const restoreWorkbenchState = async (workbenchState, dispatch) => {
   try {
     // Import all required actions
     const mapSlice = await import('@/app/GlobalRedux/Features/map/mapSlice');
-    const offcanvasSlice = await import('@/app/GlobalRedux/Features/offcanvas/offcanvasSlice');
+  const offcanvasSlice = await import('@/app/GlobalRedux/Features/offcanvas/offcanvasSlice');
     const countrySlice = await import('@/app/GlobalRedux/Features/country/countrySlice');
     const coordinateSlice = await import('@/app/GlobalRedux/Features/coordinate/mapSlice');
 
@@ -133,6 +133,29 @@ export const restoreWorkbenchState = async (workbenchState, dispatch) => {
                opacity: layer.opacity || 1,
              };
 
+             // Fallback: generate a basic WMS legend URL if missing
+             try {
+               const li = restoredLayer.layer_information || {};
+               const type = (li.layer_type || '').toUpperCase();
+               if (!li.legend_url && type.startsWith('WMS')) {
+                 const base = li.url || '';
+                 const hasQuery = base.includes('?');
+                 const layerName = li.layer_name || '';
+                 const style = li.style || '';
+                 if (base && layerName) {
+                   const qs = new URLSearchParams({
+                     SERVICE: 'WMS',
+                     REQUEST: 'GetLegendGraphic',
+                     FORMAT: 'image/png',
+                     LAYER: layerName,
+                   });
+                   if (style) qs.set('STYLE', style);
+                   const sep = hasQuery ? '&' : '?';
+                   restoredLayer.layer_information.legend_url = `${base}${sep}${qs.toString()}`;
+                 }
+               }
+             } catch {}
+
              console.log(`Restoring layer ${layer.id}:`, {
                title: restoredLayer.layer_information.layer_title,
                enabled: restoredLayer.layer_information.enabled,
@@ -162,6 +185,10 @@ export const restoreWorkbenchState = async (workbenchState, dispatch) => {
 
     // Restore offcanvas state
     if (workbenchState.offCanvas) {
+      // Restore selected bottom tab if provided
+      if (workbenchState.offCanvas.selectedTabKey) {
+        dispatch(offcanvasSlice.setSelectedTab(workbenchState.offCanvas.selectedTabKey));
+      }
       if (workbenchState.offCanvas.isVisible && workbenchState.offCanvas.currentId) {
         dispatch(offcanvasSlice.showoffCanvas(workbenchState.offCanvas.currentId));
       } else {

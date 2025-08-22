@@ -26,6 +26,7 @@ const ShareWorkbench = ({ show, onHide }) => {
   const isOffCanvasVisible = useAppSelector((state) => state.offcanvas.isVisible);
   const currentOffCanvasId = useAppSelector((state) => state.offcanvas.currentId);
   const selectedRegion = useAppSelector((state) => state.country.short_name);
+  const selectedTabKey = useAppSelector((state) => state.offcanvas.selectedTabKey);
   const selectedCoordinates = useAppSelector((state) => state.coordinate.coordinates);
 
   // Generate fresh link when modal opens
@@ -69,9 +70,16 @@ const ShareWorkbench = ({ show, onHide }) => {
     try {
       // Prepare the workbench state for sharing
       const workbenchState = {
-                 layers: mapLayers.map(layer => {
-           // Only save essential layer information to reduce URL size
-          const layerState = {
+                          layers: mapLayers.map(layer => {
+            // Only save essential layer information to reduce URL size
+           console.log(`Original layer data for ${layer.id}:`, {
+             interval_step: layer.layer_information.interval_step,
+             timeIntervalStartOriginal: layer.layer_information.timeIntervalStartOriginal,
+             timeIntervalEndOriginal: layer.layer_information.timeIntervalEndOriginal,
+             period: layer.layer_information.period,
+             enable_get_map: layer.layer_information.enable_get_map
+           });
+           const layerState = {
             id: layer.id,
             // Save a curated set of layer_information fields to avoid reintroducing
             // any very large nested properties (tile data, large arrays, etc.).
@@ -80,11 +88,14 @@ const ShareWorkbench = ({ show, onHide }) => {
               layer_title: layer.layer_information.layer_title,
               layer_type: layer.layer_information.layer_type,
               url: layer.layer_information.url,
+              // Legend image URL so legends restore correctly from shared links
+              legend_url: layer.layer_information.legend_url || null,
               enabled: layer.layer_information?.enabled || false,
               selectedSofarTypes: layer.layer_information?.selectedSofarTypes || [],
               // Date and time properties
               specific_timestemps: layer.layer_information.specific_timestemps || null,
               interval_step: layer.layer_information.interval_step || null,
+              period: layer.layer_information.period || null,
               timeIntervalStart: layer.layer_information.timeIntervalStart || null,
               timeIntervalEnd: layer.layer_information.timeIntervalEnd || null,
               timeIntervalStartOriginal: layer.layer_information.timeIntervalStartOriginal || null,
@@ -109,19 +120,25 @@ const ShareWorkbench = ({ show, onHide }) => {
               restricted: layer.layer_information.restricted || false,
               timeseries_url: layer.layer_information.timeseries_url || null,
               composite_layer_id: layer.layer_information.composite_layer_id || null,
+              enable_get_map: layer.layer_information.enable_get_map || false,
             },
             enabled: layer.layer_information?.enabled || false,
             opacity: layer.opacity || 1,
             selectedSofarTypes: layer.layer_information?.selectedSofarTypes || [],
           };
           
-          console.log(`Sharing layer:`, {
-            id: layerState.id,
-            title: layerState.layer_information.layer_title,
-            type: layerState.layer_information.layer_type,
-            enabled: layerState.layer_information.enabled,
-            selectedSofarTypes: layerState.selectedSofarTypes
-          });
+                     console.log(`Sharing layer:`, {
+             id: layerState.id,
+             title: layerState.layer_information.layer_title,
+             type: layerState.layer_information.layer_type,
+             enabled: layerState.layer_information.enabled,
+             enable_get_map: layerState.layer_information.enable_get_map,
+             period: layerState.layer_information.period,
+             interval_step: layerState.layer_information.interval_step,
+             timeIntervalStartOriginal: layerState.layer_information.timeIntervalStartOriginal,
+             timeIntervalEndOriginal: layerState.layer_information.timeIntervalEndOriginal,
+             selectedSofarTypes: layerState.selectedSofarTypes
+           });
           
           // console.log(`Sharing coordinates:`, selectedCoordinates);
           
@@ -135,6 +152,7 @@ const ShareWorkbench = ({ show, onHide }) => {
         offCanvas: {
           isVisible: isOffCanvasVisible,
           currentId: currentOffCanvasId,
+          selectedTabKey: selectedTabKey || 'tab4',
         },
         coordinates: selectedCoordinates,
         region: selectedRegion,
@@ -278,9 +296,14 @@ const ShareWorkbench = ({ show, onHide }) => {
   return (
     <Modal show={show} onHide={onHide} size="lg" className="share-modal">
       <Modal.Header closeButton>
-        <Modal.Title>
-          <GetMapIcon className="me-2" width={18} height={18} color={'#0d6efd'} />
-          Share Workbench
+        <Modal.Title className="d-flex align-items-center">
+          <GetMapIcon 
+            width={14} 
+            height={14} 
+            color={'#0d6efd'} 
+            style={{ marginRight: 6, display: 'inline-block', verticalAlign: 'text-bottom' }}
+          />
+          <span style={{ lineHeight: 1 }}>Share Workbench</span>
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>

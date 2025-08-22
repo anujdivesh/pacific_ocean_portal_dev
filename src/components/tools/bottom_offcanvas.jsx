@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
 import Offcanvas from 'react-bootstrap/Offcanvas';
-import { hideoffCanvas } from '@/app/GlobalRedux/Features/offcanvas/offcanvasSlice';
+import { hideoffCanvas, setSelectedTab } from '@/app/GlobalRedux/Features/offcanvas/offcanvasSlice';
 import { useAppDispatch, useAppSelector } from '@/app/GlobalRedux/hooks';
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
@@ -80,6 +80,7 @@ function BottomOffCanvas({ isVisible, id }) {
   const mapLayer = useAppSelector((state) => state.mapbox.layers);
   const [layerType, setLayerType] = useState('');
   const [showShareModal, setShowShareModal] = useState(false);
+  const globalSelectedTab = useAppSelector((state) => state.offcanvas.selectedTabKey);
   
   useEffect(() => {
     if (currentId === id) {
@@ -115,7 +116,14 @@ function BottomOffCanvas({ isVisible, id }) {
 
   const dispatch = useAppDispatch();
   const [height, setHeight] = useState(470);
-  const [selectedTab, setSelectedTab] = useState('tab4');
+  const [selectedTab, setSelectedTabLocal] = useState(globalSelectedTab || 'tab4');
+
+  // Keep local state in sync with global state (restored from share)
+  useEffect(() => {
+    if (globalSelectedTab && globalSelectedTab !== selectedTab) {
+      setSelectedTabLocal(globalSelectedTab);
+    }
+  }, [globalSelectedTab]);
   const draggingRef = useRef(false);
   const startYRef = useRef(0);
   const startHeightRef = useRef(0);
@@ -156,11 +164,16 @@ function BottomOffCanvas({ isVisible, id }) {
     window.addEventListener('mouseup', handleMouseUp);
   };
 
+  const handleTabSelect = (k) => {
+    setSelectedTabLocal(k);
+    dispatch(setSelectedTab(k));
+  };
+
   const renderTabsBasedOnLayerType = () => {
     switch (layerType) {
       case 'WMS':
         return (
-          <Tabs activeKey={selectedTab} onSelect={(k) => setSelectedTab(k)} id="offcanvas-tabs" className="mb-3 custom-bottom-tabs">
+          <Tabs activeKey={selectedTab} onSelect={handleTabSelect} id="offcanvas-tabs" className="mb-3 custom-bottom-tabs">
             <Tab eventKey="tab4" title="Get Map">
               <DynamicImage height={height - 100} />
             </Tab>
@@ -184,7 +197,7 @@ function BottomOffCanvas({ isVisible, id }) {
       
       case 'WFS':
         return (
-          <Tabs activeKey={selectedTab} onSelect={(k) => setSelectedTab(k)} id="offcanvas-tabs" className="mb-3 custom-bottom-tabs">
+          <Tabs activeKey={selectedTab} onSelect={handleTabSelect} id="offcanvas-tabs" className="mb-3 custom-bottom-tabs">
              <Tab eventKey="tab4" title="Timeseries">
                 <TimeseriesWfs height={height - 100} data={data} /> {/* Subtracting space for header */}
               </Tab>
@@ -193,7 +206,7 @@ function BottomOffCanvas({ isVisible, id }) {
       
       case 'SOFAR':
         return (
-          <Tabs activeKey={selectedTab} onSelect={(k) => setSelectedTab(k)} id="offcanvas-tabs" className="mb-3 custom-bottom-tabs">
+          <Tabs activeKey={selectedTab} onSelect={handleTabSelect} id="offcanvas-tabs" className="mb-3 custom-bottom-tabs">
             <Tab eventKey="tab4" title="Timeseries">
               <TimeseriesSofar height={height - 100} data={data} /> 
             </Tab>
@@ -202,7 +215,7 @@ function BottomOffCanvas({ isVisible, id }) {
 
         case 'TIDE':
           return (
-            <Tabs activeKey={selectedTab} onSelect={(k) => setSelectedTab(k)} id="offcanvas-tabs" className="mb-3 custom-bottom-tabs">
+            <Tabs activeKey={selectedTab} onSelect={handleTabSelect} id="offcanvas-tabs" className="mb-3 custom-bottom-tabs">
               <Tab eventKey="tab4" title="Tide Chart">
                 <TideImageComponent height={height - 100} data={data} /> 
               </Tab>
