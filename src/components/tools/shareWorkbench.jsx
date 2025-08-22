@@ -88,6 +88,8 @@ const ShareWorkbench = ({ show, onHide }) => {
               layer_title: layer.layer_information.layer_title,
               layer_type: layer.layer_information.layer_type,
               url: layer.layer_information.url,
+              // Legend image URL so legends restore correctly from shared links
+              legend_url: layer.layer_information.legend_url || null,
               enabled: layer.layer_information?.enabled || false,
               selectedSofarTypes: layer.layer_information?.selectedSofarTypes || [],
               // Date and time properties
@@ -294,9 +296,14 @@ const ShareWorkbench = ({ show, onHide }) => {
   return (
     <Modal show={show} onHide={onHide} size="lg" className="share-modal">
       <Modal.Header closeButton>
-        <Modal.Title>
-          <GetMapIcon className="me-2" width={18} height={18} color={'#0d6efd'} />
-          Share Workbench
+        <Modal.Title className="d-flex align-items-center">
+          <GetMapIcon 
+            width={14} 
+            height={14} 
+            color={'#0d6efd'} 
+            style={{ marginRight: 6, display: 'inline-block', verticalAlign: 'text-bottom' }}
+          />
+          <span style={{ lineHeight: 1 }}>Share Workbench</span>
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>

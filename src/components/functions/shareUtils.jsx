@@ -133,6 +133,29 @@ export const restoreWorkbenchState = async (workbenchState, dispatch) => {
                opacity: layer.opacity || 1,
              };
 
+             // Fallback: generate a basic WMS legend URL if missing
+             try {
+               const li = restoredLayer.layer_information || {};
+               const type = (li.layer_type || '').toUpperCase();
+               if (!li.legend_url && type.startsWith('WMS')) {
+                 const base = li.url || '';
+                 const hasQuery = base.includes('?');
+                 const layerName = li.layer_name || '';
+                 const style = li.style || '';
+                 if (base && layerName) {
+                   const qs = new URLSearchParams({
+                     SERVICE: 'WMS',
+                     REQUEST: 'GetLegendGraphic',
+                     FORMAT: 'image/png',
+                     LAYER: layerName,
+                   });
+                   if (style) qs.set('STYLE', style);
+                   const sep = hasQuery ? '&' : '?';
+                   restoredLayer.layer_information.legend_url = `${base}${sep}${qs.toString()}`;
+                 }
+               }
+             } catch {}
+
              console.log(`Restoring layer ${layer.id}:`, {
                title: restoredLayer.layer_information.layer_title,
                enabled: restoredLayer.layer_information.enabled,

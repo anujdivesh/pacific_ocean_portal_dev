@@ -342,10 +342,10 @@ function Navigationbar({ children }) {
                   src={getCountryFlag(flagCountryId)}
                   alt="Country flag"
                   style={{
-                    width: 56, // increased size
+                    width: '80%', // increased size
                     height: 42, // increased size          
                     objectFit: 'cover',
-                    border: '1px solid rgba(0, 0, 0, 0.1)'
+                    // border: '1px solid rgba(0, 0, 0, 0.1)'
                   }}
                   onError={(e) => {
                     e.target.style.display = 'none';

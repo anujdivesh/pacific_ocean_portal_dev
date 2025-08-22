@@ -455,7 +455,7 @@ const MapBox = () => {
                           country_code: feature.properties.owner 
                         }));
             // Use the active layer id to open the correct bottom canvas
-            dispatch(showoffCanvas(layer?.layer_information?.id));
+            dispatch(showoffCanvas(id));
                  //   } else {
                  //       showNoDataAlert(`No data available for ${feature.properties.spotter_id}`);
                  //   }
@@ -708,7 +708,7 @@ const MapBox = () => {
                           // if (isDataAvailable) {
                             dispatch(setCoordinates({ x, y, sizex, sizey, bbox, station }));
                             // Use the active layer id to open the correct bottom canvas
-                            dispatch(showoffCanvas(layer?.layer_information?.id));
+                            dispatch(showoffCanvas(id));
                           // } else {
                           //   showNoDataAlert(`No data available for ${station}`);
                           // }
@@ -858,7 +858,7 @@ const MapBox = () => {
                        // if (isDataAvailable) {
                             dispatch(setCoordinates({ x, y, sizex, sizey, bbox, station }));
              // Use the active layer id to open the correct bottom canvas
-             dispatch(showoffCanvas(layer?.layer_information?.id));
+             dispatch(showoffCanvas(id));
                        // } else {
                        //     showNoDataAlert(`No data available for ${station}`);
                        // }

@@ -93,46 +93,49 @@ function TimeseriesSofar({ height }) {
       style.id = styleId;
       style.textContent = `
         /* Force dark theme on date/time inputs */
-        .dark-mode input[type="date"],
-        .dark-mode input[type="time"] {
+        .dark-mode #timeseries-sofar input[type="date"],
+        .dark-mode #timeseries-sofar input[type="time"] {
           color-scheme: dark !important;
           background: var(--color-surface, #2d3748) !important;
           color: var(--color-text, #ffffff) !important;
           border: 1px solid var(--color-secondary, #4a5568) !important;
         }
         
-        /* Calendar picker indicator */
-        .dark-mode input[type="date"]::-webkit-calendar-picker-indicator,
-        .dark-mode input[type="time"]::-webkit-calendar-picker-indicator {
-          filter: invert(1) brightness(0.8);
+        /* Calendar/time picker indicator color */
+        .dark-mode #timeseries-sofar input[type="date"]::-webkit-calendar-picker-indicator,
+        .dark-mode #timeseries-sofar input[type="time"]::-webkit-calendar-picker-indicator {
+          filter: invert(1) brightness(1.2);
+          opacity: 1;
+          cursor: pointer;
+        }
+        body:not(.dark-mode) #timeseries-sofar input[type="date"]::-webkit-calendar-picker-indicator,
+        body:not(.dark-mode) #timeseries-sofar input[type="time"]::-webkit-calendar-picker-indicator {
+          filter: none;
+          opacity: 1;
           cursor: pointer;
         }
         
         /* Text content styling */
-        .dark-mode input[type="date"]::-webkit-datetime-edit,
-        .dark-mode input[type="time"]::-webkit-datetime-edit,
-        .dark-mode input[type="date"]::-webkit-datetime-edit-text,
-        .dark-mode input[type="time"]::-webkit-datetime-edit-text,
-        .dark-mode input[type="date"]::-webkit-datetime-edit-month-field,
-        .dark-mode input[type="time"]::-webkit-datetime-edit-hour-field,
-        .dark-mode input[type="date"]::-webkit-datetime-edit-day-field,
-        .dark-mode input[type="time"]::-webkit-datetime-edit-minute-field,
-        .dark-mode input[type="date"]::-webkit-datetime-edit-year-field,
-        .dark-mode input[type="time"]::-webkit-datetime-edit-ampm-field {
+        .dark-mode #timeseries-sofar input[type="date"]::-webkit-datetime-edit,
+        .dark-mode #timeseries-sofar input[type="time"]::-webkit-datetime-edit,
+        .dark-mode #timeseries-sofar input[type="date"]::-webkit-datetime-edit-text,
+        .dark-mode #timeseries-sofar input[type="time"]::-webkit-datetime-edit-text,
+        .dark-mode #timeseries-sofar input[type="date"]::-webkit-datetime-edit-month-field,
+        .dark-mode #timeseries-sofar input[type="time"]::-webkit-datetime-edit-hour-field,
+        .dark-mode #timeseries-sofar input[type="date"]::-webkit-datetime-edit-day-field,
+        .dark-mode #timeseries-sofar input[type="time"]::-webkit-datetime-edit-minute-field,
+        .dark-mode #timeseries-sofar input[type="date"]::-webkit-datetime-edit-year-field,
+        .dark-mode #timeseries-sofar input[type="time"]::-webkit-datetime-edit-ampm-field {
           color: var(--color-text, #ffffff) !important;
         }
         
-        /* Force system dark theme for calendar popup */
-        .dark-mode input[type="date"]::-webkit-calendar-picker-indicator {
-          background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='%23ffffff' d='M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM2 2a1 1 0 0 0-1 1v1h14V3a1 1 0 0 0-1-1H2zm13 3H1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V5z'/%3e%3c/svg%3e");
-        }
-        
         /* Focus states */
-        .dark-mode input[type="date"]:focus,
-        .dark-mode input[type="time"]:focus {
+        .dark-mode #timeseries-sofar input[type="date"]:focus,
+        .dark-mode #timeseries-sofar input[type="time"]:focus {
           outline: 2px solid #0d6efd;
           outline-offset: -1px;
         }
+        
       `;
       document.head.appendChild(style);
     }
@@ -602,7 +605,7 @@ function TimeseriesSofar({ height }) {
   }
 
   return (
-    <div style={{ 
+    <div id="timeseries-sofar" style={{ 
       display: 'flex', 
       flexDirection: 'column', 
       height: `${height}px`,
