@@ -221,7 +221,7 @@ function TimeseriesSofar({ height }) {
         return;
       }
    
-      console.log('🔍 Fetching URL:', url);
+      // console.log('🔍 Fetching URL:', url);
       setIsLoading(true);
 
       // Avoid sending Content-Type or credentials for simple GET requests
@@ -245,13 +245,13 @@ function TimeseriesSofar({ height }) {
       }
 
       const data = await res.json();
-      console.log('🔍 Response data:', data);
+      // console.log('🔍 Response data:', data);
       
       const waveData = data.data;
       const dataLabels = data.data_labels ? data.data_labels.split(',') : [];
 
       if (!waveData || waveData.length === 0) {
-        console.log('⚠️  No data returned from API');
+        // console.log('⚠️  No data returned from API');
         setDataFn([], []);
         return;
       }
@@ -338,14 +338,14 @@ function TimeseriesSofar({ height }) {
 
   const setChartDataFn = (times, datasets) => {
 
-    console.log("START LABEL AND VALUE>>>>>>>>>>>>>>>");
+    // console.log("START LABEL AND VALUE>>>>>>>>>>>>>>>");
 
-    console.log("<<<<<<<<<<< LABEL AND VALUE END");
+    // console.log("<<<<<<<<<<< LABEL AND VALUE END");
     
     setChartData({
       labels: times,
       datasets: datasets.map((dataset, index) => {
-        console.log(dataset)
+        // console.log(dataset)
         // Filter out -999 values by replacing them with null to create gaps
         const filteredValues = dataset.values.map(value => {
           // Check for -999 or similar missing data indicators
