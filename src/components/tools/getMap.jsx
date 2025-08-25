@@ -21,6 +21,7 @@ function DynamicImage({ height }) {
   const [error, setError] = useState(null);
   const [dotOffset, setDotOffset] = useState(0);
   const [enabledMap, setEnabledMap] = useState(false);
+
   const dateFormatAccepted = useRef(null);
   const dateToDisplay = useRef(null);
   const [loadingTime, setLoadingTime] = useState(0);
@@ -112,7 +113,12 @@ function DynamicImage({ height }) {
         const start_date = layerInformation.timeIntervalStartOriginal;
         const end_date = layerInformation.timeIntervalEndOriginal;
         const step = (period === "PT6H" || period === "PT1H") ? layerInformation.interval_step : 24;
-        const result = generateDateArray(start_date, end_date, step);
+        var result = generateDateArray(start_date, end_date, step);
+        var limit = layerInformation.no_of_plots;
+        if (limit !== 999) {
+            result = result.slice(-limit);
+        }
+
         /*
         if (result.length > 30) {
             result.splice(0, result.length - 30);
