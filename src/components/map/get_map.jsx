@@ -1893,7 +1893,7 @@ const MapBox = () => {
           }
          // console.log(layer.layer_information.timeIntervalStart,layer.layer_information.timeIntervalEnd, dateToDisplay)
         
-        
+        if (layer.layer_information.enabled && layer.layer_information.cog_params !== null){
          setIsLoading(true); 
         const cogParamsString = layer.layer_information.cog_params;
         const cogLayer = addCOGTileLayer(mapRef.current, cogParamsString, {
@@ -1911,6 +1911,7 @@ const MapBox = () => {
         addLayerWithLoading(layerGroup, cogLayer, setIsLoading);
         layerGroup.addTo(mapRef.current);
         setWmsLayerGroup(layerGroup);
+      }
 
 
 
