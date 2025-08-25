@@ -11,6 +11,7 @@ import { get_url } from '@/components/json/urls';
 import { showoffCanvas, hideoffCanvas  } from '@/app/GlobalRedux/Features/offcanvas/offcanvasSlice';
 import { FaShare } from "react-icons/fa";
 import ShareWorkbench from '../tools/shareWorkbench';
+import { addCOGTileLayer } from '../functions/addCogTileLayer';
 // Import marker cluster CSS
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
@@ -1488,7 +1489,7 @@ const MapBox = () => {
         url: layer.layer_information.url
       });
 
-      if(layer.layer_information.enabled){
+      if(layer.layer_information.enabled && !layer.layer_information.enable_cog ){
         var layer_Type = layer.layer_information.layer_type;
         layer_Type = layer_Type.replace("_FORECAST", "");
         if(layer_Type == "WMS" ){
@@ -1874,7 +1875,49 @@ const MapBox = () => {
         enabled: layer.layer_information.enabled
       });
     }
-  }
+      }
+      else{
+       var layer_Type = layer.layer_information.layer_type;
+        layer_Type = layer_Type.replace("_FORECAST", "");
+        if(layer_Type == "WMS" ){
+          var dateToDisplay = layer.layer_information.timeIntervalStart;
+          if (layer.layer_information.is_timeseries){
+            dateToDisplay = layer.layer_information.timeIntervalStart;
+          }
+          else if (layer.layer_information.layer_type == "WMS_FORECAST" || layer.layer_information.layer_type == "WMS_UGRID"){
+            dateToDisplay = layer.layer_information.timeIntervalStart;
+          }
+          else{
+            dateToDisplay = layer.layer_information.timeIntervalEnd;
+            
+          }
+         // console.log(layer.layer_information.timeIntervalStart,layer.layer_information.timeIntervalEnd, dateToDisplay)
+        
+        
+         setIsLoading(true); 
+        const cogParamsString = layer.layer_information.cog_params;
+        const cogLayer = addCOGTileLayer(mapRef.current, cogParamsString, {
+          extraParams: {
+            layer_id:layer.layer_information.id,
+            url: layer.layer_information.url,              // dataset/source URL
+            variable: layer.layer_information.layer_name,  // variable to render
+            time: dateToDisplay                            // ISO date
+          },
+          enforceBounds: true,                             // keep your 100/300/-45/45 bounds
+          tileOptions: { opacity: layer.layer_information.opacity }
+        })
+
+        // Use your existing loader and group
+        addLayerWithLoading(layerGroup, cogLayer, setIsLoading);
+        layerGroup.addTo(mapRef.current);
+        setWmsLayerGroup(layerGroup);
+
+
+
+
+
+      }
+      }
   //setIsLoading(false);
     });
 
