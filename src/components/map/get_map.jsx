@@ -1478,16 +1478,16 @@ const MapBox = () => {
           safeFitBoundsGlobal(bounds);
         }
         const layerGroup = L.layerGroup();
-          console.log('Map useEffect triggered with layers:', layers);
+       //   console.log('Map useEffect triggered with layers:', layers);
 
     layers.forEach(layer => {
-      console.log("Processing layer:", {
+    /*  console.log("Processing layer:", {
         id: layer.layer_information.id,
         title: layer.layer_information.layer_title,
         type: layer.layer_information.layer_type,
         enabled: layer.layer_information.enabled,
         url: layer.layer_information.url
-      });
+      });*/
 
       if(layer.layer_information.enabled && !layer.layer_information.enable_cog ){
         var layer_Type = layer.layer_information.layer_type;
