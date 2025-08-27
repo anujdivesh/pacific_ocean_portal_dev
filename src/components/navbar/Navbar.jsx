@@ -395,7 +395,7 @@ function Navigationbar({ children }) {
           </li>
           <li>
             <Link className={pathname === "/dashboard" ? "active-nav nav-link" : "nav-link"} href="/dashboard" style={{textShadow: "0 0 0.5px rgba(255, 255, 255, 0.8)"}}>
-              Dashboard
+              Collection
             </Link>
           </li>
           <li>
