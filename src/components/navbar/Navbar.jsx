@@ -397,51 +397,51 @@ function Navigationbar({ children }) {
           zIndex: 1000,
         }}
       >
-        {/* Left: Flag, logo, and company name */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0px' }}> 
-          {/* Country Flag Display - moved further left and made bigger */}
-          {/* Show persisted selection for anonymous users, and auth country for logged-in users. */}
-          {(() => {
-            // Resolve which country id to show as a flag
-            // Priority: previewRegion (transient for logged-in preview) -> auth.userCountry -> persisted selectedRegion (anonymous)
-            let flagCountryId = null;
-            if (previewRegion) {
-              flagCountryId = previewRegion;
-            } else if (isLoggedin && userCountry) {
-              flagCountryId = userCountry;
-            } else {
-              // anonymous user: respect persisted selection in localStorage
-              const persisted = typeof window !== 'undefined' ? localStorage.getItem('selectedRegion') : null;
-              flagCountryId = persisted || null;
-            }
+                 {/* Left: Flag, logo, and company name */}
+         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}> 
+           {/* Country Flag Display - moved further left and made bigger */}
+           {/* Show persisted selection for anonymous users, and auth country for logged-in users. */}
+           {(() => {
+             // Resolve which country id to show as a flag
+             // Priority: previewRegion (transient for logged-in preview) -> auth.userCountry -> persisted selectedRegion (anonymous)
+             let flagCountryId = null;
+             if (previewRegion) {
+               flagCountryId = previewRegion;
+             } else if (isLoggedin && userCountry) {
+               flagCountryId = userCountry;
+             } else {
+               // anonymous user: respect persisted selection in localStorage
+               const persisted = typeof window !== 'undefined' ? localStorage.getItem('selectedRegion') : null;
+               flagCountryId = persisted || null;
+             }
 
-            if (!flagCountryId) return null;
-            // If PAC, do not render anything
-            const flagSrc = getCountryFlag(flagCountryId);
-            if (!flagSrc) return null;
-            return (
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                marginRight: '-23px', // removed spacing between flag and logo
-                padding: '4px 4px'
-              }}>
-                <img 
-                  src={flagSrc}
-                  alt="Country flag"
-                  style={{
-                    width: '80%', // increased size
-                    height: 42, // increased size          
-                    objectFit: 'cover',
-                    // border: '1px solid rgba(0, 0, 0, 0.1)'
-                  }}
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                  }}
-                />
-              </div>
-            );
-          })()}
+             if (!flagCountryId) return null;
+             // If PAC, do not render anything
+             const flagSrc = getCountryFlag(flagCountryId);
+             if (!flagSrc) return null;
+             return (
+               <div style={{ 
+                 display: 'flex', 
+                 alignItems: 'center', 
+                 marginRight: '-27px', // Reduced spacing
+                 padding: '4px 4px'
+               }}>
+                 <img 
+                   src={flagSrc}
+                   alt="Country flag"
+                   style={{
+                     width: '80%', // increased size
+                     height: 42, // increased size          
+                     objectFit: 'cover',
+                     // border: '1px solid rgba(0, 0, 0, 0.1)'
+                   }}
+                   onError={(e) => {
+                     e.target.style.display = 'none';
+                   }}
+                 />
+               </div>
+             );
+           })()}
           <button
             onClick={toggleSidebar}
             style={{
@@ -903,7 +903,7 @@ function Navigationbar({ children }) {
               minHeight: 'calc(100vh - 60px)',
               display: 'flex',
               flexDirection: 'column',
-
+              
               alignItems: 'stretch',
               padding: '24px 0',
               position: 'relative',
