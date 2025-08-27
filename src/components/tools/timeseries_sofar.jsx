@@ -104,8 +104,7 @@ function TimeseriesSofar({ height }) {
         /* Calendar/time picker indicator color */
         .dark-mode #timeseries-sofar input[type="date"]::-webkit-calendar-picker-indicator,
         .dark-mode #timeseries-sofar input[type="time"]::-webkit-calendar-picker-indicator {
-          filter: invert(1) brightness(1.2);
-          opacity: 1;
+        color:#ffffff!important;
           cursor: pointer;
         }
         body:not(.dark-mode) #timeseries-sofar input[type="date"]::-webkit-calendar-picker-indicator,
