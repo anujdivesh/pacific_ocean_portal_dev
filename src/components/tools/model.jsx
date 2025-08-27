@@ -86,14 +86,14 @@ const ExploreModal = ({ show, onClose, title, bodyContent }) => {
     fetchThemes();
   }, []);
 
-  // When the userId is updated, ensure that "Tailored" is the only active button
+  // When the userId is updated, show the first theme (Data Catalogue) by default
   useEffect(() => {
-    if (userId) {
-      setShowTailoredContent(true); // Show tailored content by default
-      setSelectedId(null); // Deselect any theme button
-      fetchTailoredMenu(country); // Fetch tailored data for the user
+    if (userId && theme.length > 0) {
+      setShowTailoredContent(false); // Don't show tailored content by default
+      setSelectedId(theme[0].id); // Set the first theme as selected by default
+      fetchData(theme[0].id); // Fetch data for the first theme
     }
-  }, [userId,country]);
+  }, [userId, country, theme]);
 
   // Handle Tailored button click
   const handleTailoredClick = () => {
@@ -119,39 +119,82 @@ const ExploreModal = ({ show, onClose, title, bodyContent }) => {
 
   return (
     <>
-      <style>{`
-        .custom-modal.explore-modal .btn.rounded-pill {
-          background: #fff !important;
-          color: #519ac2 !important;
-        }
-        .custom-modal.explore-modal .btn.rounded-pill.active {
-          background: #fff !important;
-          color: #519ac2 !important;
-          border-width: 2px !important;
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(81,154,194,0.15);
-        }
-        body.dark-mode .custom-modal.explore-modal .btn.rounded-pill {
-          background: #fff !important;
-          color: #519ac2 !important;
-        }
-        body.dark-mode .custom-modal.explore-modal .btn.rounded-pill.active {
-          background: #fff !important;
-          color: #519ac2 !important;
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(81,154,194,0.25);
-        }
-        .custom-modal.explore-modal input[type="text"] {
-          background-color: #ffffff !important;
-          color: #519ac2 !important;
-        }
-        body.dark-mode .custom-modal.explore-modal input[type="text"] {
-          background-color: #ffffff !important;
-          color: #519ac2 !important;
-        }
+             <style>{`
+         .custom-modal.explore-modal .btn.rounded-pill {
+           background: #fff !important;
+           color: #519ac2 !important;
+         }
+         .custom-modal.explore-modal .btn.rounded-pill.active {
+           background: #519ac2 !important;
+           color: #ffffff !important;
+           border-width: 1px !important;
+           transform: translateY(-2px);
+           box-shadow: 0 6px 20px rgba(81,154,194,0.15);
+         }
+         body.dark-mode .custom-modal.explore-modal .btn.rounded-pill {
+           background: #fff !important;
+           color: #519ac2 !important;
+         }
+         body.dark-mode .custom-modal.explore-modal .btn.rounded-pill.active {
+           background: #519ac2 !important;
+           color: #ffffff !important;
+           transform: translateY(-2px);
+           box-shadow: 0 6px 20px rgba(81,154,194,0.25);
+         }
+                 .custom-modal.explore-modal input[type="text"] {
+           background-color: #ffffff !important;
+           color: #519ac2 !important;
+         }
+         body.dark-mode .custom-modal.explore-modal input[type="text"] {
+           background-color: #ffffff !important;
+           color: #519ac2 !important;
+         }
+         
+         /* Scrollbar styling for modal - same for light and dark mode */
+         .custom-modal.explore-modal ::-webkit-scrollbar {
+           width: 10px;
+         }
+         
+         .custom-modal.explore-modal ::-webkit-scrollbar-track {
+           background: #f5f5f5;
+           border-radius: 6px;
+           margin: 2px;
+         }
+         
+         .custom-modal.explore-modal ::-webkit-scrollbar-thumb {
+           background: #d1d5db;
+           border-radius: 6px;
+           border: 2px solid #f5f5f5;
+         }
+         
+         .custom-modal.explore-modal ::-webkit-scrollbar-thumb:hover {
+           background: #9ca3af;
+         }
+         
+         .custom-modal.explore-modal ::-webkit-scrollbar-thumb:active {
+           background: #6b7280;
+         }
+         
+         /* Dark mode scrollbar - same styling as light mode */
+         body.dark-mode .custom-modal.explore-modal ::-webkit-scrollbar-track {
+           background: #f5f5f5;
+         }
+         
+         body.dark-mode .custom-modal.explore-modal ::-webkit-scrollbar-thumb {
+           background: #d1d5db;
+           border: 2px solid #f5f5f5;
+         }
+         
+         body.dark-mode .custom-modal.explore-modal ::-webkit-scrollbar-thumb:hover {
+           background: #9ca3af;
+         }
+         
+         body.dark-mode .custom-modal.explore-modal ::-webkit-scrollbar-thumb:active {
+           background: #6b7280;
+         }
       `}</style>
       <Modal show={show} onHide={onClose} centered scrollable size="xl" backdrop={true} keyboard={true} className="custom-modal explore-modal">
-        <Modal.Header closeButton className="custom-header2" style={{ background: '#519ac2', borderBottom: '1px solid #3c7693', paddingTop: '8px', paddingBottom: '8px', minHeight: 'unset', color: '#ffffff' }}>
+        <Modal.Header closeButton className="custom-header2" style={{ background: '#519ac2',  paddingTop: '8px', paddingBottom: '8px', minHeight: 'unset', color: '#ffffff' }}>
           <Modal.Title style={{ fontSize: '18px', color:'#ffffff' }}>
             {/* Search input */}
             <input
@@ -163,7 +206,8 @@ const ExploreModal = ({ show, onClose, title, bodyContent }) => {
                 marginRight: '12px',
                 padding: '6px',
                 borderRadius: '20px',
-                border: '1px solid #519ac2',
+                border: 'none',
+                outline: 'none',
                 fontSize: '14px',
                 width: '200px',
                 color: '#519ac2',
@@ -175,14 +219,14 @@ const ExploreModal = ({ show, onClose, title, bodyContent }) => {
               <button
                 key={themeItem.id}
                 className={`btn btn-sm rounded-pill ${selectedId === themeItem.id ? 'active' : 'btn-light'}`}
-                style={{
-                  padding: '8px',
-                  backgroundColor: '#fff',
-                  color: '#519ac2',
-                  marginLeft: '4px',
-                  border: selectedId === themeItem.id ? '2px solid #519ac2' : '1px solid #519ac2',
-                  fontWeight: '500'
-                }}
+                                 style={{
+                   padding: '8px',
+                   backgroundColor: '#fff',
+                   color: '#519ac2',
+                   marginLeft: '4px',
+                   border: selectedId === themeItem.id ? '2px solid #ffffff' : '1px solid #519ac2',
+                   fontWeight: '500'
+                 }}
                 onClick={() => handleThemeClick(themeItem.id)}
               >
                 &nbsp;{themeItem.name} &nbsp;

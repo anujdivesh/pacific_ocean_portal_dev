@@ -236,7 +236,7 @@ const NestedAccordion = ({ data, openIds, searchQuery = "" }) => {
     });
 
     // Helper to highlight matches
-    const highlightStyle = { backgroundColor: '#fff59d' };
+    // const highlightStyle = { backgroundColor: '#fff59d' }; // Search highlighting disabled
 
     return (
       <>
@@ -272,7 +272,7 @@ const NestedAccordion = ({ data, openIds, searchQuery = "" }) => {
                         onClick={() => handleClick(contentItem)}
                         style={{
                           cursor: 'pointer',
-                          backgroundColor: activeItemId === contentItem.id ? '#d3f4ff' : isMatch ? highlightStyle.backgroundColor : 'transparent',
+                          backgroundColor: activeItemId === contentItem.id ? '#d3f4ff' : 'transparent', // Search highlighting disabled
                           borderRadius: 0,
                           padding: '2px',
                         }}
@@ -304,7 +304,7 @@ const NestedAccordion = ({ data, openIds, searchQuery = "" }) => {
               onClick={() => handleClick(contentItem)}
               style={{
                 cursor: 'pointer',
-                backgroundColor: activeItemId === contentItem.id ? '#d3f4ff' : isMatch ? highlightStyle.backgroundColor : 'transparent',
+                backgroundColor: activeItemId === contentItem.id ? '#d3f4ff' : 'transparent', // Search highlighting disabled
                 borderRadius: 0,
                 padding: '2px',
                 marginTop: '2px'
