@@ -559,6 +559,14 @@ return (
   <div className="row align-items-center" style={{ marginTop: '-5px', marginBottom: '8px',paddingTop:8 }}>
     {item.layer_information.datetime_format !== 'WFS_DAILY' && (
       <div className="col-sm-4">
+        <style>{`
+       select.form-select.form-select-sm.rounded-pill {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  }
+  body.dark-mode select.form-select.form-select-sm.rounded-pill {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23FFFFFF' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  }
+    `}</style>
         <div className="date-selector-label">Date Range:</div>
       </div>
     )}
