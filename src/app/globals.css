@@ -999,6 +999,13 @@ body.dark-mode .leaflet-control-zoom a:hover,
 body.dark-mode .leaflet-control-zoom a.leaflet-control-zoom-share:hover { background: var(--color-background) !important; }
 body.dark-mode .leaflet-control-zoom a.leaflet-control-zoom-share svg { fill: currentColor; }
 
+/* Hide zoom controls and share button in mobile mode */
+@media (max-width: 1004px) {
+  .leaflet-control-zoom {
+    display: none !important;
+  }
+}
+
 /* React DatePicker calendar icon dark mode override */
 body.dark-mode .react-datepicker__calendar-icon {
   color: #ffffff !important; /* sets icon color */
