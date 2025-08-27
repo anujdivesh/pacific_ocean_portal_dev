@@ -103,7 +103,7 @@ function Navigationbar({ children }) {
   // Helper function to get flag path by id
   function getCountryFlag(id) {
     const country = countriesxxx.find(c => c.id === Number(id));
-    if (!country) return null;
+    if (!country ||   country.short_name === 'PAC') return null;
     return `/flags/${country.short_name}.png`;
   }
 
@@ -330,16 +330,18 @@ function Navigationbar({ children }) {
             }
 
             if (!flagCountryId) return null;
-
+            // If PAC, do not render anything
+            const flagSrc = getCountryFlag(flagCountryId);
+            if (!flagSrc) return null;
             return (
               <div style={{ 
                 display: 'flex', 
                 alignItems: 'center', 
-                marginRight: '0px', // removed spacing between flag and logo
+                marginRight: '-23px', // removed spacing between flag and logo
                 padding: '4px 4px'
               }}>
                 <img 
-                  src={getCountryFlag(flagCountryId)}
+                  src={flagSrc}
                   alt="Country flag"
                   style={{
                     width: '80%', // increased size
