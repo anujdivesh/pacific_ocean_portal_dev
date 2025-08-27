@@ -168,6 +168,92 @@ function Navigationbar({ children }) {
     document.body.classList.toggle("sb-sidenav-toggled");
   };
 
+  // Drag functionality for mobile sidebar - toggle collapse/expand
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStartPos, setDragStartPos] = useState({ y: 0 });
+
+  const handleMobileDragStart = (e) => {
+    // Only prevent default for mouse events, not touch events
+    if (e.type === 'mousedown') {
+      e.preventDefault();
+    }
+    setIsDragging(true);
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    setDragStartPos({ y: clientY });
+    document.body.style.cursor = 'row-resize';
+    document.body.style.userSelect = 'none';
+  };
+
+  const handleMobileDrag = (e) => {
+    if (!isDragging) return;
+    // Only prevent default for mouse events, not touch events
+    if (e.type === 'mousemove') {
+      e.preventDefault();
+    }
+    
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const deltaY = dragStartPos.y - clientY; // Inverted for mobile (drag up to expand)
+    
+    // If dragged up (positive delta), expand. If dragged down (negative delta), collapse
+    if (deltaY > 50 && sidebarCollapsed) {
+      // Expand sidebar
+      dispatch(toggleSidebar());
+      setIsDragging(false);
+    } else if (deltaY < -50 && !sidebarCollapsed) {
+      // Collapse sidebar
+      dispatch(toggleSidebar());
+      setIsDragging(false);
+    }
+  };
+
+  const handleMobileDragEnd = () => {
+    setIsDragging(false);
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+  };
+
+  // Add global mouse/touch event listeners for mobile drag
+  useEffect(() => {
+    const handleGlobalMouseMove = (e) => {
+      if (isDragging && window.innerWidth <= 1004) {
+        e.preventDefault();
+        handleMobileDrag(e);
+      }
+    };
+
+    const handleGlobalMouseUp = () => {
+      if (isDragging && window.innerWidth <= 1004) {
+        handleMobileDragEnd();
+      }
+    };
+
+    const handleGlobalTouchMove = (e) => {
+      if (isDragging && window.innerWidth <= 1004) {
+        // For touch events, we need to prevent default to stop scrolling
+        e.preventDefault();
+        handleMobileDrag(e);
+      }
+    };
+
+    const handleGlobalTouchEnd = (e) => {
+      if (isDragging && window.innerWidth <= 1004) {
+        handleMobileDragEnd();
+      }
+    };
+
+    document.addEventListener('mousemove', handleGlobalMouseMove);
+    document.addEventListener('mouseup', handleGlobalMouseUp);
+    document.addEventListener('touchmove', handleGlobalTouchMove, { passive: false });
+    document.addEventListener('touchend', handleGlobalTouchEnd);
+
+    return () => {
+      document.removeEventListener('mousemove', handleGlobalMouseMove);
+      document.removeEventListener('mouseup', handleGlobalMouseUp);
+      document.removeEventListener('touchmove', handleGlobalTouchMove);
+      document.removeEventListener('touchend', handleGlobalTouchEnd);
+    };
+  }, [isDragging, sidebarCollapsed, dragStartPos]);
+
   // Handle logout with map zoom reset
   const handleLogoutWithMapReset = async () => {
     const response = await logout(); // Call the server-side logout action
@@ -920,16 +1006,46 @@ function Navigationbar({ children }) {
         </main>
       </div>
       
-      {/* Mobile Bottom Sidebar - only show on Explorer page (/) and mobile devices */}
-      {pathname === '/' && (
-        <div className="mobile-sidebar-container">
-          <button
-            onClick={handleToggleSidebar}
-            className="mobile-sidebar-toggle"
-            aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          >
-            <div className="toggle-handle"></div>
-          </button>
+             {/* Mobile Bottom Sidebar - only show on Explorer page (/) and mobile devices */}
+       {pathname === '/' && (
+         <div className="mobile-sidebar-container">
+           {/* Mobile drag handle */}
+           <div
+             className="mobile-drag-handle"
+             onMouseDown={handleMobileDragStart}
+             onTouchStart={handleMobileDragStart}
+             style={{
+               position: 'absolute',
+               top: 0,
+               left: 0,
+               right: 0,
+               height: '20px',
+               cursor: 'row-resize',
+               zIndex: 1029,
+               background: 'transparent',
+               display: 'flex',
+               alignItems: 'center',
+               justifyContent: 'center',
+             }}
+           >
+             <div
+               style={{
+                 width: '40px',
+                 height: '4px',
+                 background: 'var(--color-border)',
+                 borderRadius: '2px',
+                 opacity: 0.6,
+               }}
+             />
+           </div>
+
+           <button
+             onClick={handleToggleSidebar}
+             className="mobile-sidebar-toggle"
+             aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+           >
+             <div className="toggle-handle"></div>
+           </button>
           <aside
             className={`mobile-sidebar ${sidebarCollapsed ? 'collapsed' : 'expanded'}`}
             style={{
