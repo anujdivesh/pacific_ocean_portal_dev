@@ -16,6 +16,7 @@ const ExploreModal = ({ show, onClose, title, bodyContent }) => {
   const [userId, setUserId] = useState(null); // State to store the userId (token)
   const [showTailoredContent, setShowTailoredContent] = useState(false); // Tailored content shown by default if logged in
   const [country, setCountry] = useState(null);
+  const [searchQuery, setSearchQuery] = useState(""); // State for search input
   const countryId = useAppSelector((state) => state.auth.country);
 
   // Fetch data based on the selectedId (theme-based data)
@@ -133,7 +134,6 @@ const ExploreModal = ({ show, onClose, title, bodyContent }) => {
         body.dark-mode .custom-modal.explore-modal .btn.rounded-pill {
           background: #fff !important;
           color: #519ac2 !important;
-       
         }
         body.dark-mode .custom-modal.explore-modal .btn.rounded-pill.active {
           background: #fff !important;
@@ -141,69 +141,72 @@ const ExploreModal = ({ show, onClose, title, bodyContent }) => {
           transform: translateY(-2px);
           box-shadow: 0 6px 20px rgba(81,154,194,0.25);
         }
+        .custom-modal.explore-modal input[type="text"] {
+          background-color: #ffffff !important;
+          color: #519ac2 !important;
+        }
+        body.dark-mode .custom-modal.explore-modal input[type="text"] {
+          background-color: #ffffff !important;
+          color: #519ac2 !important;
         }
       `}</style>
-  <Modal show={show} onHide={onClose} centered scrollable size="xl" backdrop={true} keyboard={true} className="custom-modal explore-modal">
+      <Modal show={show} onHide={onClose} centered scrollable size="xl" backdrop={true} keyboard={true} className="custom-modal explore-modal">
         <Modal.Header closeButton className="custom-header2" style={{ background: '#519ac2', borderBottom: '1px solid #3c7693', paddingTop: '8px', paddingBottom: '8px', minHeight: 'unset', color: '#ffffff' }}>
           <Modal.Title style={{ fontSize: '18px', color:'#ffffff' }}>
-          {/* Show the "Tailored" button only if the user is logged in */}
-          {/*
-            Temporarily disabled: Tailored Products pill (visible when userId exists)
-            {userId && (
+            {/* Search input */}
+            <input
+              type="text"
+              placeholder="Search datasets..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              style={{
+                marginRight: '12px',
+                padding: '6px',
+                borderRadius: '20px',
+                border: '1px solid #519ac2',
+                fontSize: '14px',
+                width: '200px',
+                color: '#519ac2',
+                backgroundColor: '#ffffff',
+              }}
+            />
+            {/* Render the theme buttons */}
+            {theme.map((themeItem) => (
               <button
-                className={`btn btn-sm rounded-pill ${showTailoredContent ? 'active' : 'btn-light'}`}
+                key={themeItem.id}
+                className={`btn btn-sm rounded-pill ${selectedId === themeItem.id ? 'active' : 'btn-light'}`}
                 style={{
                   padding: '8px',
                   backgroundColor: '#fff',
                   color: '#519ac2',
                   marginLeft: '4px',
-                  border: showTailoredContent ? '2px solid #519ac2' : '1px solid #519ac2',
+                  border: selectedId === themeItem.id ? '2px solid #519ac2' : '1px solid #519ac2',
                   fontWeight: '500'
                 }}
-                onClick={handleTailoredClick}
+                onClick={() => handleThemeClick(themeItem.id)}
               >
-                &nbsp;Tailored Products&nbsp;
+                &nbsp;{themeItem.name} &nbsp;
               </button>
-            )}
-          */}
-
-          {/* Render the theme buttons */}
-          {theme.map((themeItem) => (
-            <button
-              key={themeItem.id}
-              className={`btn btn-sm rounded-pill ${selectedId === themeItem.id ? 'active' : 'btn-light'}`}
-              style={{
-                padding: '8px',
-                backgroundColor: '#fff',
-                color: '#519ac2',
-                marginLeft: '4px',
-                border: selectedId === themeItem.id ? '2px solid #519ac2' : '1px solid #519ac2',
-                fontWeight: '500'
-              }}
-              onClick={() => handleThemeClick(themeItem.id)}
-            >
-              &nbsp;{themeItem.name} &nbsp;
-            </button>
-          ))}
-        </Modal.Title>
-      </Modal.Header>
-             <Modal.Body style={{ padding: 0, margin: 0, width: '100%', background: '#ffffff', color: 'var(--color-text, #1e293b)' }}>
-         <Row className="g-0">
-           <Col md={4} className="scrollable-column" style={{ background: '#f8f8f8' }}>
-             {loading ? (
-               <Spinner animation="border" variant="primary" style={{ margin: 170 }} />
-             ) : (
-               <MyAccordion className="scrollable-content modal-accordion" dataset={data} />
-             )}
-           </Col>
-           <Col md={8} className="scrollable-column" style={{ background: '#ffffff', padding: 0 }}>
-             <AccordionMetadata />
-           </Col>
-         </Row>
-       </Modal.Body>
-      <Modal.Footer className="custom-header2" style={{ background: 'var(--color-surface, #fff)', borderTop: '1px solid var(--color-secondary, #e5e7eb)', paddingTop: '6px', paddingBottom: '6px', minHeight: 'unset' }}>
-        <p style={{ fontSize: '11px', color: 'var(--color-secondary, #64748b)', margin: 0 }}>&copy; All Rights Reserved SPC </p>
-      </Modal.Footer>
+            ))}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ padding: 0, margin: 0, width: '100%', background: '#ffffff', color: 'var(--color-text, #1e293b)' }}>
+          <Row className="g-0">
+            <Col md={4} className="scrollable-column" style={{ background: '#f8f8f8' }}>
+              {loading ? (
+                <Spinner animation="border" variant="primary" style={{ margin: 170 }} />
+              ) : (
+                <MyAccordion className="scrollable-content modal-accordion" dataset={data} searchQuery={searchQuery} />
+              )}
+            </Col>
+            <Col md={8} className="scrollable-column" style={{ background: '#ffffff', padding: 0 }}>
+              <AccordionMetadata />
+            </Col>
+          </Row>
+        </Modal.Body>
+        <Modal.Footer className="custom-header2" style={{ background: 'var(--color-surface, #fff)', borderTop: '1px solid var(--color-secondary, #e5e7eb)', paddingTop: '6px', paddingBottom: '6px', minHeight: 'unset' }}>
+          <p style={{ fontSize: '11px', color: 'var(--color-secondary, #64748b)', margin: 0 }}>&copy; All Rights Reserved SPC </p>
+        </Modal.Footer>
       </Modal>
     </>
   );
