@@ -5395,10 +5395,11 @@ textarea.form-control-lg {
     max-width: var(--bs-modal-width);
     margin-right: auto;
     margin-left: auto;
-  }
+  
   .modal-sm {
     --bs-modal-width: 300px;
   }
+}
 }
 @media (min-width: 992px) {
   .modal-lg,
