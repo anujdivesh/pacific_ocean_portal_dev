@@ -129,7 +129,7 @@ const SmallMap = ({currentDataset}) => {
               west_bound_longitude: dataset_list.west_bound_longitude,
               layer_information: data,
             };
-            console.log(bounds)
+           // console.log(bounds)
             const datasetBox = {
               west: dataset_list.west_bound_longitude,
               east: dataset_list.east_bound_longitude,

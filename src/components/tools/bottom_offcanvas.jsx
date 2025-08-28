@@ -79,13 +79,12 @@ function BottomOffCanvas({ isVisible, id }) {
   const currentId = useAppSelector((state) => state.offcanvas.currentId);
   const mapLayer = useAppSelector((state) => state.mapbox.layers);
   const [layerType, setLayerType] = useState('');
+  const [layerInfo, setLayerInfo] = useState(null);
   const [showShareModal, setShowShareModal] = useState(false);
   const globalSelectedTab = useAppSelector((state) => state.offcanvas.selectedTabKey);
   
   useEffect(() => {
     if (currentId === id) {
-      // var layer_type = mapLayer[mapLayer.length - 1]?.layer_information.layer_type; // kunal thinking.. :P : i think what this does is gets last layer only 
-      //24 == 24
       const selectedLayer = mapLayer.find(layer => 
         layer.id === currentId ||  
         (layer.layer_information && layer.layer_information.id === currentId)
@@ -97,6 +96,7 @@ function BottomOffCanvas({ isVisible, id }) {
         layer_type = layer_type.replace("_UGRID", "");
         layer_type = layer_type.replace("_HINDCAST", "");
         setLayerType(layer_type);
+        setLayerInfo(selectedLayer.layer_information);
       }
     }
   }, [mapLayer, currentId, id]);
@@ -124,6 +124,7 @@ function BottomOffCanvas({ isVisible, id }) {
       setSelectedTabLocal(globalSelectedTab);
     }
   }, [globalSelectedTab]);
+
   const draggingRef = useRef(false);
   const startYRef = useRef(0);
   const startHeightRef = useRef(0);
@@ -169,38 +170,84 @@ function BottomOffCanvas({ isVisible, id }) {
     dispatch(setSelectedTab(k));
   };
 
+  // Compute available WMS tab keys based on layerInfo flags
+  const getAvailableWMSTabKeys = () => {
+    const keys = [];
+    if (layerInfo?.enable_get_map) keys.push('tab4'); // Get Map
+    if (layerInfo?.enable_chart_timeseries) {
+      keys.push('tab2'); // Timeseries
+      keys.push('tab5'); // Histogram
+    }
+    if (layerInfo?.enable_chart_table) keys.push('tab1'); // Tabular
+    keys.push('tab3'); // Download always available
+    return keys;
+  };
+
+  // Ensure selected tab exists among available WMS tabs when layer/flags change
+  useEffect(() => {
+    if (layerType === 'WMS') {
+      const available = getAvailableWMSTabKeys();
+      if (available.length > 0 && !available.includes(selectedTab)) {
+        setSelectedTabLocal(available[0]);
+        dispatch(setSelectedTab(available[0]));
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [layerType, layerInfo]);
+
   const renderTabsBasedOnLayerType = () => {
     switch (layerType) {
-      case 'WMS':
-        return (
-          <Tabs activeKey={selectedTab} onSelect={handleTabSelect} id="offcanvas-tabs" className="mb-3 custom-bottom-tabs">
-            <Tab eventKey="tab4" title="Get Map">
+      case 'WMS': {
+        const tabs = [];
+        if (layerInfo?.enable_get_map) {
+          tabs.push(
+            <Tab eventKey="tab4" title="Get Map" key="tab4">
               <DynamicImage height={height - 100} />
             </Tab>
-            <Tab eventKey="tab2" title="Timeseries">
+          );
+        }
+        if (layerInfo?.enable_chart_timeseries) {
+          tabs.push(
+            <Tab eventKey="tab2" title="Timeseries" key="tab2">
               <Timeseries height={height - 100} data={data} />
             </Tab>
-            <Tab eventKey="tab5" title="Histogram">
+          );
+          tabs.push(
+            <Tab eventKey="tab5" title="Histogram" key="tab5">
               <Histogram height={height - 100} data={data} />
             </Tab>
-            <Tab eventKey="tab1" title="Tabular">
+          );
+        }
+        if (layerInfo?.enable_chart_table) {
+          tabs.push(
+            <Tab eventKey="tab1" title="Tabular" key="tab1">
               <Tabular
                 labels={['Wind Speed', 'Wave Direction', 'Wave Height']}
                 dateCount={24}
               />
             </Tab>
-            <Tab eventKey="tab3" title="Download">
-              <Download/>
-            </Tab>
+          );
+        }
+        // Download tab remains visible
+        tabs.push(
+          <Tab eventKey="tab3" title="Download" key="tab3">
+            <Download/>
+          </Tab>
+        );
+
+        return (
+          <Tabs activeKey={selectedTab} onSelect={handleTabSelect} id="offcanvas-tabs" className="mb-3 custom-bottom-tabs">
+            {tabs}
           </Tabs>
         );
-      
+      }
+
       case 'WFS':
         return (
           <Tabs activeKey={selectedTab} onSelect={handleTabSelect} id="offcanvas-tabs" className="mb-3 custom-bottom-tabs">
-             <Tab eventKey="tab4" title="Timeseries">
-                <TimeseriesWfs height={height - 100} data={data} /> {/* Subtracting space for header */}
-              </Tab>
+            <Tab eventKey="tab4" title="Timeseries">
+              <TimeseriesWfs height={height - 100} data={data} />
+            </Tab>
           </Tabs>
         );
       
@@ -213,14 +260,14 @@ function BottomOffCanvas({ isVisible, id }) {
           </Tabs>
         );
 
-        case 'TIDE':
-          return (
-            <Tabs activeKey={selectedTab} onSelect={handleTabSelect} id="offcanvas-tabs" className="mb-3 custom-bottom-tabs">
-              <Tab eventKey="tab4" title="Tide Chart">
-                <TideImageComponent height={height - 100} data={data} /> 
-              </Tab>
-            </Tabs>
-          );
+      case 'TIDE':
+        return (
+          <Tabs activeKey={selectedTab} onSelect={handleTabSelect} id="offcanvas-tabs" className="mb-3 custom-bottom-tabs">
+            <Tab eventKey="tab4" title="Tide Chart">
+              <TideImageComponent height={height - 100} data={data} /> 
+            </Tab>
+          </Tabs>
+        );
       
       default:
         return null;
@@ -269,7 +316,7 @@ function BottomOffCanvas({ isVisible, id }) {
       </div>
 
       {/* Share Button */}
-  <Button
+      <Button
         onClick={handleShowShareModal}
         style={{
           position: 'absolute',
