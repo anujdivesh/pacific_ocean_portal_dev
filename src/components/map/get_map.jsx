@@ -4,7 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { useAppSelector, useAppDispatch } from '@/app/GlobalRedux/hooks'
 import '@/components/functions/L.TileLayer.BetterWMS';
-import { setCenter, setZoom, setBaseMapLayer,setEEZEnable,setCoastlineEnable,setCityNameEnable, setBounds } from '@/app/GlobalRedux/Features/map/mapSlice';
+import { setCenter, setZoom, setBaseMapLayer,setEEZEnable,setCoastlineEnable,setCityNameEnable, setBounds, setDataLimit } from '@/app/GlobalRedux/Features/map/mapSlice';
 import addWMSTileLayer from '../functions/addWMSTileLayer';
 import '@/components/css/legend.css';
 import { get_url } from '@/components/json/urls';
@@ -416,10 +416,10 @@ const MapBox = () => {
                 stationId: feature.properties.spotter_id // Add station ID to marker options
               });
               */
-
+              const displayName = feature.properties.display_name || feature.properties.spotter_id || "Unknown";
               const tooltipContent = `
                 <div style="min-width:120px;">
-                  <strong>${feature.properties.spotter_id || "Unknown"}</strong><br>
+                 <strong>${displayName}</strong><br>
                   Status: ${feature.properties.is_active === "TRUE" ? "Active" : "Inactive"}<br>
                   Owner: ${feature.properties.owner || "Unknown"}
                 </div>
@@ -433,7 +433,7 @@ const MapBox = () => {
 
               marker.bindPopup(`
                 <div>
-                  <strong>${feature.properties.spotter_id}</strong><br>
+                  <strong>${displayName}</strong><br>
                   Status: ${feature.properties.is_active === "TRUE" ? "Active" : "Inactive"}<br>
                   Owner: ${feature.properties.owner}
                 </div>
@@ -445,6 +445,8 @@ const MapBox = () => {
                  // try {
                  //   const isDataAvailable = await checkDataAvailability('SOFAR', feature.properties.spotter_id, id);
                  //   if (isDataAvailable) {
+                        // console.log("datalimit: " + feature.properties.data_limit);
+                        dispatch(setDataLimit(feature.properties.data_limit));
                         dispatch(setCoordinates({ 
                           x: feature.properties.owner,
                           y: feature.properties.is_active,
@@ -539,11 +541,13 @@ const MapBox = () => {
               coordinates: [lon, lat],
             },
             properties: {
-              spotter_id: entry.station_id || "Unknown",                  
+              spotter_id: entry.station_id || "Unknown",   
+              display_name: entry.display_name || null,        
               is_active: (entry.is_active ? String(entry.is_active).toUpperCase() : "FALSE"),
               owner: entry.owner || "Unknown",
               sensor: entry.type_value || "",
               type_id: entry.type_id || null,
+              data_limit: entry.data_limit || 100
             }
           };
         })
@@ -709,6 +713,8 @@ const MapBox = () => {
                             dispatch(setCoordinates({ x, y, sizex, sizey, bbox, station }));
                             // Use the active layer id to open the correct bottom canvas
                             dispatch(showoffCanvas(id));
+ 
+                        
                           // } else {
                           //   showNoDataAlert(`No data available for ${station}`);
                           // }
@@ -856,6 +862,8 @@ const MapBox = () => {
                        const bbox = null;
                        // const isDataAvailable = await checkDataAvailability('TIDE', station, id);
                        // if (isDataAvailable) {
+                      //  console.log("datalimit: "+ feature.properties.data_limit  )
+                       dispatch(setDataLimit(feature.properties.data_limit)); 
                             dispatch(setCoordinates({ x, y, sizex, sizey, bbox, station }));
              // Use the active layer id to open the correct bottom canvas
              dispatch(showoffCanvas(id));
