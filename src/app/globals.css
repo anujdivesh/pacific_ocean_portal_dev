@@ -100,6 +100,21 @@ body.dark-mode .dropdown-menu {
   border: 1px solid #6b7280 !important;
 }
 
+/* Dark mode select arrow styling - Force override Bootstrap defaults */
+body.dark-mode .form-select,
+body.dark-mode .form-select:focus,
+body.dark-mode .form-select:hover,
+body.dark-mode .form-select:active,
+body.dark-mode select.form-select,
+body.dark-mode select.form-select:focus,
+body.dark-mode select.form-select:hover,
+body.dark-mode select.form-select:active {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 0.75rem center !important;
+  background-size: 16px 12px !important;
+}
+
 body.dark-mode .accordion-item:not(.explore-modal .accordion-item) {
   border: 1px solid #6b7280 !important;
 }
@@ -998,6 +1013,13 @@ body.dark-mode .leaflet-control-zoom a:last-child { border-bottom: none !importa
 body.dark-mode .leaflet-control-zoom a:hover,
 body.dark-mode .leaflet-control-zoom a.leaflet-control-zoom-share:hover { background: var(--color-background) !important; }
 body.dark-mode .leaflet-control-zoom a.leaflet-control-zoom-share svg { fill: currentColor; }
+
+/* Hide zoom controls and share button in mobile mode */
+@media (max-width: 1004px) {
+  .leaflet-control-zoom {
+    display: none !important;
+  }
+}
 
 /* React DatePicker calendar icon dark mode override */
 body.dark-mode .react-datepicker__calendar-icon {

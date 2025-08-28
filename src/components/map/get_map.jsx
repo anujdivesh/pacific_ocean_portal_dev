@@ -1375,7 +1375,10 @@ const MapBox = () => {
         });
         
         // Initialize sections as expanded
-        basemapOptions.style.display = 'block';
+  basemapOptions.style.display = 'none';
+  // Set toggle icon to '+' when collapsed
+  const basemapToggleIcon = basemapTitle.querySelector('.toggle-icon');
+  if (basemapToggleIcon) basemapToggleIcon.textContent = '+';
         layerOptions.style.display = 'block';
       
         // Add event listeners to the radio buttons

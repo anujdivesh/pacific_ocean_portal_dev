@@ -2,7 +2,9 @@ import React, {useEffect } from 'react';
 import NestedAccordion from './nested_accordion';
 import { useAppSelector } from '@/app/GlobalRedux/hooks'
 function MyAccordion({dataset}) {
-    const accordion_val = useAppSelector((state) => state.accordion.value);
+  const accordion_val = useAppSelector((state) => state.accordion.value);
+  // Accept searchQuery as prop
+  const searchQuery = arguments[0]?.searchQuery || "";
 
     useEffect(() => {
         // This will run when the dataset changes
@@ -21,7 +23,7 @@ function MyAccordion({dataset}) {
     return (
       <div>
         {/* If dataset exists, render NestedAccordion */}
-        <NestedAccordion data={dataset} openIds={accordion_val} />
+        <NestedAccordion data={dataset} openIds={accordion_val} searchQuery={searchQuery} />
       </div>
     );
   }

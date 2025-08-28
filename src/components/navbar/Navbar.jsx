@@ -103,7 +103,7 @@ function Navigationbar({ children }) {
   // Helper function to get flag path by id
   function getCountryFlag(id) {
     const country = countriesxxx.find(c => c.id === Number(id));
-    if (!country) return null;
+    if (!country ||   country.short_name === 'PAC') return null;
     return `/flags/${country.short_name}.png`;
   }
 
@@ -167,6 +167,92 @@ function Navigationbar({ children }) {
     dispatch(toggleSidebar());
     document.body.classList.toggle("sb-sidenav-toggled");
   };
+
+  // Drag functionality for mobile sidebar - toggle collapse/expand
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStartPos, setDragStartPos] = useState({ y: 0 });
+
+  const handleMobileDragStart = (e) => {
+    // Only prevent default for mouse events, not touch events
+    if (e.type === 'mousedown') {
+      e.preventDefault();
+    }
+    setIsDragging(true);
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    setDragStartPos({ y: clientY });
+    document.body.style.cursor = 'row-resize';
+    document.body.style.userSelect = 'none';
+  };
+
+  const handleMobileDrag = (e) => {
+    if (!isDragging) return;
+    // Only prevent default for mouse events, not touch events
+    if (e.type === 'mousemove') {
+      e.preventDefault();
+    }
+    
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const deltaY = dragStartPos.y - clientY; // Inverted for mobile (drag up to expand)
+    
+    // If dragged up (positive delta), expand. If dragged down (negative delta), collapse
+    if (deltaY > 50 && sidebarCollapsed) {
+      // Expand sidebar
+      dispatch(toggleSidebar());
+      setIsDragging(false);
+    } else if (deltaY < -50 && !sidebarCollapsed) {
+      // Collapse sidebar
+      dispatch(toggleSidebar());
+      setIsDragging(false);
+    }
+  };
+
+  const handleMobileDragEnd = () => {
+    setIsDragging(false);
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+  };
+
+  // Add global mouse/touch event listeners for mobile drag
+  useEffect(() => {
+    const handleGlobalMouseMove = (e) => {
+      if (isDragging && window.innerWidth <= 1004) {
+        e.preventDefault();
+        handleMobileDrag(e);
+      }
+    };
+
+    const handleGlobalMouseUp = () => {
+      if (isDragging && window.innerWidth <= 1004) {
+        handleMobileDragEnd();
+      }
+    };
+
+    const handleGlobalTouchMove = (e) => {
+      if (isDragging && window.innerWidth <= 1004) {
+        // For touch events, we need to prevent default to stop scrolling
+        e.preventDefault();
+        handleMobileDrag(e);
+      }
+    };
+
+    const handleGlobalTouchEnd = (e) => {
+      if (isDragging && window.innerWidth <= 1004) {
+        handleMobileDragEnd();
+      }
+    };
+
+    document.addEventListener('mousemove', handleGlobalMouseMove);
+    document.addEventListener('mouseup', handleGlobalMouseUp);
+    document.addEventListener('touchmove', handleGlobalTouchMove, { passive: false });
+    document.addEventListener('touchend', handleGlobalTouchEnd);
+
+    return () => {
+      document.removeEventListener('mousemove', handleGlobalMouseMove);
+      document.removeEventListener('mouseup', handleGlobalMouseUp);
+      document.removeEventListener('touchmove', handleGlobalTouchMove);
+      document.removeEventListener('touchend', handleGlobalTouchEnd);
+    };
+  }, [isDragging, sidebarCollapsed, dragStartPos]);
 
   // Handle logout with map zoom reset
   const handleLogoutWithMapReset = async () => {
@@ -311,49 +397,51 @@ function Navigationbar({ children }) {
           zIndex: 1000,
         }}
       >
-        {/* Left: Flag, logo, and company name */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0px' }}> 
-          {/* Country Flag Display - moved further left and made bigger */}
-          {/* Show persisted selection for anonymous users, and auth country for logged-in users. */}
-          {(() => {
-            // Resolve which country id to show as a flag
-            // Priority: previewRegion (transient for logged-in preview) -> auth.userCountry -> persisted selectedRegion (anonymous)
-            let flagCountryId = null;
-            if (previewRegion) {
-              flagCountryId = previewRegion;
-            } else if (isLoggedin && userCountry) {
-              flagCountryId = userCountry;
-            } else {
-              // anonymous user: respect persisted selection in localStorage
-              const persisted = typeof window !== 'undefined' ? localStorage.getItem('selectedRegion') : null;
-              flagCountryId = persisted || null;
-            }
+                 {/* Left: Flag, logo, and company name */}
+         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}> 
+           {/* Country Flag Display - moved further left and made bigger */}
+           {/* Show persisted selection for anonymous users, and auth country for logged-in users. */}
+           {(() => {
+             // Resolve which country id to show as a flag
+             // Priority: previewRegion (transient for logged-in preview) -> auth.userCountry -> persisted selectedRegion (anonymous)
+             let flagCountryId = null;
+             if (previewRegion) {
+               flagCountryId = previewRegion;
+             } else if (isLoggedin && userCountry) {
+               flagCountryId = userCountry;
+             } else {
+               // anonymous user: respect persisted selection in localStorage
+               const persisted = typeof window !== 'undefined' ? localStorage.getItem('selectedRegion') : null;
+               flagCountryId = persisted || null;
+             }
 
-            if (!flagCountryId) return null;
-
-            return (
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                marginRight: '0px', // removed spacing between flag and logo
-                padding: '4px 4px'
-              }}>
-                <img 
-                  src={getCountryFlag(flagCountryId)}
-                  alt="Country flag"
-                  style={{
-                    width: '80%', // increased size
-                    height: 42, // increased size          
-                    objectFit: 'cover',
-                    // border: '1px solid rgba(0, 0, 0, 0.1)'
-                  }}
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                  }}
-                />
-              </div>
-            );
-          })()}
+             if (!flagCountryId) return null;
+             // If PAC, do not render anything
+             const flagSrc = getCountryFlag(flagCountryId);
+             if (!flagSrc) return null;
+             return (
+               <div style={{ 
+                 display: 'flex', 
+                 alignItems: 'center', 
+                 marginRight: '-27px', // Reduced spacing
+                 padding: '4px 4px'
+               }}>
+                 <img 
+                   src={flagSrc}
+                   alt="Country flag"
+                   style={{
+                     width: '80%', // increased size
+                     height: 42, // increased size          
+                     objectFit: 'cover',
+                     // border: '1px solid rgba(0, 0, 0, 0.1)'
+                   }}
+                   onError={(e) => {
+                     e.target.style.display = 'none';
+                   }}
+                 />
+               </div>
+             );
+           })()}
           <button
             onClick={toggleSidebar}
             style={{
@@ -395,7 +483,7 @@ function Navigationbar({ children }) {
           </li>
           <li>
             <Link className={pathname === "/dashboard" ? "active-nav nav-link" : "nav-link"} href="/dashboard" style={{textShadow: "0 0 0.5px rgba(255, 255, 255, 0.8)"}}>
-              Dashboard
+              Collection
             </Link>
           </li>
           <li>
@@ -815,7 +903,7 @@ function Navigationbar({ children }) {
               minHeight: 'calc(100vh - 60px)',
               display: 'flex',
               flexDirection: 'column',
-
+              
               alignItems: 'stretch',
               padding: '24px 0',
               position: 'relative',
@@ -918,16 +1006,46 @@ function Navigationbar({ children }) {
         </main>
       </div>
       
-      {/* Mobile Bottom Sidebar - only show on Explorer page (/) and mobile devices */}
-      {pathname === '/' && (
-        <div className="mobile-sidebar-container">
-          <button
-            onClick={handleToggleSidebar}
-            className="mobile-sidebar-toggle"
-            aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          >
-            <div className="toggle-handle"></div>
-          </button>
+             {/* Mobile Bottom Sidebar - only show on Explorer page (/) and mobile devices */}
+       {pathname === '/' && (
+         <div className="mobile-sidebar-container">
+           {/* Mobile drag handle */}
+           <div
+             className="mobile-drag-handle"
+             onMouseDown={handleMobileDragStart}
+             onTouchStart={handleMobileDragStart}
+             style={{
+               position: 'absolute',
+               top: 0,
+               left: 0,
+               right: 0,
+               height: '20px',
+               cursor: 'row-resize',
+               zIndex: 1029,
+               background: 'transparent',
+               display: 'flex',
+               alignItems: 'center',
+               justifyContent: 'center',
+             }}
+           >
+             <div
+               style={{
+                 width: '40px',
+                 height: '4px',
+                 background: 'var(--color-border)',
+                 borderRadius: '2px',
+                 opacity: 0.6,
+               }}
+             />
+           </div>
+
+           <button
+             onClick={handleToggleSidebar}
+             className="mobile-sidebar-toggle"
+             aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+           >
+             <div className="toggle-handle"></div>
+           </button>
           <aside
             className={`mobile-sidebar ${sidebarCollapsed ? 'collapsed' : 'expanded'}`}
             style={{
