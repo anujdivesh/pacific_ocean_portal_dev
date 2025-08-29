@@ -234,6 +234,11 @@ const NestedAccordion = ({ data, openIds, searchQuery = "" }) => {
         regularItems.push(item);
       }
     });
+    const stripBracketed = (s = '') =>
+  s
+    .replace(/\[(?:[^\[\]]*?)\]|\{(?:[^{}]*?)\}/g, '') // remove [...] and {...}
+    .replace(/\s{2,}/g, ' ') // collapse extra spaces
+    .trim();
 
     // Helper to highlight matches
     // const highlightStyle = { backgroundColor: '#fff59d' }; // Search highlighting disabled
@@ -277,7 +282,7 @@ const NestedAccordion = ({ data, openIds, searchQuery = "" }) => {
                           padding: '2px',
                         }}
                       >
-                        <div className="item">{contentItem.name.replace(/\[.*?\]/, '').trim()}</div>
+                        <div className="item">{stripBracketed(contentItem.name)}</div>
                         <div className="item">
                           {activeItemId === contentItem.id ? (
                             <IoMdCheckmarkCircleOutline size={22} style={{ cursor: 'pointer', color: 'green' }} />

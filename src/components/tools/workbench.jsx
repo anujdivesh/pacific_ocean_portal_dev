@@ -238,7 +238,13 @@ const MyWorkbench = () => {
               <li className="d-flex align-items-start mb-2">
                 <FaLightbulb className="me-2" style={{ color: '#cacacaff', marginTop: 4, minWidth: '16px' }} />
                 <span className="workbench-hints-text">
-                  Browse datasets by selecting "Explore map data."
+                  Select Country of Interest, Browse datasets by selecting "Explore map data."
+                </span>
+              </li>
+              <li className="d-flex align-items-start mb-2">
+                <FaLightbulb className="me-2" style={{ color: '#cacacaff', marginTop: 4, minWidth: '16px' }} />
+                <span className="workbench-hints-text">
+                 Select dataset and Click on "Add to Map"
                 </span>
               </li>
               <li className="d-flex align-items-start mb-2">
@@ -250,7 +256,7 @@ const MyWorkbench = () => {
               <li className="d-flex align-items-start mb-0">
                 <FaLightbulb className="me-2" style={{ color: '#cacacaff', marginTop: 4, minWidth: '16px' }} />
                 <span className="workbench-hints-text">
-                  You can share your current map view and configuration with others by clicking the Share button.
+                  You can Share your current map view and configuration with others by clicking the Share button.
                 </span>
               </li>
             </ul>

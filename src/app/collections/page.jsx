@@ -8,7 +8,7 @@ import { get_url } from '@/components/json/urls';
 import Link from 'next/link';
 // ================= END DEPRECATED WIDGET SECTION =================
 
-function Dashboard() {
+function Collections() {
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -301,4 +301,4 @@ function Dashboard() {
     );
 }
 
-export default Dashboard;
+export default Collections;

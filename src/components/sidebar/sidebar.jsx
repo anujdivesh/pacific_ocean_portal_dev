@@ -12,7 +12,7 @@ import { setBounds, setCenter, setZoom } from '@/app/GlobalRedux/Features/map/ma
 import SideOffCanvas from '../tools/side_offcanvas';
 import {  hideoffCanvas  } from '@/app/GlobalRedux/Features/offcanvas/offcanvasSlice';
 import { MdAddCircleOutline } from "react-icons/md";
-import { CgMoreO } from "react-icons/cg";
+import { CgMoreO,CgSearch,CgAdd } from "react-icons/cg";
 // import { FaSearch } from "react-icons/fa"; // COMMENTED OUT - no longer needed
 import { get_url } from '@/components/json/urls';
 import { setShortName } from "@/app/GlobalRedux/Features/country/countrySlice";
@@ -466,27 +466,48 @@ const SideBar = () => {
         style={{paddingTop:'10px', margin: '0', paddingLeft: '0', paddingRight: '0'}} 
         className="sidebar-row">
         <Col md={12} style={{ paddingLeft: '0', paddingRight: '0' }}>
-        <select
-        className="form-select w-100 region-select region-select-override"
-        aria-label="Select a region"
-        value={selectedRegion}
-        onChange={handleRegionChange}
-     
-       style={{  
-         borderRadius: '20px',
-         border: '1px solid rgb(58 59 62)',
-         fontSize: '0.875rem',
-         padding: '0.375rem 0.75rem',
-         backgroundColor: 'white',
-         color: '#212529'
-       }}
-      >
-        {regions.map((region) => (
-          <option key={region.id} value={region.id}>
-            {region.long_name}
-          </option>
-        ))}
-      </select>
+      <div style={{ position: 'relative', width: '100%' }}>
+  <span
+    aria-hidden="true"
+    style={{
+      position: 'absolute',
+      left: 10,
+      top: '50%',
+      transform: 'translateY(-50%)',
+      color: '#519ac2',
+      pointerEvents: 'none',
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 1
+    }}
+  >
+    <CgSearch size={16} />
+  </span>
+
+  <select
+    className="form-select w-100 region-select region-select-override"
+    aria-label="Select a region"
+    value={selectedRegion}
+    onChange={handleRegionChange}
+    style={{
+      borderRadius: '20px',
+      border: '1px solid rgb(58 59 62)',
+      fontSize: '0.875rem',
+      padding: '0.375rem 0.75rem',
+      paddingLeft: '32px', // space for the icon
+      backgroundColor: 'white',
+      color: '#212529',
+      width: '100%'
+    }}
+  >
+    {regions.map((region) => (
+      <option key={region.id} value={region.id}>
+        {region.long_name}
+      </option>
+    ))}
+  </select>
+</div>
         </Col>
         </Row>
 
@@ -578,7 +599,7 @@ const SideBar = () => {
                                       e.currentTarget.blur();
                                     }}
                                 >
-                                    <MdAddCircleOutline size={16}/>&nbsp;Explore Map Data
+                                    <MdAddCircleOutline size={18} style={{marginTop:-1}}/>&nbsp;Explore Map Data
                                 </Button>
                                 <Button
     variant="btn btn-sm rounded-pill"
@@ -596,7 +617,7 @@ const SideBar = () => {
     className="more-button"
     onClick={handleShowCanvas}
 >
-    <CgMoreO size={16} />&nbsp;More
+    <CgMoreO size={16} style={{marginTop:-1}}/>&nbsp;More
 </Button>
 
 

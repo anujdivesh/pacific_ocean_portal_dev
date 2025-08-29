@@ -26,7 +26,7 @@ const mapSlice = createSlice({
       url:"https://ocean-plotter.spc.int/plotter/proxy?url=https://geonode.pacificdata.org/geoserver/gwc/service/tms/1.0.0/geonode:pac_coastline@EPSG:3857@pbf/{z}/{x}/{-y}.png",
       //url:"https://geonode.pacificdata.org/geoserver/geonode/pac_coastline/ows",
       //url: get_url('geowebcache')+'/coastline/geonode/pac_coastline/ows',
-      layer: 'geonode:pac_coastline',
+      layer: 'geonode:pacific_coastlines',
     },
     citynamesoverlay: {
       url:"https://ocean-plotter.spc.int/plotter/proxy?url=https://geonode.pacificdata.org/geoserver/gwc/service/tms/1.0.0/geonode:pac_city_names@EPSG:3857@pbf/{z}/{x}/{-y}.png",

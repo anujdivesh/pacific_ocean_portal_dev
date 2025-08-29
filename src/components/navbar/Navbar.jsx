@@ -482,8 +482,8 @@ function Navigationbar({ children }) {
             </Link>
           </li>
           <li>
-            <Link className={pathname === "/dashboard" ? "active-nav nav-link" : "nav-link"} href="/dashboard" style={{textShadow: "0 0 0.5px rgba(255, 255, 255, 0.8)"}}>
-              Collection
+            <Link className={pathname === "/collections" ? "active-nav nav-link" : "nav-link"} href="/collections" style={{textShadow: "0 0 0.5px rgba(255, 255, 255, 0.8)"}}>
+              Collections
             </Link>
           </li>
           <li>
@@ -633,11 +633,11 @@ function Navigationbar({ children }) {
             </li>
             <li style={{ marginBottom: '0.5rem' }}>
               <Link 
-                className={pathname === "/dashboard" ? "active-nav nav-link-mobile" : "nav-link-mobile"} 
-                href="/dashboard"
+                className={pathname === "/collections" ? "active-nav nav-link-mobile" : "nav-link-mobile"} 
+                href="/collections"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Dashboard
+                Collections
               </Link>
             </li>
             <li style={{ marginBottom: '0.5rem' }}>

@@ -7,6 +7,7 @@ import { get_url } from '@/components/json/urls';
 import { useAppSelector } from "@/app/GlobalRedux/hooks";
 import { FaRegCircle, FaDotCircle } from 'react-icons/fa';
 //import '@/components/css/modal.css'; // Import your CSS file
+import { CgSearch } from 'react-icons/cg';
 
 const ExploreModal = ({ show, onClose, title, bodyContent }) => {
   const [theme, setTheme] = useState([]);
@@ -197,23 +198,45 @@ const ExploreModal = ({ show, onClose, title, bodyContent }) => {
         <Modal.Header closeButton className="custom-header2" style={{ background: '#519ac2',  paddingTop: '8px', paddingBottom: '8px', minHeight: 'unset', color: '#ffffff' }}>
           <Modal.Title style={{ fontSize: '18px', color:'#ffffff' }}>
             {/* Search input */}
-            <input
-              type="text"
-              placeholder="Search datasets..."
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              style={{
-                marginRight: '12px',
-                padding: '6px',
-                borderRadius: '20px',
-                border: 'none',
-                outline: 'none',
-                fontSize: '14px',
-                width: '200px',
-                color: '#519ac2',
-                backgroundColor: '#ffffff',
-              }}
-            />
+           <div style={{ position: 'relative', display: 'inline-block' }}>
+      <span
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          left: 10,
+          top: '50%',
+          transform: 'translateY(-50%)',
+          color: '#519ac2',
+          pointerEvents: 'none',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <CgSearch size={16} />
+      </span>
+
+      <input
+        type="text"
+        placeholder="Search datasets..."
+        value={searchQuery}
+        onChange={e => setSearchQuery(e.target.value)}
+        onKeyDown={e => {
+          if (e.key === 'Enter') onSubmit?.();
+        }}
+        style={{
+          marginRight: '12px',
+          padding: '6px 10px 6px 32px', // left padding for icon
+          borderRadius: '20px',
+          border: 'none',
+          outline: 'none',
+          fontSize: '14px',
+          width: '200px',
+          color: '#519ac2',
+          backgroundColor: '#ffffff',
+        }}
+      />
+    </div>
             {/* Render the theme buttons */}
             {theme.map((themeItem) => (
               <button

@@ -25,13 +25,19 @@ function AccordionMetadata() {
         );
     }
 
+    const stripBracketed = (s = '') =>
+  s
+    .replace(/\[(?:[^\[\]]*?)\]|\{(?:[^{}]*?)\}/g, '') // remove [...] and {...}
+    .replace(/\s{2,}/g, ' ') // collapse extra spaces
+    .trim();
+
     return (
         <div style={{ margin: 0, padding: 0 }}>
             <div style={{ margin: 0, padding: 0 }}>
                 <SmallMap currentDataset={dataset_list} />
             </div>
             <div className="mt-3" style={{ backgroundColor: '#ffffff', padding: '15px', borderRadius: 0 }}>
-                <div className="fw-bold mb-2 mr-2" style={{marginLeft: '10px'}}>{dataset_list.name.replace(/\[.*?\]/g, '').trim()}</div>
+                <div className="fw-bold mb-2 mr-2" style={{marginLeft: '10px'}}>{stripBracketed(dataset_list.name)}</div>
                 <div className="mb-3  mr-2" style={{marginLeft: '10px'}}>{dataset_list.copyright}</div>
                 {dataset_list.metadata_one_id !== "" && (
                     <Accordion className="mb-2" defaultActiveKey="1" style={{ borderRadius: 0 }}>
