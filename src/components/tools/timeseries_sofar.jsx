@@ -29,10 +29,14 @@ function TimeseriesSofar({ height }) {
     labels: [],
     datasets: [],
   });
+  const dataLimitFromRedux = useAppSelector((state) => state.mapbox.dataLimit);
   const [isLoading, setIsLoading] = useState(false);
   const [enabledChart, setEnabledChart] = useState(true);
   const [liveMode, setLiveMode] = useState(false);
-  const [dataLimit, setDataLimit] = useState(100);
+  const [dataLimit, setDataLimit] = useState(() => {
+    console.log('Initial dataLimitFromRedux:', dataLimitFromRedux);
+    return dataLimitFromRedux || 100;
+  });
   // Separate date and time controls for better control over defaults
   const [startDate, setStartDate] = useState("");
   const [startTime, setStartTime] = useState("00:00");
@@ -81,7 +85,12 @@ function TimeseriesSofar({ height }) {
       }
     }
   }, [chartData.labels, dataLimit]); // Re-run when chart data or data limit changes
-
+  useEffect(() => {
+    if (dataLimitFromRedux && dataLimitFromRedux !== dataLimit) {
+      console.log('Updating dataLimit from Redux:', dataLimitFromRedux);
+      setDataLimit(dataLimitFromRedux);
+    }
+  }, [dataLimitFromRedux]);
   const isCoordinatesValid = station !== null;
   const isActive = y === 'TRUE';
 
