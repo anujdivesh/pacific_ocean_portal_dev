@@ -154,7 +154,13 @@ function TimeseriesWfs({ height }) {
           alignItems: 'center',
         }}>
         
-        <p style={{ fontSize: 16, color: '#333' }}>Please select a station to view data.</p>
+    <p 
+                style={{ fontSize: 16, 
+                color: (typeof document !== 'undefined' &&
+                        document.body.classList.contains('dark-mode')) ? '#fff' : '#333' 
+                      }}>
+                        Please select a station to view data.
+    </p>
         </div>
       );
   }

@@ -1,18 +1,80 @@
 
+
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Accordion, Spinner } from 'react-bootstrap';
-//import '@/components/css/accordion.css';
-// import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { IoMdAddCircleOutline, IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { useAppDispatch } from '@/app/GlobalRedux/hooks';
 import { setDataset } from '@/app/GlobalRedux/Features/dataset/dataSlice';
 import { setAccordion } from '@/app/GlobalRedux/Features/accordion/accordionSlice';
 
-const NestedAccordion = ({ data, openIds }) => {
+const NestedAccordion = ({ data, openIds, searchQuery = "" }) => {
+  // Lowercase searchQuery for matching
+  const normalizedSearch = searchQuery.toLowerCase();
+
+  // Filter function for search, also collect first match for auto-expand
+  let firstMatchId = null;
+  const filterData = (items) => {
+    if (!normalizedSearch) return items;
+    return items
+      .map(item => {
+        let filteredContent = item.content ? item.content.filter(ci => {
+          const match = ci.name.toLowerCase().includes(normalizedSearch);
+          if (match && !firstMatchId) firstMatchId = ci.id;
+          return match;
+        }) : [];
+        let filteredChildren = item.children ? filterData(item.children) : [];
+        const itemMatch = item.display_title?.toLowerCase().includes(normalizedSearch);
+        if (itemMatch && !firstMatchId) firstMatchId = item.id;
+        if (itemMatch || filteredContent.length > 0 || filteredChildren.length > 0) {
+          return {
+            ...item,
+            content: filteredContent,
+            children: filteredChildren
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
+  };
+
+  const filteredData = filterData(data);
+
+  // Helper to compute grouped labels for expansion
+  const groupedLabels = React.useMemo(() => {
+    if (!filteredData) return [];
+    const labels = [];
+    const collectLabels = (items) => {
+      items.forEach(item => {
+        if (item.content && item.content.length > 0) {
+          item.content.forEach(ci => {
+            const match = normalizedSearch && ci.name.toLowerCase().includes(normalizedSearch);
+            if (match && ci.name.match(/\[(.*?)\]/)) {
+              const label = ci.name.match(/\[(.*?)\]/)[1].trim();
+              labels.push(label);
+            }
+          });
+        }
+        if (item.children && item.children.length > 0) {
+          collectLabels(item.children);
+        }
+      });
+    };
+    collectLabels(filteredData);
+    return labels;
+  }, [filteredData, normalizedSearch]);
+
+  // Auto-expand grouped accordions if a match is found in the group when searching
+  useEffect(() => {
+    if (normalizedSearch && groupedLabels.length > 0) {
+      setSstAccordionOpen(groupedLabels[0]);
+    }
+  }, [normalizedSearch, groupedLabels]);
+
   const dispatch = useAppDispatch();
   const [activeItemId, setActiveItemId] = useState(null);
-  const [sstAccordionOpen, setSstAccordionOpen] = useState(null); // now tracks label string instead of true/false
+  const [sstAccordionOpen, setSstAccordionOpen] = useState(null);
+  const [manuallyOpenedAccordions, setManuallyOpenedAccordions] = useState(new Set());
 
   const findPathToRoot = (node, targetId) => {
     if (node.content && node.content.some(item => item.id === targetId)) {
@@ -61,46 +123,90 @@ const NestedAccordion = ({ data, openIds }) => {
     }
   };
 
-  const getActiveKeys = (items, openIds) => {
-    const activeKeys = [];
-    if (openIds === '0') {
-      activeKeys.push('0');
-    } else {
-      const findActiveKeys = (items, targetId) => {
-        items.forEach((item) => {
-          if (item.id === targetId) {
-            activeKeys.push(item.id);
-          }
-          if (item.children && item.children.length > 0) {
-            if (item.children.some(child => child.id === targetId)) {
-              activeKeys.push(item.id);
-              activeKeys.push(targetId);
-            } else {
-              findActiveKeys(item.children, targetId);
-            }
-          }
-        });
-      };
-      findActiveKeys(items, openIds);
-    }
-    return Array.from(new Set(activeKeys));
+  // Handle manual accordion expansion/collapse
+  const handleAccordionToggle = (accordionId) => {
+    setManuallyOpenedAccordions(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(accordionId)) {
+        newSet.delete(accordionId);
+      } else {
+        newSet.add(accordionId);
+      }
+      return newSet;
+    });
   };
 
+  // Helper to find all parent accordion IDs that contain search results
+  const findSearchResultParents = (items) => {
+    const parentIds = new Set();
+    
+    const traverse = (items) => {
+      items.forEach(item => {
+        let hasSearchResults = false;
+        
+        // Check if this item's content has search results
+        if (item.content && item.content.length > 0) {
+          hasSearchResults = true;
+        }
+        
+        // Check if this item's title matches search
+        if (item.display_title?.toLowerCase().includes(normalizedSearch)) {
+          hasSearchResults = true;
+        }
+        
+        // Check children recursively
+        if (item.children && item.children.length > 0) {
+          const childHasResults = traverse(item.children);
+          if (childHasResults) {
+            hasSearchResults = true;
+          }
+        }
+        
+        if (hasSearchResults) {
+          parentIds.add(item.id);
+        }
+        
+        return hasSearchResults;
+      });
+    };
+    
+    traverse(items);
+    return Array.from(parentIds);
+  };
+
+  // Calculate activeKeys for accordion expansion
   let activeKeys = [];
-  if (data.length !== 0) {
-    // First try to use openIds if provided
+  
+  if (normalizedSearch && filteredData.length > 0) {
+    // When searching, expand all parent accordions that contain search results
+    const searchResultParents = findSearchResultParents(filteredData);
+    activeKeys = [...searchResultParents, ...manuallyOpenedAccordions];
+  } else if (data.length !== 0) {
+    // Normal behavior when not searching
     if (openIds !== '') {
-      activeKeys = findIdsPath(data, openIds);
-    }
-    // If no openIds or no path found, try to use activeItemId
-    if ((!activeKeys || activeKeys.length === 0) && activeItemId) {
-      activeKeys = findIdsPath(data, activeItemId);
-    }
-    if (activeKeys && activeKeys.length !== 0) {
-      activeKeys.shift();
-      activeKeys = activeKeys.reverse();
+      const pathKeys = findIdsPath(data, openIds);
+      if (pathKeys && pathKeys.length > 0) {
+        pathKeys.shift();
+        activeKeys = [...pathKeys.reverse(), ...manuallyOpenedAccordions];
+      }
+    } else if (activeItemId) {
+      const pathKeys = findIdsPath(data, activeItemId);
+      if (pathKeys && pathKeys.length > 0) {
+        pathKeys.shift();
+        activeKeys = [...pathKeys.reverse(), ...manuallyOpenedAccordions];
+      }
+    } else {
+      activeKeys = [...manuallyOpenedAccordions];
     }
   }
+
+  // Auto-expand all levels for first match when searching
+  React.useEffect(() => {
+    if (normalizedSearch && firstMatchId) {
+      // Don't automatically select the first match when searching
+      // setActiveItemId(firstMatchId);
+    }
+  }, [normalizedSearch, firstMatchId]);
 
   const countItems = (item) => {
     let count = item.content ? item.content.length : 0;
@@ -128,6 +234,14 @@ const NestedAccordion = ({ data, openIds }) => {
         regularItems.push(item);
       }
     });
+    const stripBracketed = (s = '') =>
+  s
+    .replace(/\[(?:[^\[\]]*?)\]|\{(?:[^{}]*?)\}/g, '') // remove [...] and {...}
+    .replace(/\s{2,}/g, ' ') // collapse extra spaces
+    .trim();
+
+    // Helper to highlight matches
+    // const highlightStyle = { backgroundColor: '#fff59d' }; // Search highlighting disabled
 
     return (
       <>
@@ -135,47 +249,50 @@ const NestedAccordion = ({ data, openIds }) => {
         {Object.entries(grouped).map(([label, items]) => (
           <div key={label} className="sst-accordion-wrapper">
             <Accordion
-              activeKey={sstAccordionOpen === label ? label : ''}
+              activeKey={normalizedSearch ? label : (sstAccordionOpen === label ? label : '')}
               onSelect={() => setSstAccordionOpen(sstAccordionOpen === label ? null : label)}
               flush
               style={{ '--bs-accordion-border-radius': '0', '--bs-accordion-inner-border-radius': '0' }}
             >
-                             <Accordion.Item 
-                 eventKey={label}
-                 style={{ 
-                   borderRadius: 0, 
-                   padding: 2, 
-                   borderRight: '1px solid #ccc', 
-                   borderBottom: '1px solid #ccc',
-                 }}
-               >
+              <Accordion.Item 
+                eventKey={label}
+                style={{ 
+                  borderRadius: 0, 
+                  padding: 2, 
+                  borderRight: '1px solid #ccc', 
+                  borderBottom: '1px solid #ccc',
+                }}
+              >
                 <Accordion.Header onClick={(e) => e.currentTarget.blur()} style={{ borderRadius: 0 }}>
                   {label}
                   <span className="badge bg-light text-dark ms-2">{items.length}</span>
                 </Accordion.Header>
                 <Accordion.Body style={{ paddingLeft: 20, paddingRight: 0, backgroundColor: '#ffffff' }}>
-                  {items.map((contentItem, itemIndex) => (
-                    <div
-                      className={`flex-container ${activeItemId === contentItem.id ? 'active' : ''}`}
-                      key={`${contentItem.id}-${itemIndex}`}
-                      onClick={() => handleClick(contentItem)}
-                      style={{
-                        cursor: 'pointer',
-                        backgroundColor: activeItemId === contentItem.id ? '#d3f4ff' : 'transparent',
-                        borderRadius: 0,
-                        padding: '2px',
-                      }}
-                    >
-                      <div className="item">{contentItem.name.replace(/\[.*?\]/, '').trim()}</div>
-                      <div className="item">
-                        {activeItemId === contentItem.id ? (
-                          <IoMdCheckmarkCircleOutline size={22} style={{ cursor: 'pointer', color: 'green' }} />
-                        ) : (
-                          <IoMdAddCircleOutline size={22} style={{ cursor: 'pointer' }} />
-                        )}
+                  {items.map((contentItem, itemIndex) => {
+                    const isMatch = normalizedSearch && contentItem.name.toLowerCase().includes(normalizedSearch);
+                    return (
+                      <div
+                        className={`flex-container ${activeItemId === contentItem.id ? 'active' : ''}`}
+                        key={`${contentItem.id}-${itemIndex}`}
+                        onClick={() => handleClick(contentItem)}
+                        style={{
+                          cursor: 'pointer',
+                          backgroundColor: activeItemId === contentItem.id ? '#d3f4ff' : 'transparent', // Search highlighting disabled
+                          borderRadius: 0,
+                          padding: '2px',
+                        }}
+                      >
+                        <div className="item">{stripBracketed(contentItem.name)}</div>
+                        <div className="item">
+                          {activeItemId === contentItem.id ? (
+                            <IoMdCheckmarkCircleOutline size={22} style={{ cursor: 'pointer', color: 'green' }} />
+                          ) : (
+                            <IoMdAddCircleOutline size={22} style={{ cursor: 'pointer' }} />
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </Accordion.Body>
               </Accordion.Item>
             </Accordion>
@@ -183,29 +300,32 @@ const NestedAccordion = ({ data, openIds }) => {
         ))}
 
         {/* Render regular items */}
-        {regularItems.map((contentItem, itemIndex) => (
-          <div
-            className={`flex-container ${activeItemId === contentItem.id ? 'active' : ''}`}
-            key={`${contentItem.id}-${itemIndex}`}
-            onClick={() => handleClick(contentItem)}
-            style={{
-              cursor: 'pointer',
-              backgroundColor: activeItemId === contentItem.id ? '#d3f4ff' : 'transparent',
-              borderRadius: 0,
-              padding: '2px',
-              marginTop: '2px'
-            }}
-          >
-            <div className="item">{contentItem.name}</div>
-            <div className="item">
-              {activeItemId === contentItem.id ? (
-                <IoMdCheckmarkCircleOutline size={22} style={{ cursor: 'pointer', color: 'green' }} />
-              ) : (
-                <IoMdAddCircleOutline size={22} style={{ cursor: 'pointer' }} />
-              )}
+        {regularItems.map((contentItem, itemIndex) => {
+          const isMatch = normalizedSearch && contentItem.name.toLowerCase().includes(normalizedSearch);
+          return (
+            <div
+              className={`flex-container ${activeItemId === contentItem.id ? 'active' : ''}`}
+              key={`${contentItem.id}-${itemIndex}`}
+              onClick={() => handleClick(contentItem)}
+              style={{
+                cursor: 'pointer',
+                backgroundColor: activeItemId === contentItem.id ? '#d3f4ff' : 'transparent', // Search highlighting disabled
+                borderRadius: 0,
+                padding: '2px',
+                marginTop: '2px'
+              }}
+            >
+              <div className="item">{contentItem.name}</div>
+              <div className="item">
+                {activeItemId === contentItem.id ? (
+                  <IoMdCheckmarkCircleOutline size={22} style={{ cursor: 'pointer', color: 'green' }} />
+                ) : (
+                  <IoMdAddCircleOutline size={22} style={{ cursor: 'pointer' }} />
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </>
     );
   };
@@ -217,18 +337,18 @@ const NestedAccordion = ({ data, openIds }) => {
         : [];
 
       return (
-                 <Accordion.Item eventKey={item.id} key={`${item.id}-${index}`} style={{ borderRadius: '0 !important', padding: 2, borderRight: '1px solid #ccc', borderBottom: '1px solid #ccc' }}>
+        <Accordion.Item eventKey={item.id} key={`${item.id}-${index}`} style={{ borderRadius: '0 !important', padding: 2, borderRight: '1px solid #ccc', borderBottom: '1px solid #ccc' }}>
           <Accordion.Header onClick={(e) => e.currentTarget.blur()} style={{ borderRadius: 0 }}>
             {item.display_title} 
             <span className="badge bg-light text-dark ms-2">
-              {countItems(item)}
+              {countItems(item)} 
             </span>
           </Accordion.Header>
           <Accordion.Body style={{ paddingLeft: 20, paddingRight: 0, backgroundColor: '#ffffff', borderRadius: 0 }}>
             {renderContentItems(sortedContent, item.id)}
             {item.children && item.children.length > 0 && (
-              <Accordion flush defaultActiveKey={activeKeys} style={{ '--bs-accordion-border-radius': '0', '--bs-accordion-inner-border-radius': '0' }}>
-                {renderAccordionItems(item.children)}
+              <Accordion flush activeKey={activeKeys} onSelect={handleAccordionToggle} style={{ '--bs-accordion-border-radius': '0', '--bs-accordion-inner-border-radius': '0' }}>
+                {renderAccordionItems(item.children)} 
               </Accordion>
             )}
           </Accordion.Body>
@@ -239,12 +359,12 @@ const NestedAccordion = ({ data, openIds }) => {
 
   return (
     <>
-      {data.length === 0 ? (
-        <Spinner animation="border" variant="primary" style={{ marginLeft: 150, marginTop: 50 }} />
+      {filteredData.length === 0 ? (
+        <div style={{padding:120}}>No results found.</div>
       ) : (
         <div className="nested-accordion">
-          <Accordion flush defaultActiveKey={activeKeys}>
-            {renderAccordionItems(data)}
+          <Accordion flush activeKey={activeKeys} onSelect={handleAccordionToggle}>
+            {renderAccordionItems(filteredData)}
           </Accordion>
         </div>
       )}

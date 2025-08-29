@@ -1,17 +1,22 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button, Modal, Form, Alert, Spinner } from 'react-bootstrap';
 import { useAppSelector } from '@/app/GlobalRedux/hooks';
-import { FaShare, FaCopy, FaLink } from 'react-icons/fa';
+import { FaCopy, FaLink, FaCompress } from 'react-icons/fa';
+import GetMapIcon from '@/components/icons/GetMapIcon';
 import { get_url } from '@/components/json/urls';
 import LZString from 'lz-string';
 
 const ShareWorkbench = ({ show, onHide }) => {
   const [shareUrl, setShareUrl] = useState('');
+  const [shortenedUrl, setShortenedUrl] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isShortening, setIsShortening] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [error, setError] = useState('');
+  // Only auto-shorten very long URLs above this length
+  const AUTO_SHORTEN_THRESHOLD = 2000;
   
   // Get current workbench state from Redux
   const mapLayers = useAppSelector((state) => state.mapbox.layers);
@@ -21,6 +26,7 @@ const ShareWorkbench = ({ show, onHide }) => {
   const isOffCanvasVisible = useAppSelector((state) => state.offcanvas.isVisible);
   const currentOffCanvasId = useAppSelector((state) => state.offcanvas.currentId);
   const selectedRegion = useAppSelector((state) => state.country.short_name);
+  const selectedTabKey = useAppSelector((state) => state.offcanvas.selectedTabKey);
   const selectedCoordinates = useAppSelector((state) => state.coordinate.coordinates);
 
   // Generate fresh link when modal opens
@@ -28,16 +34,29 @@ const ShareWorkbench = ({ show, onHide }) => {
     if (show && mapLayers.length > 0) {
       // Clear previous URL and generate fresh one
       setShareUrl('');
+      setShortenedUrl('');
       setError('');
       setIsCopied(false);
-      generateShareUrl();
+      // Defer heavy work so the modal can paint and remain responsive.
+      const t = setTimeout(() => {
+        generateShareUrl();
+      }, 50);
+      return () => clearTimeout(t);
     } else if (!show) {
       // Clear URL when modal closes
       setShareUrl('');
+      setShortenedUrl('');
       setError('');
       setIsCopied(false);
     }
   }, [show]);
+
+  // Track mounted state to avoid setting state after unmount
+  const isMounted = useRef(true);
+  useEffect(() => {
+    isMounted.current = true;
+    return () => { isMounted.current = false; };
+  }, []);
 
   const generateShareUrl = async () => {
     if (mapLayers.length === 0) {
@@ -51,48 +70,75 @@ const ShareWorkbench = ({ show, onHide }) => {
     try {
       // Prepare the workbench state for sharing
       const workbenchState = {
-                 layers: mapLayers.map(layer => {
-           // Only save essential layer information to reduce URL size
+                          layers: mapLayers.map(layer => {
+            // Only save essential layer information to reduce URL size
+           console.log(`Original layer data for ${layer.id}:`, {
+             interval_step: layer.layer_information.interval_step,
+             timeIntervalStartOriginal: layer.layer_information.timeIntervalStartOriginal,
+             timeIntervalEndOriginal: layer.layer_information.timeIntervalEndOriginal,
+             period: layer.layer_information.period,
+             enable_get_map: layer.layer_information.enable_get_map
+           });
            const layerState = {
-             id: layer.id,
-             // Only save essential layer_information fields
-             layer_information: {
-               id: layer.layer_information.id,
-               layer_title: layer.layer_information.layer_title,
-               layer_type: layer.layer_information.layer_type,
-               url: layer.layer_information.url,
-               enabled: layer.layer_information?.enabled || false,
-               selectedSofarTypes: layer.layer_information?.selectedSofarTypes || [],
-               // Add properties needed by date_selector and other components
-               specific_timestemps: layer.layer_information.specific_timestemps || null,
-               interval_step: layer.layer_information.interval_step || null,
-               timeIntervalStart: layer.layer_information.timeIntervalStart || null,
-               timeIntervalEnd: layer.layer_information.timeIntervalEnd || null,
-               is_timeseries: layer.layer_information.is_timeseries || false,
-               is_composite: layer.layer_information.is_composite || false,
-               layer_name: layer.layer_information.layer_name || '',
-               style: layer.layer_information.style || '',
-               opacity: layer.layer_information.opacity || 1,
-               colormin: layer.layer_information.colormin || 0,
-               colormax: layer.layer_information.colormax || 1,
-               abovemaxcolor: layer.layer_information.abovemaxcolor || 'extend',
-               belowmincolor: layer.layer_information.belowmincolor || 'transparent',
-               numcolorbands: layer.layer_information.numcolorbands || 250,
-               logscale: layer.layer_information.logscale || false,
-               zoomToLayer: layer.layer_information.zoomToLayer || false,
-             },
-             enabled: layer.layer_information?.enabled || false,
-             opacity: layer.opacity || 1,
-             selectedSofarTypes: layer.layer_information?.selectedSofarTypes || [],
-           };
+            id: layer.id,
+            // Save a curated set of layer_information fields to avoid reintroducing
+            // any very large nested properties (tile data, large arrays, etc.).
+            layer_information: {
+              id: layer.layer_information.id,
+              layer_title: layer.layer_information.layer_title,
+              layer_type: layer.layer_information.layer_type,
+              url: layer.layer_information.url,
+              // Legend image URL so legends restore correctly from shared links
+              legend_url: layer.layer_information.legend_url || null,
+              enabled: layer.layer_information?.enabled || false,
+              selectedSofarTypes: layer.layer_information?.selectedSofarTypes || [],
+              // Date and time properties
+              specific_timestemps: layer.layer_information.specific_timestemps || null,
+              interval_step: layer.layer_information.interval_step || null,
+              period: layer.layer_information.period || null,
+              timeIntervalStart: layer.layer_information.timeIntervalStart || null,
+              timeIntervalEnd: layer.layer_information.timeIntervalEnd || null,
+              timeIntervalStartOriginal: layer.layer_information.timeIntervalStartOriginal || null,
+              timeIntervalEndOriginal: layer.layer_information.timeIntervalEndOriginal || null,
+              is_timeseries: layer.layer_information.is_timeseries || false,
+              is_composite: layer.layer_information.is_composite || false,
+              // Layer properties
+              layer_name: layer.layer_information.layer_name || '',
+              style: layer.layer_information.style || '',
+              opacity: layer.layer_information.opacity || 1,
+              // Color scale properties
+              colormin: layer.layer_information.colormin || 0,
+              colormax: layer.layer_information.colormax || 1,
+              abovemaxcolor: layer.layer_information.abovemaxcolor || 'extend',
+              belowmincolor: layer.layer_information.belowmincolor || 'transparent',
+              numcolorbands: layer.layer_information.numcolorbands || 250,
+              logscale: layer.layer_information.logscale || false,
+              // Map properties
+              zoomToLayer: layer.layer_information.zoomToLayer || false,
+              // Additional properties that might be needed
+              datetime_format: layer.layer_information.datetime_format || null,
+              restricted: layer.layer_information.restricted || false,
+              timeseries_url: layer.layer_information.timeseries_url || null,
+              composite_layer_id: layer.layer_information.composite_layer_id || null,
+              enable_get_map: layer.layer_information.enable_get_map || false,
+            },
+            enabled: layer.layer_information?.enabled || false,
+            opacity: layer.opacity || 1,
+            selectedSofarTypes: layer.layer_information?.selectedSofarTypes || [],
+          };
           
-          // console.log(`Sharing layer:`, {
-          //   id: layerState.id,
-          //   title: layerState.layer_information.layer_title,
-          //   type: layerState.layer_information.layer_type,
-          //   enabled: layerState.enabled,
-          //   selectedSofarTypes: layerState.selectedSofarTypes
-          // });
+                     console.log(`Sharing layer:`, {
+             id: layerState.id,
+             title: layerState.layer_information.layer_title,
+             type: layerState.layer_information.layer_type,
+             enabled: layerState.layer_information.enabled,
+             enable_get_map: layerState.layer_information.enable_get_map,
+             period: layerState.layer_information.period,
+             interval_step: layerState.layer_information.interval_step,
+             timeIntervalStartOriginal: layerState.layer_information.timeIntervalStartOriginal,
+             timeIntervalEndOriginal: layerState.layer_information.timeIntervalEndOriginal,
+             selectedSofarTypes: layerState.selectedSofarTypes
+           });
           
           // console.log(`Sharing coordinates:`, selectedCoordinates);
           
@@ -106,14 +152,15 @@ const ShareWorkbench = ({ show, onHide }) => {
         offCanvas: {
           isVisible: isOffCanvasVisible,
           currentId: currentOffCanvasId,
+          selectedTabKey: selectedTabKey || 'tab4',
         },
         coordinates: selectedCoordinates,
         region: selectedRegion,
         timestamp: new Date().toISOString(),
       };
 
-      // Compress and encode the workbench state
-      const compressedState = await compressWorkbenchState(workbenchState);
+  // Compress and encode the workbench state (non-blocking)
+  const compressedState = await compressWorkbenchState(workbenchState);
       
              // Check if the URL would be too long (browsers have URL length limits)
        const baseUrl = window.location.origin + window.location.pathname;
@@ -126,7 +173,27 @@ const ShareWorkbench = ({ show, onHide }) => {
          return;
        }
       
-      setShareUrl(url);
+  // If URL is very long, trigger auto-shortening in background to avoid
+  // blocking the UI. We set a local flag so the UI can show a spinner
+  // if desired while the shortener runs.
+  if (isMounted.current) setShareUrl(url);
+      if (url.length > AUTO_SHORTEN_THRESHOLD) {
+        if (isMounted.current) setIsShortening(true);
+        // Fire-and-forget the network shortening so the modal remains responsive
+        shortenUrlDirect(url).then((short) => {
+          if (!isMounted.current) return;
+          if (short) {
+            setShortenedUrl(short);
+            console.log('Auto-shortened share URL:', short);
+          } else {
+            console.warn('Auto-shortening failed; URL remains long.');
+          }
+        }).catch((err) => {
+          console.error('Auto-shortening error:', err);
+        }).finally(() => {
+          if (isMounted.current) setIsShortening(false);
+        });
+      }
       // console.log('Share link generated successfully!');
     } catch (err) {
       setError('Failed to generate share URL. Please try again.');
@@ -138,26 +205,89 @@ const ShareWorkbench = ({ show, onHide }) => {
 
   // Compress workbench state to reduce URL length
   const compressWorkbenchState = async (workbenchState) => {
-    try {
-      // Convert to JSON string
-      const jsonString = JSON.stringify(workbenchState);
-      
-      // Compress using LZ-string for better compression
-      return LZString.compressToEncodedURIComponent(jsonString);
-    } catch (error) {
-      console.error('Error compressing workbench state:', error);
-      // Fallback to simple base64 encoding
-      return btoa(JSON.stringify(workbenchState));
-    }
+    // Wrap heavy serialization/compression in a Promise and defer to the
+    // event loop so it doesn't block rendering for large workbench states.
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        try {
+          const jsonString = JSON.stringify(workbenchState);
+          const compressed = LZString.compressToEncodedURIComponent(jsonString);
+          resolve(compressed);
+        } catch (error) {
+          console.error('Error compressing workbench state:', error);
+          resolve(btoa(JSON.stringify(workbenchState)));
+        }
+      }, 0);
+    });
   };
 
-  const copyToClipboard = async () => {
+  const copyToClipboard = async (urlToCopy = shareUrl) => {
     try {
-      await navigator.clipboard.writeText(shareUrl);
+      await navigator.clipboard.writeText(urlToCopy);
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
     } catch (err) {
       setError('Failed to copy to clipboard. Please copy the URL manually.');
+    }
+  };
+
+  const shortenUrl = async () => {
+    if (!shareUrl) {
+      setError('No URL to shorten. Please generate a share link first.');
+      return;
+    }
+
+    setIsShortening(true);
+    setError('');
+
+    try {
+      // Using TinyURL API (free and reliable)
+      const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(shareUrl)}`);
+      
+      if (response.ok) {
+        const shortenedUrlResult = await response.text();
+        setShortenedUrl(shortenedUrlResult);
+      } else {
+        // Fallback to is.gd API
+        const fallbackResponse = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(shareUrl)}`);
+        
+        if (fallbackResponse.ok) {
+          const fallbackData = await fallbackResponse.json();
+          if (fallbackData.shorturl) {
+            setShortenedUrl(fallbackData.shorturl);
+          } else {
+            throw new Error('Failed to shorten URL with fallback service');
+          }
+        } else {
+          throw new Error('Failed to shorten URL');
+        }
+      }
+    } catch (err) {
+      console.error('Error shortening URL:', err);
+      setError('Failed to shorten URL. You can still use the original link.');
+    } finally {
+      setIsShortening(false);
+    }
+  };
+
+  // Direct shortener used internally (returns shortened URL or null)
+  const shortenUrlDirect = async (fullUrl) => {
+    try {
+      const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(fullUrl)}`);
+      if (response.ok) {
+        const short = await response.text();
+        return short;
+      }
+      // fallback
+      const fallbackResponse = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(fullUrl)}`);
+      if (fallbackResponse.ok) {
+        const data = await fallbackResponse.json();
+        if (data.shorturl) return data.shorturl;
+      }
+      return null;
+    } catch (err) {
+      console.error('Direct shortener failed:', err);
+      return null;
     }
   };
 
@@ -166,9 +296,14 @@ const ShareWorkbench = ({ show, onHide }) => {
   return (
     <Modal show={show} onHide={onHide} size="lg" className="share-modal">
       <Modal.Header closeButton>
-        <Modal.Title>
-          <FaShare className="me-2" />
-          Share Workbench
+        <Modal.Title className="d-flex align-items-center">
+          <GetMapIcon 
+            width={14} 
+            height={14} 
+            color={'#0d6efd'} 
+            style={{ marginRight: 6, display: 'inline-block', verticalAlign: 'text-bottom' }}
+          />
+          <span style={{ lineHeight: 1 }}>Share Workbench</span>
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
@@ -210,13 +345,13 @@ const ShareWorkbench = ({ show, onHide }) => {
                   <div className="input-group">
                     <Form.Control
                       type="text"
-                      value={shareUrl}
+                      value={shortenedUrl || shareUrl}
                       readOnly
                       className="form-control"
                     />
                     <Button 
                       variant="outline-secondary" 
-                      onClick={copyToClipboard}
+                      onClick={() => copyToClipboard(shortenedUrl || shareUrl)}
                       disabled={isCopied}
                     >
                       {isCopied ? (
@@ -233,6 +368,38 @@ const ShareWorkbench = ({ show, onHide }) => {
                     </Button>
                   </div>
                 </Form.Group>
+
+                {!shortenedUrl && (
+                  <div className="mb-3">
+                    <Button 
+                      variant="outline-primary" 
+                      onClick={shortenUrl}
+                      disabled={isShortening}
+                      size="sm"
+                    >
+                      {isShortening ? (
+                        <>
+                          <Spinner animation="border" size="sm" className="me-1" />
+                          Shortening...
+                        </>
+                      ) : (
+                        <>
+                          <FaCompress className="me-1" />
+                          Shorten URL
+                        </>
+                      )}
+                    </Button>
+                    <small className="text-muted ms-2">
+                      Make the link shorter and easier to share
+                    </small>
+                  </div>
+                )}
+
+                {shortenedUrl && (
+                  <Alert variant="success" className="small">
+                    <strong>URL shortened successfully!</strong> The shortened link is now displayed above and ready to share.
+                  </Alert>
+                )}
 
                 <Alert variant="info" className="small">
                   <strong>How it works:</strong> When someone opens this link, 

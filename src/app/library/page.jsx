@@ -430,7 +430,7 @@ const Library = () => {
         .card--more a {
           margin: 0 0 0 6px;
           padding: 5px 10px;
-          background: var(--color-primary, #1d1d1d);
+          background: #ff8c00;
           color: #fff;
           font-weight: 600;
           text-decoration: none;
@@ -636,13 +636,80 @@ const Library = () => {
         }
 
         body.dark-mode .card--more a {
-          background: #60a5fa;
+          background: #ff8c00;
           color: #fff;
         }
 
         body.dark-mode .card--more a:hover {
-          background: #fbbf24;
-          color: #000;
+          background: #e67e00;
+          color: #fff;
+        }
+
+        /* Dark mode select arrow styling */
+        body.dark-mode .form-select {
+          background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e") !important;
+          background-repeat: no-repeat !important;
+          background-position: right 0.75rem center !important;
+          background-size: 16px 12px !important;
+        }
+        
+        /* Additional specificity for dark mode select arrows */
+        body.dark-mode select.form-select {
+          background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e") !important;
+        }
+        
+        /* Force override for all select elements in dark mode */
+        body.dark-mode .form-select,
+        body.dark-mode select,
+        body.dark-mode .form-select:focus {
+          background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e") !important;
+          background-repeat: no-repeat !important;
+          background-position: right 0.75rem center !important;
+          background-size: 16px 12px !important;
+        }
+        
+        /* Ultra-specific selectors for dark mode select arrows */
+        body.dark-mode .form-select,
+        body.dark-mode .form-select:focus,
+        body.dark-mode .form-select:hover,
+        body.dark-mode .form-select:active,
+        body.dark-mode select.form-select,
+        body.dark-mode select.form-select:focus,
+        body.dark-mode select.form-select:hover,
+        body.dark-mode select.form-select:active {
+          background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e") !important;
+          background-repeat: no-repeat !important;
+          background-position: right 0.75rem center !important;
+          background-size: 16px 12px !important;
+        }
+
+        /* Change View PDF button color to orange */
+        .card--more a {
+          background: #ff8c00 !important;
+          color: #fff !important;
+        }
+
+        .card--more a:hover {
+          background: #e67e00 !important;
+          color: #fff !important;
+          transform: scale(1.05);
+        }
+
+        /* Dark mode View PDF button */
+        body.dark-mode .card--more a {
+          background: #ff8c00 !important;
+          color: #fff !important;
+        }
+
+        body.dark-mode .card--more a:hover {
+          background: #e67e00 !important;
+          color: #fff !important;
+        }
+
+        /* Dark mode text styling for no results message */
+        body.dark-mode .text-center h4,
+        body.dark-mode .text-center p {
+          color: #ffffff !important;
         }
 
 
@@ -652,7 +719,7 @@ const Library = () => {
         <Container fluid className="py-4">
           <Row>
             <Col md={3} className="pe-4">
-              <Card className="sticky-top" style={{ top: '20px' }}>
+              <Card className="sticky-top" style={{ top: '20px', maxHeight: '400px', overflow: 'auto' }}>
                 <Card.Body>
                   <Card.Title className="mb-3">Filters</Card.Title>
                   <Form>

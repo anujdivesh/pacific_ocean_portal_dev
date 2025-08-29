@@ -81,7 +81,7 @@ export const restoreWorkbenchState = async (workbenchState, dispatch) => {
   try {
     // Import all required actions
     const mapSlice = await import('@/app/GlobalRedux/Features/map/mapSlice');
-    const offcanvasSlice = await import('@/app/GlobalRedux/Features/offcanvas/offcanvasSlice');
+  const offcanvasSlice = await import('@/app/GlobalRedux/Features/offcanvas/offcanvasSlice');
     const countrySlice = await import('@/app/GlobalRedux/Features/country/countrySlice');
     const coordinateSlice = await import('@/app/GlobalRedux/Features/coordinate/mapSlice');
 
@@ -115,17 +115,57 @@ export const restoreWorkbenchState = async (workbenchState, dispatch) => {
                ...layer,
                layer_information: {
                  ...layer.layer_information,
-                 enabled: layer.enabled || false,
-                 selectedSofarTypes: layer.selectedSofarTypes || [],
+                 // Ensure the enabled state is properly restored from the saved state
+                 enabled: layer.layer_information.enabled || layer.enabled || false,
+                 selectedSofarTypes: layer.layer_information.selectedSofarTypes || layer.selectedSofarTypes || [],
+                 // Ensure all essential properties are present
+                 timeIntervalStart: layer.layer_information.timeIntervalStart || null,
+                 timeIntervalEnd: layer.layer_information.timeIntervalEnd || null,
+                 timeIntervalStartOriginal: layer.layer_information.timeIntervalStartOriginal || null,
+                 timeIntervalEndOriginal: layer.layer_information.timeIntervalEndOriginal || null,
+                 is_timeseries: layer.layer_information.is_timeseries || false,
+                 is_composite: layer.layer_information.is_composite || false,
+                 datetime_format: layer.layer_information.datetime_format || null,
+                 restricted: layer.layer_information.restricted || false,
+                 timeseries_url: layer.layer_information.timeseries_url || null,
+                 composite_layer_id: layer.layer_information.composite_layer_id || null,
                },
                opacity: layer.opacity || 1,
              };
+
+             // Fallback: generate a basic WMS legend URL if missing
+             try {
+               const li = restoredLayer.layer_information || {};
+               const type = (li.layer_type || '').toUpperCase();
+               if (!li.legend_url && type.startsWith('WMS')) {
+                 const base = li.url || '';
+                 const hasQuery = base.includes('?');
+                 const layerName = li.layer_name || '';
+                 const style = li.style || '';
+                 if (base && layerName) {
+                   const qs = new URLSearchParams({
+                     SERVICE: 'WMS',
+                     REQUEST: 'GetLegendGraphic',
+                     FORMAT: 'image/png',
+                     LAYER: layerName,
+                   });
+                   if (style) qs.set('STYLE', style);
+                   const sep = hasQuery ? '&' : '?';
+                   restoredLayer.layer_information.legend_url = `${base}${sep}${qs.toString()}`;
+                 }
+               }
+             } catch {}
 
              console.log(`Restoring layer ${layer.id}:`, {
                title: restoredLayer.layer_information.layer_title,
                enabled: restoredLayer.layer_information.enabled,
                selectedSofarTypes: restoredLayer.layer_information.selectedSofarTypes,
-               layerType: restoredLayer.layer_information.layer_type
+               layerType: restoredLayer.layer_information.layer_type,
+               is_timeseries: restoredLayer.layer_information.is_timeseries,
+               datetime_format: restoredLayer.layer_information.datetime_format,
+               timeIntervalStart: restoredLayer.layer_information.timeIntervalStart,
+               timeIntervalEnd: restoredLayer.layer_information.timeIntervalEnd,
+               opacity: restoredLayer.opacity
              });
 
              dispatch(mapSlice.addMapLayer(restoredLayer));
@@ -145,6 +185,10 @@ export const restoreWorkbenchState = async (workbenchState, dispatch) => {
 
     // Restore offcanvas state
     if (workbenchState.offCanvas) {
+      // Restore selected bottom tab if provided
+      if (workbenchState.offCanvas.selectedTabKey) {
+        dispatch(offcanvasSlice.setSelectedTab(workbenchState.offCanvas.selectedTabKey));
+      }
       if (workbenchState.offCanvas.isVisible && workbenchState.offCanvas.currentId) {
         dispatch(offcanvasSlice.showoffCanvas(workbenchState.offCanvas.currentId));
       } else {

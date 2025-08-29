@@ -129,7 +129,7 @@ const SmallMap = ({currentDataset}) => {
               west_bound_longitude: dataset_list.west_bound_longitude,
               layer_information: data,
             };
-            console.log(bounds)
+           // console.log(bounds)
             const datasetBox = {
               west: dataset_list.west_bound_longitude,
               east: dataset_list.east_bound_longitude,
@@ -229,6 +229,7 @@ const SmallMap = ({currentDataset}) => {
 
             onAdd: function (map) {
                 var container = L.DomUtil.create('div', 'leaflet-control-custom');
+                container.style.marginRight = '16px';
 
                 if (currentDataset && Object.keys(currentDataset).length > 0) {
                     var button = L.DomUtil.create('button', 'custom-map-btn', container);

@@ -12,7 +12,7 @@ import { setBounds, setCenter, setZoom } from '@/app/GlobalRedux/Features/map/ma
 import SideOffCanvas from '../tools/side_offcanvas';
 import {  hideoffCanvas  } from '@/app/GlobalRedux/Features/offcanvas/offcanvasSlice';
 import { MdAddCircleOutline } from "react-icons/md";
-import { CgMoreO } from "react-icons/cg";
+import { CgMoreO,CgSearch,CgAdd } from "react-icons/cg";
 // import { FaSearch } from "react-icons/fa"; // COMMENTED OUT - no longer needed
 import { get_url } from '@/components/json/urls';
 import { setShortName } from "@/app/GlobalRedux/Features/country/countrySlice";
@@ -29,6 +29,7 @@ const SideBar = () => {
 
     const isVisiblecanvas = useAppSelector((state) => state.sideoffcanvas.isVisible);
     const short_name = useAppSelector((state) => state.country.short_name);
+  const isLoggedin = useAppSelector((state) => state.auth.isLoggedin);
     //const [showModal, setShowModal] = useState(false);
     const isVisible = useAppSelector((state) => state.modal.isVisible);
     const dispatch = useAppDispatch();
@@ -383,14 +384,15 @@ const SideBar = () => {
           const sortedData = [...data].sort((a, b) => a.long_name.localeCompare(b.long_name));
           setRegions(sortedData); // Set regions data to state
           const savedRegion = localStorage.getItem('selectedRegion'); // Check localStorage for saved region
-          if (savedRegion) {
+          // Only apply persisted selection for anonymous users. If a user is logged in, prefer their session country.
+          if (savedRegion && !isLoggedin) {
             // Check if the saved region exists in the fetched data
             const regionExists = data.find((region) => region.id.toString() === savedRegion);
             if (regionExists) {
               setSelectedRegion(savedRegion); // Set the region from localStorage if valid
-              localStorage.setItem('selectedRegion', savedRegion);
-              // Set bounds based on the saved region
+              // Persisting already done; ensure redux gets current selection
               dispatch(setShortName(savedRegion));
+              // Set bounds based on the saved region
               dispatch(
                 setBounds({
                   west: regionExists.west_bound_longitude,
@@ -410,8 +412,22 @@ const SideBar = () => {
       dispatch(hideoffCanvas());
       const regionId = e.target.value;
       setSelectedRegion(regionId);
-      localStorage.setItem('selectedRegion', regionId);
+      // If user is not logged in, persist selection to localStorage so it survives refresh.
+      if (!isLoggedin) {
+        localStorage.setItem('selectedRegion', regionId);
+      }
+      // Always update the redux country short_name so the UI can preview the selection.
       dispatch(setShortName(regionId))
+
+      // If user is logged in, emit a transient event so Navbar can preview the flag without persisting
+      try {
+        if (isLoggedin && typeof window !== 'undefined') {
+          const ev = new CustomEvent('regionSelected', { detail: { regionId } });
+          window.dispatchEvent(ev);
+        }
+      } catch (err) {
+        // ignore
+      }
   
       // Find the selected region by its id
       const region = regions.find((region) => region.id === parseInt(regionId));
@@ -450,27 +466,48 @@ const SideBar = () => {
         style={{paddingTop:'10px', margin: '0', paddingLeft: '0', paddingRight: '0'}} 
         className="sidebar-row">
         <Col md={12} style={{ paddingLeft: '0', paddingRight: '0' }}>
-        <select
-        className="form-select w-100 region-select region-select-override"
-        aria-label="Select a region"
-        value={selectedRegion}
-        onChange={handleRegionChange}
-     
-       style={{  
-         borderRadius: '20px',
-         border: '1px solid rgb(58 59 62)',
-         fontSize: '0.875rem',
-         padding: '0.375rem 0.75rem',
-         backgroundColor: 'white',
-         color: '#212529'
-       }}
-      >
-        {regions.map((region) => (
-          <option key={region.id} value={region.id}>
-            {region.long_name}
-          </option>
-        ))}
-      </select>
+      <div style={{ position: 'relative', width: '100%' }}>
+  <span
+    aria-hidden="true"
+    style={{
+      position: 'absolute',
+      left: 10,
+      top: '50%',
+      transform: 'translateY(-50%)',
+      color: '#519ac2',
+      pointerEvents: 'none',
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 1
+    }}
+  >
+    <CgSearch size={16} />
+  </span>
+
+  <select
+    className="form-select w-100 region-select region-select-override"
+    aria-label="Select a region"
+    value={selectedRegion}
+    onChange={handleRegionChange}
+    style={{
+      borderRadius: '20px',
+      border: '1px solid rgb(58 59 62)',
+      fontSize: '0.875rem',
+      padding: '0.375rem 0.75rem',
+      paddingLeft: '32px', // space for the icon
+      backgroundColor: 'white',
+      color: '#212529',
+      width: '100%'
+    }}
+  >
+    {regions.map((region) => (
+      <option key={region.id} value={region.id}>
+        {region.long_name}
+      </option>
+    ))}
+  </select>
+</div>
         </Col>
         </Row>
 
@@ -562,15 +599,15 @@ const SideBar = () => {
                                       e.currentTarget.blur();
                                     }}
                                 >
-                                    <MdAddCircleOutline size={16}/>&nbsp;Explore Map Data
+                                    <MdAddCircleOutline size={18} style={{marginTop:-1}}/>&nbsp;Explore Map Data
                                 </Button>
                                 <Button
-    variant="btn btn-info btn-sm rounded-pill"
+    variant="btn btn-sm rounded-pill"
     style={{
         padding: '10px 12px',
         color: 'white',
         width: '45%',
-        backgroundColor: '#C7D444',
+        backgroundColor: '#b8c93a',
         border: 'none',
         fontSize: '0.85rem',
         fontWeight: '500',
@@ -580,7 +617,7 @@ const SideBar = () => {
     className="more-button"
     onClick={handleShowCanvas}
 >
-    <CgMoreO size={16} />&nbsp;More
+    <CgMoreO size={16} style={{marginTop:-1}}/>&nbsp;More
 </Button>
 
 

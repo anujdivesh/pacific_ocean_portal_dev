@@ -147,7 +147,7 @@ return(
   </Row>
 
   {/* Legend Image */}
-  {item.layer_information.legend_url !== 'null' && (
+  {item.layer_information.legend_url && item.layer_information.legend_url !== 'null' && (
     <Row className="g-1" style={{ marginTop: "4px" }}>
       <Col>
         <img 

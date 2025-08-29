@@ -21,11 +21,14 @@ function DynamicImage({ height }) {
   const [error, setError] = useState(null);
   const [dotOffset, setDotOffset] = useState(0);
   const [enabledMap, setEnabledMap] = useState(false);
+
   const dateFormatAccepted = useRef(null);
   const dateToDisplay = useRef(null);
   const [loadingTime, setLoadingTime] = useState(0);
   const MAX_VISIBLE_DOTS = 25;
   const imgHeight = height || 200;
+  // whether to use cached images; default true
+  const [useCache, setUseCache] = useState(true);
 
   function generateDateArray(start_date, end_date, stepHours) {
     const dateArray = [];
@@ -110,7 +113,12 @@ function DynamicImage({ height }) {
         const start_date = layerInformation.timeIntervalStartOriginal;
         const end_date = layerInformation.timeIntervalEndOriginal;
         const step = (period === "PT6H" || period === "PT1H") ? layerInformation.interval_step : 24;
-        const result = generateDateArray(start_date, end_date, step);
+        var result = generateDateArray(start_date, end_date, step);
+        var limit = layerInformation.no_of_plots;
+        if (limit !== 999) {
+            result = result.slice(-limit);
+        }
+
         /*
         if (result.length > 30) {
             result.splice(0, result.length - 30);
@@ -119,9 +127,12 @@ function DynamicImage({ height }) {
         if (layerInformation.id == 4 || layerInformation.id == 19){
           coral = 'True'
         }
-        const dynamicImages = result.map((date) =>
-          get_url('getMap')+`region=`+short_name+`&layer_map=`+layerInformation.id+`&time=${date}&nocache=${Date.now()}&token=${token_id}`
-        );
+        const dynamicImages = result.map((date) => {
+          const base = get_url('getMap') + `region=` + short_name + `&layer_map=` + layerInformation.id + `&time=${date}`;
+          const cacheParam = `&use_cache=${useCache ? 'True' : 'False'}`;
+          const nocache = useCache ? '' : `&nocache=${Date.now()}`;
+          return base + cacheParam + nocache + `&token=${token_id}`;
+        });
         setImages(dynamicImages);
         setTimestamps(result);
         setLoading(true);
@@ -143,9 +154,13 @@ function DynamicImage({ height }) {
         if (layerInformation.id == 4 || layerInformation.id == 19){
           coral = 'True'
         }
-        const dynamicImages = result.map((date) =>
-          get_url('getMap')+`region=`+short_name+`&layer_map=`+layerInformation.id+`&time=${date.replace(/\s/g, "")}&nocache=${Date.now()}&token=${token_id}`
-        );
+        const dynamicImages = result.map((date) => {
+          const cleanDate = date.replace(/\s/g, "");
+          const base = get_url('getMap') + `region=` + short_name + `&layer_map=` + layerInformation.id + `&time=${cleanDate}`;
+          const cacheParam = `&use_cache=${useCache ? 'True' : 'False'}`;
+          const nocache = useCache ? '' : `&nocache=${Date.now()}`;
+          return base + cacheParam + nocache + `&token=${token_id}`;
+        });
 
         setImages(dynamicImages);
         setTimestamps(result);
@@ -153,7 +168,7 @@ function DynamicImage({ height }) {
         setDotOffset(0);
       }
     }
-  }, [mapLayer, savedRegion,short_name,enabledMap,currentId]);
+  }, [mapLayer, savedRegion,short_name,enabledMap,currentId, useCache]);
 
   useEffect(() => {
     if (images.length > 0 && currentIndex >= images.length) {
@@ -515,6 +530,23 @@ const visibleDots = timestamps.slice(
           </button>
         </div>
 
+        {/* Use Cache toggle (Bootstrap switch) */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '2px'}}>
+          <div className="form-check form-switch">
+            <input
+              className="form-check-input"
+              id="use-cache-toggle"
+              type="checkbox"
+              role="switch"
+              checked={useCache}
+              onChange={(e) => setUseCache(e.target.checked)}
+            />
+            <label className="form-check-label" htmlFor="use-cache-toggle" style={{ fontSize: '13px', color: 'var(--color-text, #333)' }}>
+              Use cache for images
+            </label>
+          </div>
+        </div>
+
         {timestamps.length > 0 && (
           <div style={{
             marginTop: '10px',
@@ -562,9 +594,9 @@ const visibleDots = timestamps.slice(
                     padding: '5px 15px',
                     cursor: 'pointer',
                     textDecoration: 'none',
-                    backgroundColor: isDarkMode ? '#495057' : '#f8f9fa',
-                    border: isDarkMode ? '1px solid #6c757d' : '1px solid #dee2e6',
-                    color: isDarkMode ? '#ffa500' : '#ff8c00',
+                    backgroundColor: isDarkMode ? '#ff8c00' : '#f8f9fa',
+                    border: isDarkMode ? '1px solid #ff8c00' : '1px solid #dee2e6',
+                    color: isDarkMode ? '#ffffff' : '#ff8c00',
                     borderRadius: '4px',
                     transition: 'all 0.2s ease'
                   }}

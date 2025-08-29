@@ -28,7 +28,7 @@ function DateSelector({item,period,startDateStr,endDateStr}) {
 
     const [startDate, setStartDate] = useState(startDateStr);
     const [endDate, setEndDate] = useState(endDateStr);
-    const dateArray = useRef();
+    const dateArray = useRef([]);
     var spec = item.layer_information?.specific_timestemps || null;
     var specifc_stemps = item.layer_information?.specific_timestemps && item.layer_information.specific_timestemps !== null ? item.layer_information.specific_timestemps.split(',') : null;
     var weekRange = item.layer_information?.interval_step && item.layer_information.interval_step !== null ? item.layer_information.interval_step.split(',') : null;
@@ -125,6 +125,20 @@ function DateSelector({item,period,startDateStr,endDateStr}) {
           zIndex: 9999, // Higher than other elements
         },
       };
+       const handleonchange3monthSeasonal = (date, item) => {
+  const d = new Date(date);
+  // Force midnight (00:00:00) in UTC
+  console.log(d)
+  console.log(formatDateToISOWithoutMilliseconds3Monthly(d))
+
+  handleUpdateLayer(item.id, {
+    layer_information: {
+      ...item.layer_information,
+      timeIntervalStart: formatDateToISOWithoutMilliseconds3Monthly(d),
+      zoomToLayer: false
+    }
+  });
+};
       useEffect(() => {  
         if (_isMounted.current){
 
@@ -178,6 +192,43 @@ function DateSelector({item,period,startDateStr,endDateStr}) {
             setCurrentDate(new Date(endDateStr));
 
           }
+           // inside useEffect, add this branch
+          else if (item.layer_information.datetime_format === '3MONTHLY_SEASONAL') {
+            let dateTimeArray = [];
+            const hasSpec = typeof spec === 'string' && spec.trim() !== '';
+
+            if (hasSpec) {
+              dateTimeArray = spec
+                .split(',')
+                .map(t => new Date(t.trim()))
+                .filter(d => !isNaN(d));
+            } else {
+              const sSrc = item.layer_information?.timeIntervalStartOriginal || startDateStr;
+              const eSrc = item.layer_information?.timeIntervalEndOriginal || endDateStr;
+              const s = sSrc ? new Date(sSrc) : null;
+              const e = eSrc ? new Date(eSrc) : null;
+
+              if (s && e && !isNaN(s) && !isNaN(e)) {
+                const d = new Date(s.getFullYear(), s.getMonth(), 1);
+                while (d <= e) {
+                  dateTimeArray.push(new Date(d));
+                  d.setMonth(d.getMonth() + 3);
+                }
+              }
+            }
+
+            dateArray.current = dateTimeArray;
+
+            if (dateTimeArray.length) {
+              setStartDate(dateTimeArray[0]);
+              setEndDate(dateTimeArray[dateTimeArray.length - 1]);
+              setCurrentDate(
+                item.layer_information.layer_type == "WMS_FORECAST"
+                  ? dateTimeArray[0]
+                  : dateTimeArray[dateTimeArray.length - 1]
+              );
+            }
+          }
           else if (item.layer_information.datetime_format === 'WEEKLY'){
            let dateWithoutZ = startDateStr.replace(/Z/g,'');
 
@@ -210,7 +261,7 @@ function DateSelector({item,period,startDateStr,endDateStr}) {
   //new
   let content;
   if (item.layer_information.datetime_format === 'DAILY') {
-    content = <div>
+    content = <div style={{ width: '90%' }}>
   <DatePicker
     id="datepicker"
     selected={currentDate}
@@ -295,19 +346,43 @@ else if (item.layer_information.datetime_format === '3MONTHLY') {
   if (!dateArray.current || dateArray.current.length === 0) {
     content = <div>Loading dates...</div>;
   } else {
-    // Extract unique years and months from dateArray
+    // Extract unique years from dateArray
     const years = [...new Set(dateArray.current.map(date => new Date(date).getFullYear()))];
-    const months = [...new Set(dateArray.current.map(date => {
+    
+    // For 3-monthly intervals, we need to find unique 3-month periods
+    // Group dates by year and starting month of 3-month period
+    const monthPeriods = new Map();
+    
+    dateArray.current.forEach(date => {
       const d = new Date(date);
-      return { 
-        value: d.getMonth(), 
-        name: d.toLocaleString('default', { month: 'short' }) 
-      };
-    }))].sort((a, b) => a.value - b.value);
+      const year = d.getFullYear();
+      const month = d.getMonth();
+      
+      // Determine which 3-month period this month belongs to
+      // 0-2 -> Jan-Mar (period 0), 3-5 -> Apr-Jun (period 3), etc.
+      const periodStart = Math.floor(month / 3) * 3;
+      const periodKey = `${year}-${periodStart}`;
+      
+      if (!monthPeriods.has(periodKey)) {
+        monthPeriods.set(periodKey, {
+          year: year,
+          startMonth: periodStart,
+          startMonthName: new Date(year, periodStart, 1).toLocaleString('default', { month: 'short' }),
+          endMonthName: new Date(year, periodStart + 2, 1).toLocaleString('default', { month: 'short' })
+        });
+      }
+    });
+
+    // Convert to sorted array
+    const sortedPeriods = Array.from(monthPeriods.values()).sort((a, b) => {
+      if (a.year !== b.year) return a.year - b.year;
+      return a.startMonth - b.startMonth;
+    });
 
     // Find current year and month from currentDate
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth();
+    const currentPeriodStart = Math.floor(currentMonth / 3) * 3;
 
     content = (
       <div style={{ width: '80%', display: 'flex', gap: '5px', marginLeft: -20  }}>
@@ -320,6 +395,13 @@ else if (item.layer_information.datetime_format === '3MONTHLY') {
             const selectedYear = parseInt(e.target.value);
             const newDate = new Date(currentDate);
             newDate.setFullYear(selectedYear);
+            
+            // Find the first available period for this year
+            const availablePeriod = sortedPeriods.find(p => p.year === selectedYear);
+            if (availablePeriod) {
+              newDate.setMonth(availablePeriod.startMonth);
+            }
+            
             setCurrentDate(newDate);
             handleonchange3month(newDate, item);
           }}
@@ -331,30 +413,26 @@ else if (item.layer_information.datetime_format === '3MONTHLY') {
           ))}
         </select>
 
-        {/* Month Range Select */}
+        {/* 3-Month Period Select */}
         <select 
           className="form-select form-select-sm rounded-pill"
-          value={currentMonth}
+          value={currentPeriodStart}
           style={{ minWidth: '120px' }}
           onChange={(e) => {
-            const selectedMonth = parseInt(e.target.value);
+            const selectedPeriodStart = parseInt(e.target.value);
             const newDate = new Date(currentDate);
-            newDate.setMonth(selectedMonth);
+            newDate.setMonth(selectedPeriodStart);
             setCurrentDate(newDate);
             handleonchange3month(newDate, item);
           }}
         >
-          {months.map((month, index) => {
-            const startMonth = month.name;
-            const endDate = new Date(currentYear, month.value + 2, 1);
-            const endMonth = endDate.toLocaleString('default', { month: 'short' });
-            
-            return (
-              <option key={`month-${index}`} value={month.value}>
-                {startMonth} - {endMonth}
+          {sortedPeriods
+            .filter(period => period.year === currentYear)
+            .map((period, index) => (
+              <option key={`period-${index}`} value={period.startMonth}>
+                {period.startMonthName} - {period.endMonthName}
               </option>
-            );
-          })}
+            ))}
         </select>
       </div>
     );
@@ -521,6 +599,105 @@ else if (item.layer_information.datetime_format === 'WEEKLY_NRT') {
  
     );
   }
+   else if (item.layer_information.datetime_format === '3MONTHLY_SEASONAL') {
+  if (!dateArray.current || dateArray.current.length === 0 || !currentDate) {
+    content = <div>Loading dates...</div>;
+  } else {
+    // Normalize all available dates to UTC midnight
+    const parsedUTC = dateArray.current
+      .map(d => new Date(d))
+      .filter(d => !isNaN(d))
+      .map(d => new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 0, 0, 0, 0)));
+
+    // Build year/month map using UTC parts
+    const years = [...new Set(parsedUTC.map(d => d.getUTCFullYear()))].sort((a, b) => a - b);
+
+    const monthsByYearMap = new Map();
+    parsedUTC.forEach(d => {
+      const y = d.getUTCFullYear();
+      const m = d.getUTCMonth();
+      let arr = monthsByYearMap.get(y);
+      if (!arr) {
+        arr = [];
+        monthsByYearMap.set(y, arr);
+      }
+      if (!arr.includes(m)) arr.push(m);
+    });
+    for (const [y, arr] of monthsByYearMap.entries()) {
+      arr.sort((a, b) => a - b);
+      monthsByYearMap.set(y, arr);
+    }
+
+    // Helper: get the correct day-of-month for a given UTC year/month from source data
+    const dayFor = (y, m) => {
+      const match = parsedUTC.find(d => d.getUTCFullYear() === y && d.getUTCMonth() === m);
+      return match ? match.getUTCDate() : 1;
+    };
+
+    // Resolve currently selected year/month via UTC
+    const curr = currentDate instanceof Date ? currentDate : new Date(currentDate);
+    const yearToUse = years.includes(curr.getUTCFullYear()) ? curr.getUTCFullYear() : years[0];
+    const monthsForYear = monthsByYearMap.get(yearToUse) || [];
+    const monthToUse = monthsForYear.includes(curr.getUTCMonth())
+      ? curr.getUTCMonth()
+      : (monthsForYear[0] ?? 0);
+
+    content = (
+      <div style={{ width: '80%', display: 'flex', gap: '5px', marginLeft: -20 }}>
+        {/* Year Select */}
+        <select
+          className="form-select form-select-sm rounded-pill"
+          value={yearToUse}
+          style={{ minWidth: '80px' }}
+          onChange={(e) => {
+            const selectedYear = parseInt(e.target.value, 10);
+            const monthsForSelectedYear = monthsByYearMap.get(selectedYear) || [0];
+            const firstMonth = monthsForSelectedYear[0] ?? 0;
+            const day = dayFor(selectedYear, firstMonth);
+
+            // Construct exact UTC midnight using the correct day from data
+            const newDateUTC = new Date(Date.UTC(selectedYear, firstMonth, day, 0, 0, 0, 0));
+            setCurrentDate(newDateUTC);
+            handleonchange3monthSeasonal(newDateUTC, item);
+          }}
+        >
+          {years.map((year) => (
+            <option key={`year-${year}`} value={year}>
+              {year}
+            </option>
+          ))}
+        </select>
+
+        {/* Month Select (label shows prev - next month) */}
+        <select
+          className="form-select form-select-sm rounded-pill"
+          value={monthToUse}
+          style={{ minWidth: '120px' }}
+          onChange={(e) => {
+            const selectedMonth = parseInt(e.target.value, 10);
+            const day = dayFor(yearToUse, selectedMonth);
+
+            const newDateUTC = new Date(Date.UTC(yearToUse, selectedMonth, day, 0, 0, 0, 0));
+            setCurrentDate(newDateUTC);
+            handleonchange3monthSeasonal(newDateUTC, item);
+          }}
+        >
+          {(monthsByYearMap.get(yearToUse) || []).map((m) => {
+            const prev = new Date(Date.UTC(yearToUse, m - 1, 1));
+            const next = new Date(Date.UTC(yearToUse, m + 1, 1));
+            const label = `${prev.toLocaleString('default', { month: 'short' })} - ${next.toLocaleString('default', { month: 'short' })}`;
+            return (
+              <option key={`month-${m}`} value={m}>
+                {label}
+              </option>
+            );
+          })}
+        </select>
+      </div>
+    );
+  }
+}
+  
   
   else {
     content = <div>Default Content</div>;
@@ -532,6 +709,14 @@ return (
   <div className="row align-items-center" style={{ marginTop: '-5px', marginBottom: '8px',paddingTop:8 }}>
     {item.layer_information.datetime_format !== 'WFS_DAILY' && (
       <div className="col-sm-4">
+        <style>{`
+       select.form-select.form-select-sm.rounded-pill {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  }
+  body.dark-mode select.form-select.form-select-sm.rounded-pill {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23FFFFFF' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  }
+    `}</style>
         <div className="date-selector-label">Date Range:</div>
       </div>
     )}

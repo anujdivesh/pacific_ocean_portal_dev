@@ -100,6 +100,21 @@ body.dark-mode .dropdown-menu {
   border: 1px solid #6b7280 !important;
 }
 
+/* Dark mode select arrow styling - Force override Bootstrap defaults */
+body.dark-mode .form-select,
+body.dark-mode .form-select:focus,
+body.dark-mode .form-select:hover,
+body.dark-mode .form-select:active,
+body.dark-mode select.form-select,
+body.dark-mode select.form-select:focus,
+body.dark-mode select.form-select:hover,
+body.dark-mode select.form-select:active {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 0.75rem center !important;
+  background-size: 16px 12px !important;
+}
+
 body.dark-mode .accordion-item:not(.explore-modal .accordion-item) {
   border: 1px solid #6b7280 !important;
 }
@@ -118,33 +133,7 @@ body.dark-mode .table th {
   border-color: #6b7280 !important;
 }
 
-body.dark-mode .btn {
-  border: 1px solid #6b7280 !important;
-}
-
-body.dark-mode .btn-primary {
-  border: 1px solid #60a5fa !important;
-}
-
-body.dark-mode .btn-secondary {
-  border: 1px solid #6b7280 !important;
-}
-
-body.dark-mode .btn-success {
-  border: 1px solid #4ade80 !important;
-}
-
-body.dark-mode .btn-warning {
-  border: 1px solid #fde047 !important;
-}
-
-body.dark-mode .btn-danger {
-  border: 1px solid #f87171 !important;
-}
-
-body.dark-mode .btn-info {
-  border: 1px solid #38bdf8 !important;
-}
+/* Remove global dark-mode button border rules to avoid conflicts with modal pill styles */
 
 /* Ensure offcanvas elements have borders */
 body.dark-mode .offcanvas {
@@ -170,36 +159,7 @@ body.dark-mode .modal-footer {
 .card-title, .modal-title, .offcanvas-title, .accordion-header, .navbar-brand {
   color: var(--color-primary) !important;
 }
-.btn-primary {
-  background-color: var(--color-primary) !important;
-  color: #fff !important;
-  border: none !important;
-}
-.btn-primary:hover, .btn-primary:focus {
-  background-color: var(--color-accent) !important;
-  color: #fff !important;
-}
-.btn-secondary {
-  background-color: var(--color-secondary) !important;
-  color: #fff !important;
-  border: none !important;
-}
-.btn-success {
-  background-color: var(--color-success) !important;
-  color: #fff !important;
-}
-.btn-warning {
-  background-color: var(--color-warning) !important;
-  color: #1e293b !important;
-}
-.btn-danger {
-  background-color: var(--color-error) !important;
-  color: #fff !important;
-}
-.btn-info {
-  background-color: var(--color-info) !important;
-  color: #fff !important;
-}
+/* Remove global button background/border rules to avoid conflicts with modal pill styles */
 .alert-success {
   background-color: var(--color-success) !important;
   color: #fff !important;
@@ -322,51 +282,7 @@ body.dark-mode .form-control {
   border-color: var(--color-border) !important;
 }
 /* Preserve original button colors in dark mode */
-body.dark-mode .btn-primary {
-  background-color: var(--color-primary) !important;
-  color: #fff !important;
-  border: 1px solid var(--color-primary) !important;
-}
-
-body.dark-mode .btn-secondary {
-  background-color: var(--color-secondary) !important;
-  color: #fff !important;
-  border: 1px solid var(--color-secondary) !important;
-}
-
-body.dark-mode .btn-success {
-  background-color: var(--color-success) !important;
-  color: #fff !important;
-  border: 1px solid var(--color-success) !important;
-}
-
-body.dark-mode .btn-warning {
-  background-color: var(--color-warning) !important;
-  color: #1e293b !important;
-  border: 1px solid var(--color-warning) !important;
-}
-
-body.dark-mode .btn-danger {
-  background-color: var(--color-error) !important;
-  color: #fff !important;
-  border: 1px solid var(--color-error) !important;
-}
-
-body.dark-mode .btn-info {
-  background-color: var(--color-info) !important;
-  color: #fff !important;
-  border: 1px solid var(--color-info) !important;
-}
-
-body.dark-mode .btn-light {
-  background-color: #f8f9fa !important;
-  color: #1e293b !important;
-  border: 1px solid #dee2e6 !important;
-}
-body.dark-mode .btn-light {
-  background-color: #333 !important;
-  color: var(--color-text) !important;
-}
+/* Remove global dark-mode button background/border rules to avoid conflicts with modal pill styles */
 body.dark-mode input,
 body.dark-mode textarea,
 body.dark-mode select {
@@ -473,6 +389,11 @@ body.dark-mode .navbar {
   border: none !important;
 }
 
+/* Ensure navbar title stays blue in dark mode */
+body.dark-mode .navbar .navbar-title {
+  color: var(--color-primary) !important;
+}
+
 /* Chart.js text styling for dark mode */
 body.dark-mode canvas {
   color: #ffffff !important;
@@ -547,6 +468,8 @@ body.dark-mode .explore-modal .modal-footer {
   background-color: #ffffff !important;
   color: #1e293b !important;
 }
+/* Lighten footer divider line specifically in dark mode */
+body.dark-mode .explore-modal .modal-footer { border-top:1px solid #dddddd !important; }
 body.dark-mode .explore-modal .modal-title {
   color: #2563eb !important;
 }
@@ -1007,7 +930,7 @@ body.dark-mode .offcanvas .offcanvas-body {
   .leaflet-right .leaflet-control-zoom {
     right: 20px !important;
     left: auto !important;
-    top: 93% !important;
+    top: 90% !important; /* zoom share button control% */
     transform: translateY(-50%) !important;
     bottom: auto !important;
     position: fixed !important;
@@ -1049,6 +972,114 @@ body.dark-mode .offcanvas .offcanvas-body {
 
 .leaflet-control-zoom-out {
   border-bottom: none !important;
+}
+
+/* Integrated share button at top of zoom stack */
+.leaflet-control-zoom a.leaflet-control-zoom-share {
+  background: #fff !important;
+  color: #223 !important;
+  border: none !important;
+  width: 40px !important;
+  height: 40px !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0 !important; /* hide any text */
+  box-shadow: none !important;
+  transition: background 0.2s;
+  border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+  border-radius: 0 !important; /* interior */
+}
+.leaflet-control-zoom a.leaflet-control-zoom-share svg { width:22px; height:22px; }
+.leaflet-control-zoom a.leaflet-control-zoom-share:hover { background:#f0f0f0 !important; }
+
+/* First child (share) should keep top rounding; last child keep bottom rounding */
+.leaflet-control-zoom a:first-child { border-radius:16px 16px 0 0 !important; }
+.leaflet-control-zoom a:last-child { border-radius:0 0 16px 16px !important; }
+
+/* Dark mode variants for zoom + share control */
+body.dark-mode .leaflet-control-zoom {
+  background: var(--color-surface) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.35) !important;
+}
+body.dark-mode .leaflet-control-zoom a,
+body.dark-mode .leaflet-control-zoom a.leaflet-control-zoom-share {
+  background: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+}
+body.dark-mode .leaflet-control-zoom a:last-child { border-bottom: none !important; }
+body.dark-mode .leaflet-control-zoom a:hover,
+body.dark-mode .leaflet-control-zoom a.leaflet-control-zoom-share:hover { background: var(--color-background) !important; }
+body.dark-mode .leaflet-control-zoom a.leaflet-control-zoom-share svg { fill: currentColor; }
+
+/* Hide zoom controls and share button in mobile mode */
+@media (max-width: 1004px) {
+  .leaflet-control-zoom {
+    display: none !important;
+  }
+}
+
+/* React DatePicker calendar icon dark mode override */
+body.dark-mode .react-datepicker__calendar-icon {
+  color: #ffffff !important; /* sets icon color */
+  fill: #ffffff !important;  /* for SVG fill */
+  opacity: 0.95;
+}
+/* Ensure input keeps spacing when icon present */
+body.dark-mode .react-datepicker__view-calendar-icon input {
+  color: var(--color-text) !important;
+}
+
+/* Custom region select arrow color */
+.region-select-override {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236b737d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 18px 18px; /* normalized arrow size */
+  padding-right: 2.2rem !important; /* space for arrow */
+  height: 38px !important; /* consistent control height */
+  line-height: 1.4 !important;
+}
+/* High contrast / hover focus states */
+.region-select-override:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(107,115,125,0.25);
+  border-color: #6b737d !important;
+}
+/* Dark mode arrow variant */
+body.dark-mode .region-select-override {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23b0b6bd' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-size: 18px 18px !important; /* keep same size in dark mode */
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  height: 38px !important; /* match light mode */
+}
+
+/* Explore modal header color override (apply in both modes) */
+.explore-modal .modal-header.custom-header2 {
+  background:#519ac2 !important;
+  border-bottom:1px solid #3c7693 !important;
+  color:#ffffff !important;
+}
+.explore-modal .modal-header.custom-header2 .modal-title { color:#ffffff !important; }
+.explore-modal .modal-header.custom-header2 .btn,
+.explore-modal .modal-header.custom-header2 button { color:#ffffff !important; }
+.explore-modal .modal-header.custom-header2 .btn-close { filter: invert(1) brightness(200%); opacity:.85; }
+body.dark-mode .explore-modal .modal-header.custom-header2 { background:#519ac2 !important; }
+body.dark-mode .explore-modal .modal-header.custom-header2 .btn-close { filter: invert(1) brightness(200%) !important; }
+/* Dark mode pill button fixes inside explore modal header so text remains visible */
+body.dark-mode .explore-modal .modal-header.custom-header2 .btn-light {
+  background: rgba(255,255,255,0.15) !important; /* translucent pill */
+  color:#ffffff !important; /* readable on blue */
+  border:1px solid rgba(255,255,255,0.45) !important;
+}
+body.dark-mode .explore-modal .modal-header.custom-header2 .btn-light:hover {
+  background: rgba(255,255,255,0.25) !important;
 }
 
 .leaflet-control-zoom-in:hover,
