@@ -23,6 +23,7 @@ const getColorByIndex = (index) => {
 
 function TimeseriesSofar({ height }) {
   const mapLayer = useAppSelector((state) => state.mapbox.layers);
+  const dataLimitFromRedux = useAppSelector((state) => state.mapbox.dataLimit);
   const lastlayer = useRef(0);
   const { x, y, sizex, sizey, bbox, station,country_code } = useAppSelector((state) => state.coordinate.coordinates);
   const [chartData, setChartData] = useState({
@@ -32,7 +33,7 @@ function TimeseriesSofar({ height }) {
   const [isLoading, setIsLoading] = useState(false);
   const [enabledChart, setEnabledChart] = useState(true);
   const [liveMode, setLiveMode] = useState(false);
-  const [dataLimit, setDataLimit] = useState(100);
+  const [dataLimit, setDataLimit] = useState(dataLimitFromRedux || 100);
   const refreshIntervalRef = useRef(null);
 
   const isCoordinatesValid = station !== null;
@@ -51,7 +52,7 @@ function TimeseriesSofar({ height }) {
     return keyValuePairs[key] || null;
   }
 
-  function generateWaveDataUrl(spotterId, token) {
+  function generateWaveDataUrl(spotterId, token, limit = 1000) {
     // const baseUrl = "https://api.sofarocean.com/api/wave-data";
     const baseUrl = get_url('insitu-station');
   
@@ -62,11 +63,11 @@ function TimeseriesSofar({ height }) {
     //     includeWindData: false,
     //     includeDirectionalMoments: true,
     //     includeSurfaceTempData: true,
-    //     limit: dataLimit,
+    //     limit: limit,
     //     includeTrack: true
     // });
     // return `${baseUrl}?${queryParams.toString()}`;
-    return `${baseUrl}/${spotterId.toString()}?limit=1000`;
+    return `${baseUrl}/${spotterId.toString()}?limit=${limit}`;
     // return `${baseUrl}`
   }
 
@@ -172,9 +173,9 @@ function TimeseriesSofar({ height }) {
 
   const setChartDataFn = (times, datasets) => {
 
-    console.log("START LABEL AND VALUE>>>>>>>>>>>>>>>");
+    // console.log("START LABEL AND VALUE>>>>>>>>>>>>>>>");
 
-    console.log("<<<<<<<<<<< LABEL AND VALUE END");
+    // console.log("<<<<<<<<<<< LABEL AND VALUE END");
     
     setChartData({
       labels: times,
@@ -244,13 +245,14 @@ function TimeseriesSofar({ height }) {
       }
       
       var token = getValueByKey(x);
-      const waveDataUrl = generateWaveDataUrl(station, token);
+      const waveDataUrl = generateWaveDataUrl(station, token, dataLimit);
       
       fetchWaveData(waveDataUrl, setChartDataFn);
 
       if (liveMode && isActive) {
         refreshIntervalRef.current = setInterval(() => {
-          fetchWaveData(waveDataUrl, setChartDataFn);
+          const updatedWaveDataUrl = generateWaveDataUrl(station, token, dataLimit);
+          fetchWaveData(updatedWaveDataUrl, setChartDataFn);
         }, 1800000);
       }
 
@@ -300,7 +302,7 @@ function TimeseriesSofar({ height }) {
   }
 
   }
-  }, [isCoordinatesValid, enabledChart, mapLayer, station,country_code, liveMode, isActive, dataLimit]);
+  }, [isCoordinatesValid, enabledChart, mapLayer, station, country_code, liveMode, isActive, dataLimit, x]);
 
   if (isLoading) {
     return (

@@ -4,7 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { useAppSelector, useAppDispatch } from '@/app/GlobalRedux/hooks'
 import '@/components/functions/L.TileLayer.BetterWMS';
-import { setCenter, setZoom, setBaseMapLayer,setEEZEnable,setCoastlineEnable,setCityNameEnable, setBounds } from '@/app/GlobalRedux/Features/map/mapSlice';
+import { setCenter, setZoom, setBaseMapLayer,setEEZEnable,setCoastlineEnable,setCityNameEnable, setBounds, setDataLimit } from '@/app/GlobalRedux/Features/map/mapSlice';
 import addWMSTileLayer from '../functions/addWMSTileLayer';
 import '@/components/css/legend.css';
 import { get_url } from '@/components/json/urls';
@@ -392,6 +392,7 @@ const MapBox = () => {
                  // try {
                  //   const isDataAvailable = await checkDataAvailability('SOFAR', feature.properties.spotter_id, id);
                  //   if (isDataAvailable) {
+                  dispatch(setDataLimit(feature.properties.data_limit));
                         dispatch(setCoordinates({ 
                           x: feature.properties.owner,
                           y: feature.properties.is_active,
@@ -490,6 +491,7 @@ const MapBox = () => {
               owner: entry.owner || "Unknown",
               sensor: entry.type_value || "",
               type_id: entry.type_id || null,
+              data_limit: entry.data_limit || 1000, // Default to 1000 if not provided
             }
           };
         })
@@ -603,6 +605,13 @@ const MapBox = () => {
       
           // Process the GeoJSON data
           const processedGeoJSON = processGeoJSON(geojsonData);
+          
+          // Ensure all features have data_limit property
+          processedGeoJSON.features.forEach(feature => {
+            if (!feature.properties.data_limit) {
+              feature.properties.data_limit = 1000; // Default value
+            }
+          });
       
           // Create GeoJSON layer with markers
           const geoJsonLayer = L.geoJSON(processedGeoJSON, {
@@ -759,6 +768,13 @@ const MapBox = () => {
           };
     
           const processedGeoJSON = processGeoJSON(geojsonData);
+          
+          // Ensure all features have data_limit property
+          processedGeoJSON.features.forEach(feature => {
+            if (!feature.properties.data_limit) {
+              feature.properties.data_limit = 1000; // Default value
+            }
+          });
     
           // Create GeoJSON layer with markers
           const geoJsonLayer = L.geoJSON(processedGeoJSON, {
@@ -801,6 +817,7 @@ const MapBox = () => {
                        const bbox = null;
                        // const isDataAvailable = await checkDataAvailability('TIDE', station, id);
                        // if (isDataAvailable) {
+                        dispatch(setDataLimit(feature.properties.data_limit)); 
                             dispatch(setCoordinates({ x, y, sizex, sizey, bbox, station }));
                             dispatch(showoffCanvas(id));
                        // } else {

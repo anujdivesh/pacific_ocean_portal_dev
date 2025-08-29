@@ -15,6 +15,7 @@ const mapSlice = createSlice({
       //url: get_url('geowebcache')+'/basemap/{z}/{x}/{y}.png',
       attribution: '&copy; Pacific Community SPC',
     },
+    dataLimit: 100, // Default data limit
     eezoverlay: {
       url: "https://ocean-plotter.spc.int/plotter/proxy?url=https://geonode.pacificdata.org/geoserver/gwc/service/tms/1.0.0/geonode:global_eez_200nm@EPSG:3857@pbf/{z}/{x}/{-y}.png",
       //url: 'https://geonode.pacificdata.org/geoserver/geonode/global_eez_200nm/ows',
@@ -44,6 +45,9 @@ const mapSlice = createSlice({
     enable_citynames: true
   },
   reducers: {
+    setDataLimit(state, action) {
+      state.dataLimit = action.payload;
+    },
     setCenter(state, action) {
       state.center = action.payload;
     },
@@ -146,5 +150,5 @@ const mapSlice = createSlice({
   },
 });
 
-export const { setCenter, setZoom, setBounds, addMapLayer, removeMapLayer,updateMapLayer,setBaseMapLayer,setOverlayLayer,setEEZEnable,setCoastlineLayer,setCoastlineEnable,setCityNameLayer,setCityNameEnable,removeAllMapLayer,removeDuplicateLayers,toggleSidebar,setSidebarCollapsed, handleStationSearchKeyDown, selectStation } = mapSlice.actions;
+export const { setCenter, setZoom, setBounds, addMapLayer, removeMapLayer,updateMapLayer,setBaseMapLayer,setOverlayLayer,setEEZEnable,setCoastlineLayer,setCoastlineEnable,setCityNameLayer,setCityNameEnable,removeAllMapLayer,removeDuplicateLayers,toggleSidebar,setSidebarCollapsed, handleStationSearchKeyDown, selectStation,setDataLimit } = mapSlice.actions;
 export default mapSlice.reducer;
