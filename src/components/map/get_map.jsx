@@ -81,6 +81,7 @@ const MapBox = () => {
     const dispatch = useAppDispatch();
     const { center, zoom, bounds, maxBounds, layers, basemap, eezoverlay,enable_eez,enable_coastline,coastlineoverlay,citynamesoverlay,enable_citynames, sidebarCollapsed } = useAppSelector((state) => state.mapbox);
     const isBing = useRef(false); 
+    const selectedOptionRef = useRef('bing');
     const [selectedOption, setSelectedOption] = useState('bing'); // Changed default to 'bing' for Satellite view 
     const [checkboxChecked, setCheckboxChecked] = useState(true);
     const [checkboxCheckedCoast, setCheckboxCheckedCoast] = useState(true);
@@ -1162,12 +1163,13 @@ const MapBox = () => {
         } catch (e) {
           storedBaseMap = null;
         }
-
+       // console.log(basemap.option)
         // Step 2: Choose which basemap to use
         // If storedBaseMap exists and has a url, use it; else use Redux basemap
         const initialBasemap = (storedBaseMap && storedBaseMap.url) ? storedBaseMap : basemap;
        // console.log(initialBasemap)
         setSelectedOption(initialBasemap.option);
+        selectedOptionRef.current = initialBasemap.option;
         // Step 3: Sync Redux if needed
         // If the stored basemap differs from Redux, update Redux
         // (You may want to check by url or attribution or both)
@@ -1215,7 +1217,7 @@ const MapBox = () => {
       // Add fallback mechanism for SPC tiles (only if not using satellite)
       const checkSPCTilesLoaded = () => {
         // Only check SPC tiles if we're not using satellite view
-        if (selectedOption !== 'bing') {
+        if (selectedOptionRef.current !== 'bing') {
           setTimeout(() => {
             const tiles = document.querySelectorAll('img[src*="spc-osm.spc.int"]');
             let failedTiles = 0;
@@ -1357,7 +1359,7 @@ const MapBox = () => {
                 name="option" 
                 value="opentopo" 
                 id="opentopo-radio" 
-                ${selectedOption === 'opentopo' ? 'checked' : ''}
+                ${selectedOptionRef.current === 'opentopo' ? 'checked' : ''}
               /> OpenStreetMap
             </label>
             <label>
@@ -1366,7 +1368,7 @@ const MapBox = () => {
                 name="option" 
                 value="osm" 
                 id="osm-radio" 
-                ${selectedOption === 'osm' ? 'checked' : ''}
+                ${selectedOptionRef.current === 'osm' ? 'checked' : ''}
               /> OpenTopoMap
             </label>
             <label>
@@ -1375,7 +1377,7 @@ const MapBox = () => {
                 name="option" 
                 value="bing" 
                 id="bing-radio" 
-                ${selectedOption === 'bing' ? 'checked' : ''}
+                ${selectedOptionRef.current === 'bing' ? 'checked' : ''}
               /> Satellite
             </label>
           </div>
@@ -2296,7 +2298,7 @@ const MapBox = () => {
           };
           L.tileLayer(basemapObj.url, { attribution: basemapObj.attribution }).addTo(mapRef.current);
         }
-        console.log(basemapObj)
+      //  console.log(basemapObj)
 
         // Save the full basemap object to localStorage
         localStorage.setItem("basemap", JSON.stringify(basemapObj));
@@ -2305,6 +2307,7 @@ const MapBox = () => {
         dispatch(setBaseMapLayer(basemapObj));
 
         setSelectedOption(value);
+        selectedOptionRef.current = value;
       };
 
       const handleCheckboxChange = (event) => {

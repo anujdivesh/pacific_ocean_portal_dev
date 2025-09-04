@@ -14,7 +14,8 @@ const mapSlice = createSlice({
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
       //url: get_url('geowebcache')+'/basemap/{z}/{x}/{y}.png',
       attribution: '&copy; Pacific Community SPC',
-      dataLimit: 100, // Default data limit
+      dataLimit: 100, // Default data limit,
+      option:'bing'
     },
     eezoverlay: {
       url: "https://ocean-plotter.spc.int/plotter/proxy?url=https://geonode.pacificdata.org/geoserver/gwc/service/tms/1.0.0/geonode:global_eez_200nm@EPSG:3857@pbf/{z}/{x}/{-y}.png",

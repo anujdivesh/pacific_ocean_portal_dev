@@ -44,12 +44,12 @@ const WelcomeModal = () => {
     if (stored) {
       try {
         const obj = JSON.parse(stored);
-        return basemapOptions.find(o => o.url === obj.url)?.key || "osm";
+        return basemapOptions.find(o => o.url === obj.url)?.key || "bing";
       } catch {
-        return "osm";
+        return "bing";
       }
     }
-    return "osm";
+    return "bing";
   });
 
   useEffect(() => {
@@ -156,7 +156,7 @@ const WelcomeModal = () => {
             ))}
           </div>
                <div className="alert alert-warning" style={{background:'#fffbe7', border:'1px solid #ffe58f', color:'#ad8b00', borderRadius:6, padding:'8px 12px', marginBottom:'14px', fontSize:'15px'}}>
-  <strong>Important Note:</strong> For high performance and faster loading on Low bandwidth connections, please use the <strong>SPC OSM</strong> basemap.
+  For <strong>High Performance</strong> and fast loading on <strong>Low bandwidth Connections</strong>, it is recommended to use the <strong>SPC OSM</strong> basemap.
 </div>
 
         </div>
