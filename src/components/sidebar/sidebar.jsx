@@ -1,4 +1,4 @@
-"use client" // client side rendering 
+//"use client" // client side rendering 
 import React, { useState, useEffect, useRef } from 'react';
 import { Container, Row, Col, Button, InputGroup, Form } from 'react-bootstrap';
 import dynamic from 'next/dynamic';

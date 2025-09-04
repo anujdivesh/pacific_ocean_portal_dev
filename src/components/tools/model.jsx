@@ -1,4 +1,4 @@
-"use client"; // Ensure this is a Client Component
+//"use client"; // Ensure this is a Client Component
 import React, { useState, useEffect } from 'react';
 import { Modal, Row, Col, Spinner } from 'react-bootstrap';
 import MyAccordion from './accordion';

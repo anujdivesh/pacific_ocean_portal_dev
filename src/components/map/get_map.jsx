@@ -1,4 +1,4 @@
-"use client" // client side rendering 
+//"use client" // client side rendering 
 import React, { useEffect, useState, useRef } from 'react';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';

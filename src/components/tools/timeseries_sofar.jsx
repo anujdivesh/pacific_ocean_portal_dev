@@ -1,4 +1,4 @@
-'use client';
+//'use client';
 import React, { useState, useEffect, useRef,Suspense } from 'react';
 import { Spinner, Form, Button } from 'react-bootstrap'; 
 import { Line } from 'react-chartjs-2'; 

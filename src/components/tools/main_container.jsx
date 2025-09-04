@@ -2,6 +2,9 @@
 import MapBox from "../map/get_map";
 import React, { useEffect } from 'react';
 import WelcomeModal from './welcomeModal'; 
+import dynamic from 'next/dynamic';
+
+const MapComponent = dynamic(() => import('../map/get_map'), { ssr: false });
 
 
 export default function MainContainer() {
@@ -16,7 +19,7 @@ export default function MainContainer() {
 return (
   <>
    <WelcomeModal />
- <MapBox/>
+ <MapComponent/>
   </>
 );
 }

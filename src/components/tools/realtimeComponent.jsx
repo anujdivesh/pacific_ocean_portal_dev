@@ -1,4 +1,4 @@
-'use client';
+//'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import { Container, Button, Row, Col, Form, Spinner, Badge, Card } from 'react-bootstrap';
 import { FaTimes, FaWaveSquare, FaArrowLeft } from 'react-icons/fa';
