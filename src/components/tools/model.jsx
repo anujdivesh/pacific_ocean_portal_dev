@@ -35,7 +35,7 @@ const ExploreModal = ({ show, onClose, title, bodyContent }) => {
       setLoading(false);
     }
   };
-
+/*
   // Fetch session to get the userId
   useEffect(() => {
     const fetchSession = async () => {
@@ -50,6 +50,7 @@ const ExploreModal = ({ show, onClose, title, bodyContent }) => {
     };
     fetchSession();
   }, [countryId,country]);
+  */
 
   // Fetch tailored menu data using the userId as the bearer token
   const fetchTailoredMenu = async (country) => {

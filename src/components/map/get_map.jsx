@@ -60,7 +60,7 @@ const createFirefoxCompatibleTileLayer = (url, options = {}) => {
             const newUrl = this.getTileUrl(tile.coords) + (this.getTileUrl(tile.coords).includes('?') ? '&' : '?') + '_retry=' + retryCount + '&_cb=' + Date.now();
             tile.src = newUrl;
           } catch (error) {
-            console.warn('Error retrying tile load:', error);
+           // console.warn('Error retrying tile load:', error);
             done(e, tile);
           }
         }, 1000 * (retryCount + 1));
@@ -126,7 +126,7 @@ const MapBox = () => {
         if (e?.message?.includes('_leaflet_pos') && attempt < 10) {
           return setTimeout(() => scheduleMapOp(fn, attempt + 1), 120 * (attempt + 1));
         }
-        console.warn('Map op failed (final):', e);
+       // console.warn('Map op failed (final):', e);
       }
     };
     const flushOpQueue = () => {
@@ -150,7 +150,7 @@ const MapBox = () => {
       if (!b) return;
       scheduleMapOp(() => {
         if (!mapRef.current) return;
-        mapRef.current.fitBounds(b, { animate: false, ...options, animate: false });
+        mapRef.current.fitBounds(b, { animate: false, ...options });
       });
     };
     
@@ -311,7 +311,7 @@ const MapBox = () => {
       try {
         mapRef.current.removeLayer(markerClusterRef.current);
       } catch (error) {
-        console.error('Error removing marker cluster:', error);
+       // console.error('Error removing marker cluster:', error);
       }
         markerClusterRef.current = null;
       }
@@ -322,12 +322,12 @@ const MapBox = () => {
     };
 
     const fetchWaveBuoy = async (url, id, selectedTypes = []) => {
-      console.log("fetchWaveBuoy called with:", {
+     /* console.log("fetchWaveBuoy called with:", {
         url: url,
         id: id,
         selectedTypes: selectedTypes,
         selectedTypesLength: selectedTypes.length
-      });
+      });*/
     
       // Cleanup any pending requests and markers
       cleanupMarkers();
@@ -373,10 +373,10 @@ const MapBox = () => {
           // Store the new marker cluster group
           markerClusterRef.current = markerClusterGroup;
 
-          console.log("Adding markers to map:", {
+      /*    console.log("Adding markers to map:", {
             processedGeoJSONFeatures: processedGeoJSON.features.length,
             markerClusterGroup: markerClusterGroup
-          });
+          });*/
           
           // Add markers to the group
           const geoJsonLayer = L.geoJSON(processedGeoJSON, {
@@ -456,7 +456,8 @@ const MapBox = () => {
                           sizey: null,
                           bbox: null, 
                           station: feature.properties.spotter_id,
-                          country_code: feature.properties.owner 
+                          country_code: feature.properties.owner,
+                          display_name:  feature.properties.display_name
                         }));
             // Use the active layer id to open the correct bottom canvas
             dispatch(showoffCanvas(id));
@@ -480,7 +481,7 @@ const MapBox = () => {
             try {
           mapRef.current.addLayer(markerClusterGroup);
             } catch (error) {
-              console.error('Error adding marker cluster to map:', error);
+           //   console.error('Error adding marker cluster to map:', error);
             }
           }
           
@@ -498,7 +499,7 @@ const MapBox = () => {
           });
 
         } catch (error) {
-          console.error('Error processing wave buoy data:', error);
+         // console.error('Error processing wave buoy data:', error);
         } finally {
           pendingRequestRef.current = null;
         }
@@ -510,11 +511,11 @@ const MapBox = () => {
       const entries = Array.isArray(raw) ? raw : [raw];
       let filteredEntries = entries;
       
-      console.log("transformToGeoJSON called with:", {
+     /* console.log("transformToGeoJSON called with:", {
         rawLength: entries.length,
         selectedTypes: selectedTypes,
         selectedTypesLength: selectedTypes.length
-      });
+      });*/
       
       // // Debug: Log first entry to see API structure
       // if (entries.length > 0) {
@@ -525,7 +526,7 @@ const MapBox = () => {
         filteredEntries = entries.filter(entry => {
           return selectedTypes.includes(entry.type_id);
         });
-        console.log("Filtered entries:", filteredEntries.length);
+      //  console.log("Filtered entries:", filteredEntries.length);
       } else {
         // If no types selected, show no entries (empty array means no markers)
         filteredEntries = [];
@@ -579,7 +580,7 @@ const MapBox = () => {
               }
           });
         } catch (error) {
-          console.error('Error removing existing cluster layers:', error);
+        //  console.error('Error removing existing cluster layers:', error);
         }
       }
       
@@ -674,7 +675,7 @@ const MapBox = () => {
               id: "tide_gauge",
               pointToLayer: function(feature, latlng) {
                 if (!latlng || typeof latlng.lat !== 'number' || typeof latlng.lng !== 'number') {
-                  console.warn('Invalid latlng:', latlng, feature);
+                //  console.warn('Invalid latlng:', latlng, feature);
                   return null;
                 }
               
@@ -719,7 +720,7 @@ const MapBox = () => {
                           // if (isDataAvailable) {
                             // Set data limit with fallback to default if not provided
                             const dataLimit = feature.properties.data_limit || 100;
-                            console.log("dataLimit", dataLimit);
+                         //   console.log("dataLimit", dataLimit);
                             dispatch(setDataLimit(dataLimit)); 
                             dispatch(setCoordinates({ x, y, sizex, sizey, bbox, station }));
                             // Use the active layer id to open the correct bottom canvas
@@ -743,7 +744,7 @@ const MapBox = () => {
           mapRef.current.addLayer(markerClusterGroup);
       
       } catch (error) {
-          console.error('Error fetching GeoJSON data:', error);
+      //    console.error('Error fetching GeoJSON data:', error);
       }
     };
     const fetchAndPlotGeoJSONTIDE = async (url, id) => {
@@ -893,7 +894,7 @@ const MapBox = () => {
           mapRef.current.addLayer(markerClusterGroup);
     
       } catch (error) {
-          console.error('Error fetching GeoJSON data:', error);
+        //  console.error('Error fetching GeoJSON data:', error);
       }
     };
     
@@ -1155,11 +1156,49 @@ const MapBox = () => {
             attributionElement.style.textOverflow = 'ellipsis';
           }
         }, 100);
+        let storedBaseMap = null;
+        try {
+          storedBaseMap = JSON.parse(localStorage.getItem('basemap'));
+        } catch (e) {
+          storedBaseMap = null;
+        }
 
+        // Step 2: Choose which basemap to use
+        // If storedBaseMap exists and has a url, use it; else use Redux basemap
+        const initialBasemap = (storedBaseMap && storedBaseMap.url) ? storedBaseMap : basemap;
+       // console.log(initialBasemap)
+        setSelectedOption(initialBasemap.option);
+        // Step 3: Sync Redux if needed
+        // If the stored basemap differs from Redux, update Redux
+        // (You may want to check by url or attribution or both)
+        if (storedBaseMap && storedBaseMap.url !== basemap.url) {
+          dispatch(setBaseMapLayer(storedBaseMap)); // update Redux store
+        }
+        // Step 4: Add basemap layer
+        if (initialBasemap.url.includes('opentopomap')) {
+          L.tileLayer(initialBasemap.url, {
+            attribution: initialBasemap.attribution || '© Pacific Community SPC'
+          }).addTo(mapRef.current);
+          isBing.current = false;
+        } else if (initialBasemap.url.includes('bing') || initialBasemap.url.includes('ocean-plotter.spc.int/plotter/cache/basemap')) {
+          L.tileLayer(initialBasemap.url, {
+            attribution: initialBasemap.attribution || '© Pacific Community SPC | Tiles &copy; Esri &mdash; Source: Esri, ...',
+            maxZoom: 18,
+            minZoom: 2
+          }).addTo(mapRef.current);
+          isBing.current = true;
+        } else {
+          L.tileLayer(initialBasemap.url, {
+            attribution: initialBasemap.attribution || '© Pacific Community SPC'
+          }).addTo(mapRef.current);
+          isBing.current = false;
+        }
+
+        /*
         // Check if we should use satellite view based on selectedOption
         if (selectedOption === 'bing') {
           // Use ESRI World Imagery for satellite view (free alternative to Bing)
-          const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+          const satelliteLayer = L.tileLayer('https://ocean-plotter.spc.int/plotter/cache/basemap/{z}/{x}/{y}.png', {
             attribution: '© Pacific Community SPC | Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
             maxZoom: 18,
             minZoom: 2
@@ -1171,7 +1210,7 @@ const MapBox = () => {
             attribution: '© Pacific Community SPC',
           }).addTo(mapRef.current);
           isBing.current = false;
-        }
+        }*/
       
       // Add fallback mechanism for SPC tiles (only if not using satellite)
       const checkSPCTilesLoaded = () => {
@@ -1190,7 +1229,7 @@ const MapBox = () => {
             
             // If more than 50% of SPC tiles failed, switch to Bing Maps fallback
             if (totalTiles > 0 && failedTiles > totalTiles * 0.5) {
-              console.warn('SPC tiles failed to load, switching to Bing Maps fallback');
+           //   console.warn('SPC tiles failed to load, switching to Bing Maps fallback');
               isBing.current = true;
               
               // Remove SPC layer
@@ -1487,7 +1526,6 @@ const MapBox = () => {
        //Add new layers from state
 
         if(layers.length === 0){
-          console.log();
           setShowTime(false)
         }
   
@@ -1858,23 +1896,24 @@ const MapBox = () => {
     else if(layer.layer_information.layer_type == "WFS"){
       //PLOT marker here
       var geojson_url =  layer.layer_information.url;
-      console.log("TEST_1")
+      //console.log("TEST_1")
       fetchAndPlotGeoJSON(geojson_url, layer.layer_information.id);
     }
     else if(layer.layer_information.layer_type == "SOFAR"){
       //PLOT marker here
-      console.log("Processing SOFAR layer:", {
+     /* console.log("Processing SOFAR layer:", {
         id: layer.layer_information.id,
         enabled: layer.layer_information.enabled,
         selectedTypes: layer.layer_information.selectedSofarTypes
-      });
+      });*/
       var geojson_url =  layer.layer_information.url;
       //fetchFromSOFAR(geojson_url, layer.layer_information.id);
       // console.log("ID" + layer.layer_information.id);
       // Get selected SOFAR types from layer information, default to all if not set
       const selectedTypes = layer.layer_information.selectedSofarTypes || [];
+    //  console.log(selectedTypes)
       // fetchWaveBuoy(geojson_url, layer.layer_information.id, selectedTypes);// prod
-      fetchWaveBuoy("https://ocean-obs-api.spc.int/insitu/stations/", layer.layer_information.id, selectedTypes); //local
+      fetchWaveBuoy(layer.layer_information.url, layer.layer_information.id, selectedTypes); //local
     }
     else if(layer.layer_information.layer_type == "TIDE"){
       //PLOT marker here
@@ -1885,12 +1924,12 @@ const MapBox = () => {
 
     }
     else{
-      console.log('Layer not enabled or unknown type:', {
+     /* console.log('Layer not enabled or unknown type:', {
         id: layer.layer_information.id,
         title: layer.layer_information.layer_title,
         type: layer.layer_information.layer_type,
         enabled: layer.layer_information.enabled
-      });
+      });*/
     }
       }
       else{
@@ -2080,16 +2119,17 @@ const MapBox = () => {
         };
 
         if (enable_eez) {
-          const newWmsLayer =  L.tileLayer(eezoverlay.url,{id:'eez'});
-          addWithLoading(newWmsLayer, 'eez');
+       //   const newWmsLayer =  L.tileLayer(eezoverlay.url,{id:'eez'});
+         
           //setWmsLayer2(newWmsLayer);
-          /*const newWmsLayer = L.tileLayer.wms(eezoverlay.url, {
+          const newWmsLayer = L.tileLayer.wms(eezoverlay.url, {
             layers: eezoverlay.layer, // Replace with your WMS layer name
             format: 'image/png',
             transparent: true,
           }).addTo(mapRef.current);
-          */
+          
           setWmsLayer(newWmsLayer);
+          addWithLoading(newWmsLayer, 'eez');
         } else {
           if (wmsLayer && mapRef.current && isMapInitialized.current) {
             try {
@@ -2104,17 +2144,17 @@ const MapBox = () => {
           }
         }
         if(enable_coastline){
-          const newWmsLayer2 =  L.tileLayer(coastlineoverlay.url,{id:'coastline'});
-          addWithLoading(newWmsLayer2, 'coastline');
+         // const newWmsLayer2 =  L.tileLayer(coastlineoverlay.url,{id:'coastline'});
+          
           //setWmsLayer2(newWmsLayer2);
-          /*
-          const newWmsLayer2 = L.tileLayer.wms(coastlineoverlay.url, {
+                    const newWmsLayer2 = L.tileLayer.wms(coastlineoverlay.url, {
             layers: coastlineoverlay.layer, // Replace with your WMS layer name
             format: 'image/png',
             transparent: true,
           }).addTo(mapRef.current);
-          */
+          
           setWmsLayer2(newWmsLayer2);
+          addWithLoading(newWmsLayer2, 'coastline');
           
         }
         else{
@@ -2131,16 +2171,17 @@ const MapBox = () => {
           }
         }
         if(enable_citynames){
-          const newWmsLayer3 =  L.tileLayer(citynamesoverlay.url,{id:"pacnames"});
-          addWithLoading(newWmsLayer3, 'pacnames');
-          /*
+         // const newWmsLayer3 =  L.tileLayer(citynamesoverlay.url,{id:"pacnames"});
+         // addWithLoading(newWmsLayer3, 'pacnames');
+          
           const newWmsLayer3 = L.tileLayer.wms(citynamesoverlay.url, {
             layers: citynamesoverlay.layer, // Replace with your WMS layer name
             format: 'image/png',
             transparent: true,
           }).addTo(mapRef.current);
-          */
+          
           setWmsLayer3(newWmsLayer3);
+          addWithLoading(newWmsLayer3, 'pacnames');
         }
         else{
           if (wmsLayer3 && mapRef.current && isMapInitialized.current) {
@@ -2160,8 +2201,10 @@ const MapBox = () => {
         
 
       }, [layers,basemap,enable_eez,bounds,enable_citynames,enable_coastline]);
-
+      /*
       const handleRadioChange = (event) => {
+         const value = event.target.value;
+        localStorage.setItem("basemap", value);
         // Remove existing base layers
         if (mapRef.current && isMapInitialized.current) {
           mapRef.current.eachLayer(layer => {
@@ -2185,12 +2228,12 @@ const MapBox = () => {
         }
         else if(event.target.value === "bing"){
           isBing.current = true;
-          const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+          const satelliteLayer = L.tileLayer('https://ocean-plotter.spc.int/plotter/cache/basemap/{z}/{x}/{y}.png', {
             attribution: '© Pacific Community SPC | Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
             maxZoom: 18,
             minZoom: 2
           }).addTo(mapRef.current);
-          dispatch(setBaseMapLayer({ url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', attribution:'&copy; Pacific Community SPC' }));
+          dispatch(setBaseMapLayer({ url: 'https://ocean-plotter.spc.int/plotter/cache/basemap/{z}/{x}/{y}.png', attribution:'&copy; Pacific Community SPC' }));
         }
         else{
           isBing.current = false;
@@ -2200,6 +2243,68 @@ const MapBox = () => {
           dispatch(setBaseMapLayer({ url: 'https://spc-osm.spc.int/tile/{z}/{x}/{y}.png', attribution:'&copy; Pacific Community SPC' }));
         }
         setSelectedOption(event.target.value);
+      };
+      */
+     const handleRadioChange = (event) => {
+        const value = event.target.value;
+        let basemapObj;
+
+        // Remove existing base layers
+        if (mapRef.current && isMapInitialized.current) {
+          mapRef.current.eachLayer(layer => {
+            if (
+              layer._url && (
+                layer._url.includes('spc-osm.spc.int') ||
+                layer._url.includes('opentopomap') ||
+                layer._url.includes('arcgisonline.com') ||
+                layer.options.bingMapsKey
+              )
+            ) {
+              mapRef.current.removeLayer(layer);
+            }
+          });
+        }
+
+        if (value === "osm") {
+          isBing.current = false;
+          basemapObj = {
+            url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+            attribution: '© Pacific Community SPC',
+            option:value
+          };
+          L.tileLayer(basemapObj.url, { attribution: basemapObj.attribution }).addTo(mapRef.current);
+        } else if (value === "bing") {
+          isBing.current = true;
+          basemapObj = {
+            url: 'https://ocean-plotter.spc.int/plotter/cache/basemap/{z}/{x}/{y}.png',
+            attribution: '© Pacific Community SPC | Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+            maxZoom: 18,
+            minZoom: 2,
+            option:value
+          };
+          L.tileLayer(basemapObj.url, {
+            attribution: basemapObj.attribution,
+            maxZoom: basemapObj.maxZoom,
+            minZoom: basemapObj.minZoom
+          }).addTo(mapRef.current);
+        } else {
+          isBing.current = false;
+          basemapObj = {
+            url: 'https://spc-osm.spc.int/tile/{z}/{x}/{y}.png',
+            attribution: '© Pacific Community SPC',
+            option:value
+          };
+          L.tileLayer(basemapObj.url, { attribution: basemapObj.attribution }).addTo(mapRef.current);
+        }
+        console.log(basemapObj)
+
+        // Save the full basemap object to localStorage
+        localStorage.setItem("basemap", JSON.stringify(basemapObj));
+
+        // Sync to Redux store
+        dispatch(setBaseMapLayer(basemapObj));
+
+        setSelectedOption(value);
       };
 
       const handleCheckboxChange = (event) => {
@@ -2247,7 +2352,7 @@ const MapBox = () => {
       {(isLoading || isLoading2) && <Loading />}
       <div id="map" style={{Zindex: "auto",marginRight:-12, marginLeft:-12}}></div>
       
-      Data Checking Loading Alert
+
       {/* COMMENTED OUT - Data Checking Loading Alert */}
       {/* {isCheckingData && (
         <div
@@ -2309,14 +2414,16 @@ const MapBox = () => {
         </div>
       )} */}
       
-      <style jsx>{`
-        @keyframes fadeInOut {
-          0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
-          15% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-          85% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-          100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
-        }
-      `}</style>
+      <style>
+  {`
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+      15% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      85% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+    }
+  `}
+</style>
       
       <ShareWorkbench
         show={showShareModal}

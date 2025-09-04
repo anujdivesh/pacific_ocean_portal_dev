@@ -28,355 +28,30 @@ const SideBar = () => {
     
 
     const isVisiblecanvas = useAppSelector((state) => state.sideoffcanvas.isVisible);
-    const short_name = useAppSelector((state) => state.country.short_name);
-  const isLoggedin = useAppSelector((state) => state.auth.isLoggedin);
-    //const [showModal, setShowModal] = useState(false);
+    const isLoggedin = useAppSelector((state) => state.auth.isLoggedin);
     const isVisible = useAppSelector((state) => state.modal.isVisible);
+    const country_idx = useAppSelector((state) => state.country.short_name);
     const dispatch = useAppDispatch();
     
-    // Station search state - COMMENTED OUT
-    // const [stationSearchId, setStationSearchId] = useState('');
-    // const [isSearching, setIsSearching] = useState(false);
-    // const [searchError, setSearchError] = useState('');
-    // const [showStationSearch, setShowStationSearch] = useState(false);
-    
-
-    
-    // Autocomplete state - COMMENTED OUT
-    // const [autocompleteSuggestions, setAutocompleteSuggestions] = useState([]);
-    // const [showAutocomplete, setShowAutocomplete] = useState(false);
-    // const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
-    // const autocompleteRef = useRef(null);
-
-    // Get map layers to check if SOFAR is active
-    const mapLayers = useAppSelector((state) => state.mapbox.layers);
-
     const handleShow = () => {
       dispatch(setAccordion(''))
       dispatch(setDataset([]))
       dispatch(showModaler());
       dispatch(hideoffCanvas());
-      //setShowModal(true)
     };
+    
     const handleClose = () => {
       dispatch(hideModal())
-      //setShowModal(false)
     };
-
-    // Check if SOFAR layers are active - COMMENTED OUT
-    // useEffect(() => {
-    //   const hasSofarLayer = mapLayers.some(layer => 
-    //     layer.layer_information?.layer_type === "SOFAR" && layer.layer_information?.enabled
-    //   );
-    //   setShowStationSearch(hasSofarLayer);
-    // }, [mapLayers]);
-
-    // Function to get all available stations from the map - COMMENTED OUT
-    // const getAllStations = () => {
-    //   const mapInstance = window.mapInstance;
-    //   if (!mapInstance) {
-    //     console.log('Map instance not available yet');
-    //     return [];
-    //   }
-
-    //   const stationsMap = new Map(); // Use Map to prevent duplicates
-      
-    //   try {
-    //     mapInstance.eachLayer((layer) => {
-    //       // Handle marker cluster groups (SOFAR markers are typically in clusters)
-    //       if (layer && typeof layer.eachLayer === 'function') {
-    //         layer.eachLayer((marker) => {
-    //           if (marker && marker.getLatLng && marker.options?.stationId) {
-    //             const stationId = marker.options.stationId;
-                
-    //             // Skip if we already have this station
-    //             if (stationsMap.has(stationId)) {
-    //               return;
-    //             }
-                
-    //             // Get popup content to extract additional info
-    //             let owner = "Unknown";
-    //             let status = "Unknown";
-                
-    //             if (marker.getPopup) {
-    //                   const popup = marker.getPopup();
-    //                   if (popup && popup.getContent) {
-    //                     const popupContent = popup.getContent();
-    //                     if (popupContent) {
-    //                       // Extract owner and status from popup content
-    //                       const ownerMatch = popupContent.match(/Owner: ([^<]+)/);
-    //                       const statusMatch = popupContent.match(/Status: ([^<]+)/);
-    //                       if (ownerMatch) owner = ownerMatch[1];
-    //                       if (statusMatch) status = statusMatch[1];
-    //                     }
-    //                   }
-    //                 }
-                
-    //                 stationsMap.set(stationId, {
-    //                   id: stationId,
-    //                   owner: owner,
-    //                   status: status,
-    //                   marker: marker
-    //                 });
-    //               }
-    //             });
-    //           }
-            
-    //           // Also check individual markers that might not be in clusters
-    //           if (layer && layer.getLatLng && layer.options?.stationId) {
-    //             const stationId = layer.options.stationId;
-            
-    //             if (!stationsMap.has(stationId)) {
-    //               let owner = "Unknown";
-    //               let status = "Unknown";
-            
-    //               if (layer.getPopup) {
-    //                 const popup = layer.getPopup();
-    //                 if (popup && popup.getContent) {
-    //                   const popupContent = popup.getContent();
-    //                   if (popupContent) {
-    //                     const ownerMatch = popupContent.match(/Owner: ([^<]+)/);
-    //                     const statusMatch = popupContent.match(/Status: ([^<]+)/);
-    //                     if (ownerMatch) owner = ownerMatch[1];
-    //                     if (statusMatch) status = statusMatch[1];
-    //                   }
-    //                 }
-    //               }
-            
-    //               stationsMap.set(stationId, {
-    //                 id: stationId,
-    //                 owner: owner,
-    //                 status: status,
-    //                 marker: layer
-    //               });
-    //             }
-    //           }
-    //         });
-    //       } catch (error) {
-    //         console.error('Error getting stations from map:', error);
-    //       }
-      
-    //       return Array.from(stationsMap.values());
-    //     };
-
-    // Function to filter stations based on search input - COMMENTED OUT
-    // const filterStations = (searchTerm) => {
-    //   if (!searchTerm.trim()) {
-    //     setAutocompleteSuggestions([]);
-    //     setShowAutocomplete(false);
-    //     return;
-    //   }
-
-    //   const allStations = getAllStations();
-      
-    //   // If no stations found, show message
-    //   if (allStations.length === 0) {
-    //     setAutocompleteSuggestions([]);
-    //     setShowAutocomplete(false);
-    //     return;
-    //   }
-      
-    //   const filtered = allStations.filter(station => 
-    //     station.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    //     station.owner.toLowerCase().includes(searchTerm.toLowerCase())
-    //   ).slice(0, 10); // Limit to 10 suggestions
-
-    //   setAutocompleteSuggestions(filtered);
-    //   setShowAutocomplete(filtered.length > 0);
-    //   setSelectedSuggestionIndex(-1);
-    // };
-
-    // Handle input change with autocomplete - COMMENTED OUT
-    // const handleStationSearchChange = (e) => {
-    //   const value = e.target.value;
-    //   setStationSearchId(value);
-    //   setSearchError('');
-    //   filterStations(value);
-    // };
-
-    // Handle keyboard navigation in autocomplete - COMMENTED OUT
-    // const handleStationSearchKeyDown = (e) => {
-    //   if (!showAutocomplete) return;
-
-    //   switch (e.key) {
-    //     case 'ArrowDown':
-    //       e.preventDefault();
-    //       setSelectedSuggestionIndex(prev => 
-    //         prev < autocompleteSuggestions.length - 1 ? prev + 1 : prev
-    //       );
-    //       break;
-    //     case 'ArrowUp':
-    //       e.preventDefault();
-    //       setSelectedSuggestionIndex(prev => prev > 0 ? prev - 1 : -1);
-    //       break;
-    //     case 'Enter':
-    //       e.preventDefault();
-    //       if (selectedSuggestionIndex >= 0 && autocompleteSuggestions[selectedSuggestionIndex]) {
-    //         selectStation(autocompleteSuggestions[selectedSuggestionIndex]);
-    //       } else {
-    //         handleStationSearch();
-    //       }
-    //       break;
-    //     case 'Escape':
-    //       setShowAutocomplete(false);
-    //       setSelectedSuggestionIndex(-1);
-    //       break;
-    //   }
-    // };
-
-    // Function to select a station from autocomplete - COMMENTED OUT
-    // const selectStation = (station) => {
-    //   setStationSearchId(station.id);
-    //   setShowAutocomplete(false);
-    //   setSelectedSuggestionIndex(-1);
-    
-    //   // Navigate to the station
-    //   const latlng = station.marker.getLatLng();
-    
-    //   // Pan map to station location
-    //   dispatch(setCenter([latlng.lat, latlng.lng]));
-    //   dispatch(setZoom(12));
-    
-    //   // Set bounds around the station
-    //   const buffer = 0.1; // 0.1 degree buffer
-    //   dispatch(setBounds({
-    //     west: latlng.lng - buffer,
-    //     east: latlng.lng + buffer,
-    //     south: latlng.lat - buffer,
-    //     north: latlng.lat + buffer,
-    //   }));
-    
-    //   // Open the marker popup to highlight it
-    //   if (station.marker.openPopup) {
-    //     station.marker.openPopup();
-    //   }
-    // };
-
-    // Station search function - search existing markers on map - COMMENTED OUT
-    // const handleStationSearch = async () => {
-    //   if (!stationSearchId.trim()) {
-    //     setSearchError('Please enter a station ID');
-    //     return;
-    //   }
-
-    //   setIsSearching(true);
-    //   setSearchError('');
-
-    //   try {
-    //     // Get the map instance from the global scope
-    //     const mapInstance = window.mapInstance;
-    
-    //     if (!mapInstance) {
-    //       setSearchError('Map not available. Please try again.');
-    //       return;
-    //     }
-
-    //     let foundMarker = null;
-    //     const searchTerm = stationSearchId.trim().toLowerCase();
-
-    //     // Search through all layers on the map
-    //     mapInstance.eachLayer((layer) => {
-    //       // Check if it's a marker cluster group (SOFAR markers are in clusters)
-    //       if (layer && typeof layer.eachLayer === 'function') {
-    //         layer.eachLayer((marker) => {
-    //           if (marker && marker.getLatLng) {
-    //             // Check marker options for station ID
-    //             if (marker.options?.stationId) {
-    //               const markerStationId = marker.options.stationId.toLowerCase();
-    //               if (markerStationId.includes(searchTerm) || searchTerm.includes(markerStationId)) {
-    //                 foundMarker = marker;
-    //               }
-    //             }
-    
-    //             // Also check popup content for station info
-    //             if (!foundMarker && marker.getPopup) {
-    //               const popup = marker.getPopup();
-    //               if (popup && popup.getContent) {
-    //                 const popupContent = popup.getContent();
-    //                 if (popupContent) {
-    //                   // Extract station ID from popup content
-    //                   const stationMatch = popupContent.match(/<strong>([^<]+)<\/strong>/);
-    //                   if (stationMatch) {
-    //                     const stationId = stationMatch[1].toLowerCase();
-    //                     if (stationId.includes(searchTerm) || searchTerm.includes(stationId)) {
-    //                       foundMarker = marker;
-    //                     }
-    //                   }
-    //                 }
-    //               }
-    //             }
-    //           }
-    //         });
-    //       }
-    //     });
-
-    //     if (foundMarker) {
-    //       const latlng = foundMarker.getLatLng();
-    
-    //       // Pan map to station location
-    //       dispatch(setCenter([latlng.lat, latlng.lng]));
-    //       dispatch(setZoom(12));
-    
-    //       // Set bounds around the station
-    //       const buffer = 0.1; // 0.1 degree buffer
-    //       dispatch(setBounds({
-    //         west: latlng.lng - buffer,
-    //         east: latlng.lng + buffer,
-    //         south: latlng.lat - buffer,
-    //         north: latlng.lat + buffer,
-    //       }));
-    
-    //       // Open the marker popup to highlight it
-    //       if (foundMarker.openPopup) {
-    //         foundMarker.openPopup();
-    //       }
-    
-    //       setStationSearchId('');
-    //       setSearchError('');
-    //       setShowAutocomplete(false);
-    //     } else {
-    //       setSearchError('Station not found on map. Please check the station ID.');
-    //     }
-    
-    //   } catch (error) {
-    //     console.error('Error searching for station:', error);
-    //     setSearchError('Error searching for station. Please try again.');
-    //   } finally {
-    //     setIsSearching(false);
-    //   }
-    // };
-
-    // const handleStationSearchKeyPress = (e) => {
-    //   if (e.key === 'Enter') {
-    //     handleStationSearch();
-    //   }
-    // };
-
-    // Close autocomplete when clicking outside - COMMENTED OUT
-    // useEffect(() => {
-    //   const handleClickOutside = (event) => {
-    //     if (autocompleteRef.current && !autocompleteRef.current.contains(event.target)) {
-    //       setShowAutocomplete(false);
-    //       setSelectedSuggestionIndex(-1);
-    //     }
-    //   };
-
-    //   // Add event listener with passive option for better performance
-    //   document.addEventListener('mousedown', handleClickOutside, { passive: true });
-    //   document.addEventListener('touchstart', handleClickOutside, { passive: true });
-    
-    //   return () => {
-    //     document.removeEventListener('mousedown', handleClickOutside);
-    //     document.removeEventListener('touchstart', handleClickOutside);
-    //   };
-    // }, []);
 
     const [regions, setRegions] = useState([]);
     const [selectedRegion, setSelectedRegion] = useState("1"); 
-   // const [bounds, setBounds] = useState(null);
+
+    
   
     // Fetch regions data from API
     useEffect(() => {
+       setSelectedRegion(country_idx);
       // Example API URL - replace with your actual API endpoint
       fetch(get_url('country'))
         .then((response) => response.json())
@@ -405,7 +80,7 @@ const SideBar = () => {
           }
         })
         .catch((error) => console.error('Error fetching regions:', error));
-    }, [dispatch]);
+    }, [dispatch,country_idx]);
   
     // Handle region selection
     const handleRegionChange = (e) => {
@@ -425,7 +100,7 @@ const SideBar = () => {
           const ev = new CustomEvent('regionSelected', { detail: { regionId } });
           window.dispatchEvent(ev);
         }
-      } catch (err) {
+      } catch {
         // ignore
       }
   
@@ -511,76 +186,6 @@ const SideBar = () => {
         </Col>
         </Row>
 
-                {/* Station Search Section - Only show when SOFAR layers are active - COMMENTED OUT */}
-        {/* {showStationSearch && (
-          <Row style={{paddingTop:'10px', margin: '0', paddingLeft: '0', paddingRight: '0'}} className="station-search-row">
-            <Col md={12} style={{ paddingLeft: '0', paddingRight: '0' }}>
-              <div ref={autocompleteRef} style={{ position: 'relative', width: '100%' }}>
-                <InputGroup style={{ border: '1px solid rgb(58 59 62)', borderRadius: '20px', overflow: 'visible', width: '100%' }}>
-                  <Form.Control
-                    type="text"
-                    placeholder="Search by station ID"
-                    value={stationSearchId}
-                    onChange={handleStationSearchChange}
-                    onKeyDown={handleStationSearchKeyDown}
-                    onKeyPress={handleStationSearchKeyPress}
-                    style={{ fontSize: '0.875rem', border: 'none', borderRadius: '0',left:'18px' }}
-                  />
-                  <Button
-                    variant="outline-secondary"
-                    onClick={handleStationSearch}
-                    disabled={isSearching}
-                    style={{ fontSize: '0.875rem', border: 'none', borderRadius: '0' }}
-                  >
-                    {isSearching ? (
-                      <div className="spinner-border spinner-border-sm" role="status">
-                        <span className="visually-hidden">Searching...</span>
-                      </div>
-                    ) : (
-                      <FaSearch size={14} />
-                    )}
-                  </Button>
-                </InputGroup>
-                {showAutocomplete && (
-                  <div 
-                    className="autocomplete-dropdown"
-                    style={{
-                      position: 'absolute',
-                      top: '100%',
-                      left: 0,
-                      right: 0,
-                      zIndex: 9999,
-                      maxHeight: '200px',
-                      overflowY: 'auto'
-                    }}
-                  >
-                    {autocompleteSuggestions.length === 0 ? (
-                      <div className="text-center py-2">No results found.</div>
-                    ) : (
-                      autocompleteSuggestions.map((station, index) => (
-                        <div
-                          key={station.id}
-                          className={`autocomplete-item ${index === selectedSuggestionIndex ? 'active' : ''}`}
-                          onClick={() => selectStation(station)}
-                          style={{ cursor: 'pointer' }}
-                        >
-                          <strong>{station.id}</strong>
-                          <span>{station.owner} ({station.status})</span>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                )}
-              </div>
-              {searchError && (
-                <div className="text-danger small mt-1" style={{ fontSize: '0.75rem' }}>
-                  {searchError}
-                </div>
-              )}
-            </Col>
-          </Row>
-        )} */}
-
           <div className="d-flex justify-content-between sidebar-buttons" style={{paddingTop:'10px', gap: '8px'}}>
                                 <Button
                                     variant="btn btn-primary btn-sm rounded-pill"
@@ -628,12 +233,14 @@ const SideBar = () => {
         <MyWorkbench/>
       </Row>
       <SideOffCanvas isVisible={isVisiblecanvas}/>
-      <ExploreModal
-       show={isVisible} 
-       onClose={handleClose} 
-       title="Data Catalogue" 
-       bodyContent="This is the modal body content." 
-       />
+      <React.Suspense fallback={<div>Loading...</div>}>
+        <ExploreModal
+         show={isVisible} 
+         onClose={handleClose} 
+         title="Data Catalogue" 
+         bodyContent="This is the modal body content." 
+         />
+      </React.Suspense>
 
     </div>
   );

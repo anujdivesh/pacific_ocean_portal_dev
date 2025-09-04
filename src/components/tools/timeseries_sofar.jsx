@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef,Suspense } from 'react';
 import { Spinner, Form, Button } from 'react-bootstrap'; 
 import { Line } from 'react-chartjs-2'; 
 import 'chart.js/auto'; 
@@ -7,6 +7,8 @@ import { useAppSelector } from '@/app/GlobalRedux/hooks';
 import Lottie from "lottie-react";
 import animationData from "@/components/lottie/live.json";
 import { get_url } from '@/components/json/urls';
+
+//const Line = lazy(() => import('react-chartjs-2').then((mod) => ({ default: mod.Line })));
 
 const fixedColors = [
   'rgb(255, 87, 51)',
@@ -24,7 +26,7 @@ const getColorByIndex = (index) => {
 function TimeseriesSofar({ height }) {
   const mapLayer = useAppSelector((state) => state.mapbox.layers);
   const lastlayer = useRef(0);
-  const { x, y, sizex, sizey, bbox, station,country_code } = useAppSelector((state) => state.coordinate.coordinates);
+  const { x, y, sizex, sizey, bbox, station,country_code,display_name } = useAppSelector((state) => state.coordinate.coordinates);
   const [chartData, setChartData] = useState({
     labels: [],
     datasets: [],
@@ -275,13 +277,27 @@ function TimeseriesSofar({ height }) {
   }
   //y-axis datasets
   const yLabels = dataLabels.filter(label => label.trim() !== timeLabel);
+    const times = waveData.map(entry => {
+  const time = entry[timeLabel];
+  // If time is ISO string, strip seconds and always append 'Z'
+  if (typeof time === 'string') {
+    // Match "T12:34:56", "T12:34:56.789", "T12:34", etc.
+    // Remove seconds, keep "T12:34", and add 'Z' at the end
+    const match = time.match(/^(.+T\d{2}:\d{2})/);
+    const base = match ? match[1] : time;
+    return base + 'Z';
+  }
+  // If time is a Date object, format as "YYYY-MM-DDTHH:MMZ"
+  const date = new Date(time);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}T${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}Z`;
+});
 
     // X-axis labels (format as UTC)
-    const times = waveData.map(entry => {
+   /* const times = waveData.map(entry => {
       const time = entry[timeLabel];
       const date = new Date(time);      
       return `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getFullYear()).slice(-2)}T${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-    });
+    });*/
       // Y-axis datasets (dynamic)
       const datasets = yLabels.map(label => ({
         label: label.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()), 
@@ -296,63 +312,89 @@ function TimeseriesSofar({ height }) {
   }
 };
 
-  const fetchWaveDataV2 = async (url, setDataFn) => {
-    try {
-      if (!url) {
-        setDataFn([], []);
-        return;
-      }
+  // OLD ERDDAP fetch function (commented out, now using fetchWaveData for all APIs):
+  // const fetchWaveDataV2 = async (url, setDataFn) => {
+  //   try {
+  //     if (!url) {
+  //       setDataFn([], []);
+  //       return;
+  //     }
    
-      setIsLoading(true);
-      const res = await fetch(url, {
-        method: 'GET',
-        mode: 'cors',
-        credentials: 'omit', // Fixes CORS for public ERDDAP
-        headers: {
-          'Accept': 'application/json',
-        },
-      });
+  //     setIsLoading(true);
+  //     const res = await fetch(url, {
+  //       method: 'GET',
+  //       mode: 'cors',
+  //       credentials: 'omit', // Fixes CORS for public ERDDAP
+  //       headers: {
+  //         'Accept': 'application/json',
+  //       },
+  //     });
 
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
+  //     if (!res.ok) {
+  //       throw new Error(`HTTP error! status: ${res.status}`);
+  //     }
 
-      const data = await res.json();
-      const features = data.features;
+  //     const data = await res.json();
+  //     const features = data.features;
 
-      const times = features.map(feature => feature.properties.time);
-      const waveHeights = features.map(feature => feature.properties.waveHs);
-      const peakPeriods = features.map(feature => feature.properties.waveTp);
-      const meanDirections = features.map(feature => feature.properties.waveDp);
+  //     const times = features.map(feature => feature.properties.time);
+  //     const waveHeights = features.map(feature => feature.properties.waveHs);
+  //     const peakPeriods = features.map(feature => feature.properties.waveTp);
+  //     const meanDirections = features.map(feature => feature.properties.waveDp);
 
-      const formattedTimes = times.map(time => {
-        const date = new Date(time);
-        return `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getFullYear()).slice(-2)}T${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-      });
+  //     const formattedTimes = times.map(time => {
+  //       const date = new Date(time);
+  //       return `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getFullYear()).slice(-2)}T${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+  //     });
 
-      setDataFn(formattedTimes, [
-        { values: waveHeights, label: 'Significant Wave Height (m)' },
-        { values: peakPeriods, label: 'Peak Period (s)' },
-        { values: meanDirections, label: 'Mean Direction (degrees)' }
-      ]);
+  //     setDataFn(formattedTimes, [
+  //       { values: waveHeights, label: 'Significant Wave Height (m)' },
+  //       { values: peakPeriods, label: 'Peak Period (s)' },
+  //       { values: meanDirections, label: 'Mean Direction (degrees)' }
+  //     ]);
       
-    } catch (error) {
-      console.log(`Error fetching wave data:`, error);
-      setDataFn([], []);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //   } catch (error) {
+  //     console.log(`Error fetching wave data:`, error);
+  //     setDataFn([], []);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   const setChartDataFn = (times, datasets) => {
 
     // console.log("START LABEL AND VALUE>>>>>>>>>>>>>>>");
 
     // console.log("<<<<<<<<<<< LABEL AND VALUE END");
+    const indices = times.map((t, i) => i);
+  indices.sort((a, b) => {
+    // Parse custom format "DD-MM-YYTHH:MM" as UTC
+    const parseCustom = (str) => {
+      const [datePart, timePart] = str.split('T');
+      const [day, month, year] = datePart.split('-');
+      const [hour, minute] = timePart.split(':');
+      return Date.UTC(
+        parseInt('20' + year), // assumes YY is 25, so 2025
+        parseInt(month) - 1,
+        parseInt(day),
+        parseInt(hour),
+        parseInt(minute)
+      );
+    };
+    return parseCustom(times[a]) - parseCustom(times[b]);
+  });
+
+  const sortedTimes = indices.map(i => times[i]);
+  const sortedDatasets = datasets.map(ds => ({
+    ...ds,
+    values: indices.map(i => ds.values[i])
+  }));
+  //////////////SRTING TIMES///////////////// removed sortedTimes and sortedDatasets
+
     
     setChartData({
-      labels: times,
-      datasets: datasets.map((dataset, index) => {
+      labels: sortedTimes,
+      datasets: sortedDatasets.map((dataset, index) => {
         // console.log(dataset)
         // Filter out -999 values by replacing them with null to create gaps
         const filteredValues = dataset.values.map(value => {
@@ -463,10 +505,15 @@ function TimeseriesSofar({ height }) {
   else{
     if (isCoordinatesValid && mapLayer.length > 0) {
     // Prevent duplicate calls by checking if same URL was called recently (within 1 second)
-    const baseUrl = 'https://erddap.cdip.ucsd.edu/erddap/tabledap/wave_agg.geoJson';
-    const parameters = 'station_id,time,waveHs,waveTp,waveTa,waveDp,latitude,longitude';
-    const waveFlagPrimary = 1;
-    const url = `${baseUrl}?${parameters}&station_id="${station}"&waveFlagPrimary=${waveFlagPrimary}`;
+    // OLD ERDDAP API (commented out):
+    // const baseUrl = 'https://erddap.cdip.ucsd.edu/erddap/tabledap/wave_agg.geoJson';
+    // const parameters = 'station_id,time,waveHs,waveTp,waveTa,waveDp,latitude,longitude';
+    // const waveFlagPrimary = 1;
+    // const url = `${baseUrl}?${parameters}&station_id="${station}"&waveFlagPrimary=${waveFlagPrimary}`;
+    
+    // NEW API using get_url('insitu-station'):
+    const baseUrl = get_url('insitu-station');
+    const url = `${baseUrl}/${station}?limit=${dataLimit}`;
     const now = Date.now();
     
     if (lastRequestRef.current && 
@@ -480,11 +527,15 @@ function TimeseriesSofar({ height }) {
     lastRequestRef.current = { url, timestamp: now };
 
     // console.log('🚀 Making API call (PACIOOS):', url);
-    fetchWaveDataV2(url, setChartDataFn);
+    // OLD: fetchWaveDataV2(url, setChartDataFn);
+    // NEW: Use the same fetch function as non-PACIOOS
+    fetchWaveData(url, setChartDataFn);
 
       if (liveMode && isActive) {
         refreshIntervalRef.current = setInterval(() => {
-          fetchWaveDataV2(url, setChartDataFn);
+          // OLD: fetchWaveDataV2(url, setChartDataFn);
+          // NEW: Use the same fetch function as non-PACIOOS
+          fetchWaveData(url, setChartDataFn);
         }, 1800000);
       }
 
@@ -555,18 +606,19 @@ function TimeseriesSofar({ height }) {
         endDateStr = formatDate(now);
       }
 
-      const baseUrl = 'https://erddap.cdip.ucsd.edu/erddap/tabledap/wave_agg.geoJson';
-      const parameters = 'station_id,time,waveHs,waveTp,waveTa,waveDp,latitude,longitude';
-      const waveFlagPrimary = 1;
+      // Use your API instead of ERDDAP
+      const baseUrl = get_url('insitu-station');
+      const url = `${baseUrl}/${station}?limit=${dataLimit}`;
 
-      // Construct URL with variables
-      const url = `${baseUrl}?${parameters}&station_id="${station}"&time>=${encodeURIComponent(startDateStr)}&time<=${encodeURIComponent(endDateStr)}&waveFlagPrimary=${waveFlagPrimary}`;
-
-      fetchWaveDataV2(url, setChartDataFn);
+      // OLD: fetchWaveDataV2(url, setChartDataFn);
+      // NEW: Use the same fetch function as non-PACIOOS
+      fetchWaveData(url, setChartDataFn);
 
       if (liveMode && isActive) {
         refreshIntervalRef.current = setInterval(() => {
-          fetchWaveDataV2(url, setChartDataFn);
+          // OLD: fetchWaveDataV2(url, setChartDataFn);
+          // NEW: Use the same fetch function as non-PACIOOS
+          fetchWaveData(url, setChartDataFn);
         }, 1800000);
       }
 
@@ -654,7 +706,7 @@ function TimeseriesSofar({ height }) {
             <>
               <Lottie
                 animationData={animationData}
-                style={{ width: 20, height: 20, marginRight: '-4px',marginTop:'-8px' }}
+                style={{ width: 50, height: 50, marginRight: '-12px',marginTop:'-1px' }}
                 loop={true}
               />
               <i className="fas fa-circle" style={{ fontSize: '12px', color: '#28a745', marginRight: '5px' }}></i>
@@ -694,10 +746,49 @@ function TimeseriesSofar({ height }) {
               border: '1px solid var(--color-secondary, #dee2e6)'
             }}
           />
+           <style>
+{`
+  @keyframes pulse-text {
+    0% {
+      transform: scale(1);
+      color: #1e90ff;
+      text-shadow: 0 0 8px #1e90ff80;
+    }
+    50% {
+      transform: scale(1.16);
+      color: #1976d2;
+      text-shadow: 0 0 20px #1e90ff;
+    }
+    100% {
+      transform: scale(1);
+      color: #1e90ff;
+      text-shadow: 0 0 8px #1e90ff80;
+    }
+  }
+  .pulse-utc {
+    display: inline-block;
+    animation: pulse-text 1.4s infinite;
+    font-weight: bold;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+    padding-left: 10px;
+    padding-top: 14px;
+    color: #1e90ff;
+    text-shadow: 0 0 6px #1e90ff80;
+  }
+`}
+</style>
+  <p style={{paddingLeft:10, paddingTop:14, fontSize:13, fontWeight:'bold'}}>
+          Station Name: {display_name}
+
+        </p>
+         
         </div>
+      
 
         {/* Date controls moved to far right */}
         <div style={{ display: 'flex', alignItems: 'center', marginLeft: 'auto', color: 'var(--color-text, #181c20)' }}>
+               
           <span style={{ fontSize: '12px', marginRight: '6px' }}>Start:</span>
           <Form.Control
             type="date"
@@ -854,6 +945,11 @@ function TimeseriesSofar({ height }) {
           // Build the scales object
           const scales = {
             x: {
+              title: {
+      display: true,
+      text: 'Time (UTC)',
+      color: textColor,
+    },
               ticks: {
                 display: true,
                 maxRotation: 45,
@@ -874,40 +970,42 @@ function TimeseriesSofar({ height }) {
           });
 
           return (
-            <Line
-              data={chartData}
-              options={{
-                maintainAspectRatio: false,
-                responsive: true,
-                scales: scales,
-                interaction: {
-                  mode: 'index',
-                  intersect: false,
-                },
-                plugins: {
-                  tooltip: {
-                    backgroundColor: isDarkMode ? '#2d3748' : 'rgba(0,0,0,0.8)',
-                    titleColor: isDarkMode ? '#ffffff' : '#fff',
-                    bodyColor: isDarkMode ? '#ffffff' : '#fff',
-                    borderColor: isDarkMode ? '#4a5568' : '#ccc',
-                    borderWidth: 1,
-                    callbacks: {
-                      label: function(context) {
-                        return `${context.dataset.label}: ${context.parsed.y}`;
-                      }
-                    }
+            <Suspense fallback={<Spinner animation="border" />}>
+              <Line
+                data={chartData}
+                options={{
+                  maintainAspectRatio: false,
+                  responsive: true,
+                  scales: scales,
+                  interaction: {
+                    mode: 'index',
+                    intersect: false,
                   },
-                  legend: {
-                    labels: {
-                      color: textColor,
-                      font: {
-                        weight: 'normal'
+                  plugins: {
+                    tooltip: {
+                      backgroundColor: isDarkMode ? '#2d3748' : 'rgba(0,0,0,0.8)',
+                      titleColor: isDarkMode ? '#ffffff' : '#fff',
+                      bodyColor: isDarkMode ? '#ffffff' : '#fff',
+                      borderColor: isDarkMode ? '#4a5568' : '#ccc',
+                      borderWidth: 1,
+                      callbacks: {
+                        label: function(context) {
+                          return `${context.dataset.label}: ${context.parsed.y}`;
+                        }
+                      }
+                    },
+                    legend: {
+                      labels: {
+                        color: textColor,
+                        font: {
+                          weight: 'normal'
+                        }
                       }
                     }
                   }
-                }
-              }}
-            />
+                }}
+              />
+            </Suspense>
           );
         })()}
       </div>

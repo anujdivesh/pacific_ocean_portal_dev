@@ -33,6 +33,7 @@ import { CiCircleChevLeft, CiCircleChevRight } from "react-icons/ci";
 import { HiMenuAlt3, HiX } from "react-icons/hi";
 import { get_url } from '@/components/json/urls';
 import BottomOffCanvas from '../tools/bottom_offcanvas';
+import { IoMdArrowDropdown } from "react-icons/io";
 
 function Navigationbar({ children }) {
   // Default to light mode
@@ -541,7 +542,7 @@ function Navigationbar({ children }) {
                     fontSize: '14px'
                   }}
                 >
-                  Login <span style={{ fontSize: '10px' }}>▼</span>
+                  Login <span style={{marginLeft:-1,fontSize: 15}}><IoMdArrowDropdown /></span>
                 </button>
               </div>
             )}

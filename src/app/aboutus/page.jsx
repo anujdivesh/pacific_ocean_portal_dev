@@ -25,10 +25,10 @@ const Aboutus = () => {
     ];
     
     // Technical partners data
-    const technicalPartners = [
+        const technicalPartners = [
         {
             name: "Bureau of Meteorology Australia (BOM)",
-            logo: "/logos/BOM1.png",
+            logo: "/logos/Bureaulogo1.png",
             description: "The Bureau of Meteorology (BOM) is Australia's national weather, climate, and water agency. ",
             website: "http://www.bom.gov.au/"
         },
@@ -40,7 +40,7 @@ const Aboutus = () => {
         },
         {
             name: "National Institute of Water and Atmospheric Research (NIWA)",
-            logo: "/logos/NIWA1.png",
+            logo: "/logos/NIWAES.png",
             description: "NIWA, the National Institute of Water and Atmospheric Research, is a Crown Research Institute established in 1992.",
             website: "https://niwa.co.nz/"
         },
@@ -50,14 +50,12 @@ const Aboutus = () => {
             description: "The principal scientific and technical organization in the Pacific region, supporting development since 1947.",
             website: "https://www.spc.int/"
         },
-        
         {
             name: "Pacific Regional Environment Programme (SPREP)",
             logo: "/logos/SPREP.png",
             description: "SPREP is charged with protecting and managing the environment and natural resources of the Pacific.",
             website: "https://www.sprep.org/"
         }
-        
     ];
 
     return (
