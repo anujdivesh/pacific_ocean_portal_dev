@@ -10,9 +10,8 @@ const mapSlice = createSlice({
     bounds:null,
     layers: [],
     basemap: {
-      //url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png',
-      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-      //url: get_url('geowebcache')+'/basemap/{z}/{x}/{y}.png',
+      //url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      url: 'https://ocean-plotter.spc.int/plotter/cache/basemap/{z}/{x}/{y}.png',
       attribution: '&copy; Pacific Community SPC',
       dataLimit: 100, // Default data limit,
       option:'bing'
@@ -31,9 +30,9 @@ const mapSlice = createSlice({
       layer: 'geonode:pacific_coastlines',
     },
     citynamesoverlay: {
-      url:"https://ocean-plotter.spc.int/plotter/proxy?url=https://geonode.pacificdata.org/geoserver/gwc/service/tms/1.0.0/geonode:pac_city_names@EPSG:3857@pbf/{z}/{x}/{-y}.png",
+      url:"https://ocean-plotter.spc.int/plotter/proxy?url=https://geonode.pacificdata.org/geoserver/gwc/service/tms/1.0.0/geonode:pacific_names@EPSG:3857@pbf/{z}/{x}/{-y}.png",
       //url: 'https://geonode.pacificdata.org/geoserver/geonode/pac_city_names/ows',
-      layer: 'geonode:pac_city_names',
+      layer: 'geonode:pacific_names',
     },
     /*
     citynamesoverlay: {
