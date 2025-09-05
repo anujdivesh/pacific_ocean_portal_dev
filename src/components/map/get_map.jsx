@@ -920,7 +920,7 @@ const MapBox = () => {
         zoom: zoom,
         zoomControl: false, // We'll add custom zoom control
         maxBounds: maxBounds,
-        maxZoom: 18,
+        maxZoom: 10,
         minZoom: 2,
         attributionControl: false,
         zoomSnap: 0.5,
@@ -2280,7 +2280,7 @@ const MapBox = () => {
           basemapObj = {
             url: 'https://ocean-plotter.spc.int/plotter/cache/basemap/{z}/{x}/{y}.png',
             attribution: '© Pacific Community SPC | Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
-            maxZoom: 18,
+            maxZoom: 10,
             minZoom: 2,
             option:value
           };
